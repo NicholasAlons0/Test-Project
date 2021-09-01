@@ -1,4 +1,6 @@
-# 1.	Study Group: Thakur Grimire, Bolina Oxilus, Diep Luu, Joel Rosas.
+# Question 1 
+# Study Group: Thakur Grimire, Bolina Oxilus, Diep Luu, Joel Rosas.
+# Question 3
 die <- 1:6
 dice <- sample(die, size = 20, replace = TRUE)
 roll <- function(){
@@ -17,11 +19,15 @@ dicew <- sample(die, size = 20, replace = TRUE,
 list(dice,dicew)
 6 6 4 6 6 6 6 6 1 6 3 3 5 3 6 6 6 6 6 6
 1 5 5 6 1 4 5 5 4 2 6 6 6 6 2 4 3 1 2 4
-# Number 4	The average age for women is: 42.72 years.
+
+# Question 4
+# The average age for women is: 42.72 years.
 # The average age for men is: 40.35 years.
 # Something interesting that I found in the data was the mean travel time to work was 25.2571 minutes. But what I found even more surprising was the median travel time to work was 20 minutes. 
 mean(TRANTIME)
+25.2571
 median(TRANTIME)
+20
 x <- 1:50
 w <- 1 + sqrt(x)/2
 example1 <- data.frame(x=x, y= x + rnorm(x)*w)
