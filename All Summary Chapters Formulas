@@ -1,0 +1,82 @@
+# Test-Project
+#Chapter 3
+#3.1 Measures Of Center (Sample Mean, Median and Mode)
+list <- c(0,3,7,-10,11,-11)
+mean(list)
+median(list)
+#mode there is no R function, so we will use calculator.
+#go to stat, go to edit, then enter your list of numbers.
+#Then go to stat again and enter SortA(,finally hit 2nd then 1 for the L1 button.
+
+#Example: using mean to find data value
+Malachi has just received his monthly credit card statement. He placed 8 charges 
+on his card in the last month with a mean of $39.74 per charge. He knows that 7 of the charges were as follows:
+$34.82,$36.46,$39.02,$42.98,$40.22,$40.61,$42.75
+Determine the amount of the 8th charge.
+#Solve for x.
+39.74=(34.82+36.46+39.02+42.98+40.22+40.61+42.75+x)/8
+#add the values on the right side and multiply 8 on both sides.
+39.74*8=276.86+x
+317.92=276.86+x
+#Subtract 276.86 from both sides
+41.06=x
+
+# 3.2 Measures Of Dispersion (Range,Population Varience,Population Standard Deviation,
+#Sample Varience, Sample Standard Deviation and Coefficient Of Variation)
+
+# how to calculate range
+max(list)-min(list)
+#How to calculate population varience
+var(list)*((n-1)/n)
+#How to calculate population standard deviation
+sqrt(var(list)*((n-1)/n))
+#How to calculate sample varience
+var(list)
+#How to calculate sample standard deviation
+sqrt(var(list))
+#How to calculate coefficient of variation
+(sqrt(var(list))/mean(list))*100
+
+# Example: use values to calculate range, pop VAR, pop SD and CV.
+
+x <- c(14,11,6,17,18,7,14,11,9,10)
+max(x)-min(x)=12
+var(x)*((10-1)/10)=14.41
+sqrt(var(x)*((10-1)/10))=3.796051
+(sqrt(var(x))/mean(x))*100=34.1999
+
+# 3.3 Measures Of Relative Position (Location of Data For the Pth Percentile)
+
+#How to calculate location of data for the Pth percentile
+n*(P/100)
+# Calculate Pth percentile of a data value
+(l/n)*100
+#To find QUANTILES use calculator, stat, edit, enter values, var-1 stats
+#Interquartile range
+Q3-Q1=IQR
+#calculate z-score
+(x-u)/o
+
+# Example: Given the following data, find the diameter that represents the 36th percentile.
+15*(36/100)=5.4 # round to the next highest integer.
+5.4 = 6 
+x <- c(1.35,1.62,1.32,1.52,1.59,1.65,1.48,1.65,1.49,1.62,1.48,1.65,1.67,1.48,1.61)
+sort(x)
+# 1.32 1.35 1.48 1.48 1.48 "1.49" 1.52 1.59 1.61 1.62 1.62 1.65 1.65 1.65
+# The 6th on the list is "1.49", so that value represents the 36th percentile.
+
+
+
+#Chapter 4
+#4.1 Intro to probability
+# Example: Out Of ten coin flips, what is the probability of getting all heads
+dbinom(10,10,.5)=0.0009765625
+
+#4.2 Addition Probability
+#A box contains 11 large marbles and 11 small marbles. Each marble is either green or white. 6 of the large marbles are green, and 4 of the small marbles are white. 
+#If a marble is randomly selected from the box, what is the probability that it is small or green? Express your answer as a fraction or a decimal number rounded to four decimal places.
+#So we add up 6LG,5LW,4SW7SG for the total, them add 6,4 and 7. Finally,
+#Divide that by the total.
+6+5+4+7=22
+6+4+7=17
+17/22=0.7727273
