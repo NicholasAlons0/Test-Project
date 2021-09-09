@@ -53,7 +53,32 @@ dice.roll.sample Freq
 #I am somewhat confident in my conclusion, the adjustments I would make if I were to do EP2, I would want to create a level of significance, find the p-values and compare them to better support or deny my hypothesis. 
 
 #EP2 
-#The expected value 
-#
+#The expected value #Hypothesis the probability of the value of 6 is less than or equal to 0.167?
+#copy from other git, swap the n values, for prop test do the frequency table instead of ggplot
 dice.roll.sample2 <- sample(x = 1:6, size = 1000, replace = TRUE)
 as.data.frame(table(dice.roll.sample2))
+dice.roll.sample2    Freq
+1                 1  170
+2                 2  155
+3                 3  169
+4                 4  165
+5                 5  177
+6                 6  164
+
+prop.test(164,1000,p=0.167,alternative = "less")
+
+1-sample proportions test with continuity correction
+
+data:  164 out of 1000, null probability 0.167
+X-squared = 0.044928, df = 1, p-value = 0.4161
+alternative hypothesis: true p is less than 0.167
+95 percent confidence interval:
+  0.0000000 0.1846839
+sample estimates:
+  p 
+0.164 
+#since the pvalue is greater than the level of sigificance, we fail to reject the null hypothesis.
+#the frequency of 6, diveied by the sample size will equal the probability
+#WE STILL NEED TO FIND P VALUE OR REJECTION REGION, WE KNOW THIS IS NOT STATISTICALLY SIGNIFICANT.  
+164/1000=0.164
+
