@@ -1,4 +1,3 @@
-
 # PP1 Concluded die is fair because a 3 was rolled. The probability that it would be judged unfair is 1/6 chance.
 #If he dice were unfair, the chance that it would be judged fair is a 5/6 chance.
 unfair <- 1/6
@@ -53,8 +52,8 @@ dice.roll.sample Freq
 #I am somewhat confident in my conclusion, the adjustments I would make if I were to do EP2, I would want to create a level of significance, find the p-values and compare them to better support or deny my hypothesis. 
 
 #EP2 
-#The expected value #Hypothesis the probability of the value of 6 is less than or equal to 0.167?
-#copy from other git, swap the n values, for prop test do the frequency table instead of ggplot
+#The null hypothesis is the p1=p2=p3=p4=p5=p6. The alternative hypothesis is the probability of the value of 6 is less than 0.167?
+#We will use a confidence level of 95%.
 dice.roll.sample2 <- sample(x = 1:6, size = 1000, replace = TRUE)
 as.data.frame(table(dice.roll.sample2))
 dice.roll.sample2    Freq
@@ -77,8 +76,7 @@ alternative hypothesis: true p is less than 0.167
 sample estimates:
   p 
 0.164 
-#since the pvalue is greater than the level of sigificance, we fail to reject the null hypothesis.
-#the frequency of 6, diveied by the sample size will equal the probability
-#WE STILL NEED TO FIND P VALUE OR REJECTION REGION, WE KNOW THIS IS NOT STATISTICALLY SIGNIFICANT.  
-164/1000=0.164
+#Although the sample estimates a probability of 0.164(which agrees with the statement of the alternative hypothesis), the p-value is greater than the level of significance.
+# p-value>level of significance= 0.4161>0.05
+# Therefore we fail to reject the null hypothesis, at 95% confidence, we can't provide enough evidence to support our assumption that the probability of the value 6 is less than 0.167.
 
