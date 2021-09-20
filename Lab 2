@@ -1,0 +1,256 @@
+#Firstly, we create variables for the ages of those with majors of Fine Arts & Liberal Arts and Humanities, where there will be two separate samples of people. One will consist of only those that have degrees in Fine Arts and the other will consist of those that have degrees in Liberal Arts and Humanities.
+
+finearts <- acs2017_ny$AGE[(acs2017_ny$DEGFIELD == "Fine Arts")]
+libart_huma <- acs2017_ny$AGE[(acs2017_ny$DEGFIELD == "Liberal Arts and Humanities")]
+#Now we will check the summaries of the variables.
+length(finearts)
+3491
+length(libart_huma)
+779
+#In the $DEGFIELD category, we know there are 3491 people in fine arts and 779 people in Liberal Arts and Humanities.
+
+#Then we create the variables for the industries of art, retail, entertainment, accommodation and restaurants.
+acs2017_ny$IND_8560 <- as.numeric(levels(acs2017_ny$IND))[acs2017_ny$IND]
+acs2017_ny$Covid_risk <- ((acs2017_ny$IND_8560 > 4600) & acs2017_ny$IND_8560 < 6000) | ((acs2017_ny$IND_8560 > 8500) & (acs2017_ny$IND_8560 < 8700))
+
+#We created variables for fine arts and liberal arts majors that work in the industries affected by COVID.
+covid_risk_finarts <- acs2017_ny$Covid_risk [ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$Covid_risk == TRUE)]
+773
+covid_risk_libarts <- acs2017_ny$Covid_risk[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$Covid_risk == TRUE )]
+96
+# So now we have the the people that were in industries that were affected by unemployment that were fine arts majors and the liberal arts majors.
+
+#Next we will find the the males and the females for both of the majors.
+gender_covid_finearts <- acs2017_ny$female [ ( acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$Covid_risk)]
+female_gender_finearts <- length(which(gender_covid_finearts == 1))
+male_gender_finearts <- length(which(gender_covid_finearts == 0))
+
+gender_covid_libarts <- acs2017_ny$female [ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$Covid_risk )]
+female_gender_libart <- length(which(gender_covid_libarts == 1))
+male_gender_libart <- length(which(gender_covid_libarts == 0))
+
+female_gender_finearts+male_gender_finearts
+female_gender_libart+male_gender_libart
+list(gender_covid_finearts)
+list(gender_covid_libarts)
+#I was looking to the genders, and an interesting thing I found was that when I added both the male and female numbers, they did not add up to the total.
+# So I ran the list I saw genders that were NA, I will assume that those people did not identify as either male or female (part of the lgbtq), or it might have been an error in data entry. If I had to choose, I would say it is the former.
+#Then, I subtracted the total length of the variable from the combination of the female and male genders to obtain the number of unknown genders.
+length(gender_covid_finearts)-(female_gender_finearts+male_gender_finearts)
+15
+15/773
+length(gender_covid_libarts)-(female_gender_libart+male_gender_libart)
+1
+1/96
+#Finally divide the total amount of by NA to get the percent of unknown genders for workers in Covid affected industries that are Fine Arts and Liberal Arts Majors.
+# 1 Percent of NA gender Fine Arts
+# 2 Percent of NA gender Liberal Arts
+
+#Now we will search for Japanese Fine Arts Majors.
+race_finearts <- (acs2017_ny$RACE[ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$Covid_risk )])
+race_japanese_finearts <- length(which(race_finearts == 5))
+9/773
+0.01164295
+# The percentage of Japanese people was obtained by dividing the number of Japanese people by the total of those who have degrees in Fine Arts and were at risk for unemployment due to COVID.
+# Resulting in about 1 percent of Japanese in this variable.
+
+# Now we will check the amount for Japanese Liberal Arts and Humanities majors.
+race_libart <- (acs2017_ny$RACE[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$Covid_risk)])
+race_japanesse_libart <- length(which(race_libart == 5))
+0/96
+0
+#In this case of Liberal Arts majors, the proportion of Japanese people is 0. Although the proportion of Japanese people should be small, it should not be non existent. The reason there is 0 Japanese is most likely due to the very small sample of 96.
+#To prove this point we will increase the sample size by eliminating the subcategory of the unemployment in industries affected by COVID.
+race_libart_no_covid <- (acs2017_ny$RACE[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities")])
+race_japanesse_libart_nocovid <- length(which(race_libart_no_covid == 5))
+# Indeed, while we only find 5 Japanese people, they are nonetheless part of this larger sample.
+
+
+#Now for the difference in the proportion to specific neighborhoods of Manhattan.
+#As you can see below, the numbers on the left hand side are the code used to describe the people that live in those areas. 
+# By coding a search for the number in between 3800 and 3811, it will show everyone in those neighborhoods that has a degree in Fine Arts and live in the listed neighborshoods of Manhattan.  
+
+#3801,"NYC-Manhattan CD 12--Washington Heights, Inwood & Marble Hill"
+#3802,"NYC-Manhattan CD 9--Hamilton Heights, Manhattanville & West Harlem"
+#3803,NYC-Manhattan CD 10--Central Harlem
+#3804,NYC-Manhattan CD 11--East Harlem
+#3805,NYC-Manhattan CD 8--Upper East Side
+#3806,NYC-Manhattan CD 7--Upper West Side & West Side
+#3807,"NYC-Manhattan CD 4 & 5--Chelsea, Clinton & Midtown Business District"
+#3808,"NYC-Manhattan CD 6--Murray Hill, Gramercy & Stuyvesant Town"
+#3809,NYC-Manhattan CD 3--Chinatown & Lower East Side
+#3810,"NYC-Manhattan CD 1 & 2--Battery Park City, Greenwich Village & Soho"
+
+#Additionally, using the number of people from the created variable divide by the total number for this variable, we can get the percentage of those that live in these neighborhoods.
+neighboorhoods_manhattan_finearts <- (acs2017_ny$PUMA[ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$PUMA > 3800 & acs2017_ny$PUMA < 3811 & acs2017_ny$Covid_risk) ] ) 
+158/773
+0.2043984
+
+neighboorhoods_manhattan_liberal_arts <- (acs2017_ny$PUMA[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$PUMA > 3800 & acs2017_ny$PUMA < 3811 & acs2017_ny$Covid_risk) ] ) 
+10/96
+0.1041667
+# According to the variables above, there are 20 percent of Fine Arts majors live in the listed neighborhoods in the Manhattan, but inly 10 percent of Liberal arts majors do.
+# Comparing the percentages for the proportion of Fine Arts and Liberal Arts and Humanities majors that live in these neighborhoods, however there are proportionally more Fine Arts majors than Liberal Arts majors in Manhattan.
+
+
+# The additional restrictions that we will impose when comparing a subgroup are that they are employed, are younger that 66 and are part of the risk industries affected by COVID.
+#IMPORTANT!!!!!!! (you can delete important when your done.
+finart_employed_under66 <- (acs2017_ny$Covid_risk[ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$AGE < 66 & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Covid_risk == TRUE)])
+
+
+
+test_subgroup <- glm(acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$Covid_risk == TRUE ~ acs2017_ny$AGE < 66 + acs2017_ny$EMPSTAT + acs2017_ny$RACE + acs2017_ny$MARST + acs2017_ny$FAMSIZE + acs2017_ny$FUELHEAT)
+
+# In the console we can see the estimates, which we can compare to get the difference in outcome, as well as the standard error of difference measure.
+
+#Then we have our 97.5% confidence level.
+confint(test_subgroup)
+
+
+
+#Important, must have same lengths
+#THIS WORKS...
+lm(covid_risk_libarts ~ libart_huma +gender_libart)
+#THIS WORKS!!!!!!!!!!!!!!!!!!
+glm(acs2017_ny$DEGFIELD == "Fine Arts" ~ acs2017_ny$AGE + acs2017_ny$RACE)
+summary(glm(acs2017_ny$DEGFIELD == "Fine Arts" ~ acs2017_ny$AGE +  acs2017_ny$RACE))
+
+
+
+
+# Now, to calculate the standard error of the difference we use this formulas. SE x1-x2 = sqrt [ s1^2 / n1 + s2^2 / n2 ]
+sqrt(sd(finearts)^2 +sd(finart_employed_under66)^2)
+
+(sd(finearts)^2)/3491 +(sd(finart_employed_under66)^2)/2502
+standard_error <- sqrt(0.1326654)
+0.3642326
+# So the standard error of the difference of the group and the subgroup for Fine Arts is 0.364.
+# Now we will set up a confidence interval of 99% for the sub group.
+# First, we will find the margin of error using, critical value*standard error.
+# Looking at a t-table we find that with a confidence of 99% and a degrees of freedom of 2501, the critical value is
+2.576*standard_error
+margin_error_ <-0.9382632
+#Thus we have a margin of error of 0.9382632.
+# We use the difference between the population means:
+mean(finart_employed_under66)
+mean(finearts)
+44.16586+39.34253
+83.50839/2
+point_estimate <- 41.7542
+
+# Finally, we add and subtract the margin of error from the confidence intervals.
+point_estimate+margin_error_
+42.69246
+point_estimate-margin_error_
+40.81594
+#Resulting in a confident interval of:
+#(40.81594, 42.69246)
+
+# When the mean ages of Fine Arts majors from the original group and sub group differ, it is approximately by 0.94 years.
+# There difference is there, but the difference is small as can by seen that the margin of error is less than 1.
+
+
+# We have created two new subsets to make the cross table more simple, one Liberal Arts and Humanities marital status, that are under 66 and are employed, while the other is Liberal Arts and Humanities race, that are under 66 and are employed.
+marst_libart_employed_under66 <- (acs2017_ny$MARST[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$AGE < 66 & acs2017_ny$EMPSTAT == 1)])
+race_libart_employed_under66 <- (acs2017_ny$RACE[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$AGE < 66 & acs2017_ny$EMPSTAT == 1)])
+#The total number of people in both samples are 456, they also have attributes that overlap, so we can make a cross table.
+cross_table <- CrossTable(marst_libart_employed_under66,race_libart_employed_under66)
+
+apply(marst_libart_employed_under66,1,sum)
+
+# By using the cross tabs with the are married with their spouse present we observe that 0.388 of people are both white and married.
+#As mentioned before, by using the cross tables to compute for marginal probabilities of someone that is married with their spouse present and is white is 0.388, or about 39 out of 100 chance.
+# In other words, the probability that someone is married, given that they are white is 0.388.
+0.388 
+#However, this way is INCORRECT.
+# We must get the probabilities using Bayes Theorem with the hypothesis stating that a fine arts major is married person with their spouse present given that they are white.
+# First we need the probability of just white people, which can be seen in the cross table at the bottom of the first column that the total proportion of white people is 0.7.
+# We will call this P_H.
+P_of_H <- 0.70
+# Next we will use the proportion of people that are married, given that they are white is 0.388, which is in the first row and first row.
+# We will call this P_E | H
+P_of_E_given_H <- 0.388
+# Two more values are needed, one of them is the total proportion that are not white, so the total number of white people, 319, is subtracted from  the total number of people are 456 to get 137.
+456-319
+# With 137 with divide that by 456 to get that total proportion of that are not white, which is 0.3004386.
+137/456
+0.3004386
+# The variable will be named P_not_H.
+P_not_H <- 0.3004386
+#Then we look for the proportion of people that are married with a spouse present and are not white which is 65/242 because we subtract the number of white people that are married with their spouses,which is 177, from the total amount of of married people with their spouses.
+242-177
+65
+#So we divide that by the total number of married people with their spouses which gives us 0.268595.
+65/242
+0.268595
+# Naming the proportion of people that are married with a spouse present and are not white P_of_E_given_not_H.
+P_of_E_given_not_H <- 0.268595
+#Thus by using Bayes Theorem, the probability that a fine arts major is married with a spouse given that they are white is 0.7709419.
+P_of_H*P_of_E_given_H/((P_of_H*P_of_E_given_H)+(P_not_H*P_of_E_given_not_H))
+0.700*0.388/((0.700*0.388) + (0.3004386*0.268595))
+0.7709419
+#Initially, I had computed the probability wrong, however, using Bayes Theorem it is much more accurate.
+# The table is not mutually exclusive nor it is exhaustive.
+# The probability informs that there is a high likelihood of a Fine Arts major with their spouse and is white but the probability of someone that is not married with their spouse present and is not white is unlikely.
+
+
+# Factors that could have influenced the difference in outcome were the size of the Fine Arts group is more than 3 times than the Liberal Arts and Humanities group. Another difference is the proportion of 4 year degree students in Fine arts that live in Manhattan is nearly twice as much as those the Liberal Arts majors that live in Manhattan, which is shown below.
+74/779
+607/3491
+# A potential confounding variable that could have made the size of those that live in Manhattan that were Fine Arts majors larger than those of the Liberal Arts and Humanities majors was the high school where the Fine Arts majors graduate from had more networking opportunities with the Fine Arts schools, thus easier access to admissions and ultimately more of them were able to easier.
+# Another potential confounding variable the difficulty of the Liberal Arts and Humanities major was much higher than that of Fine Arts, thus less people are likely to enroll and more people are likely to fail, ultimately less people will have the degree.
+
+educat_neighboorhoods_manhattan_finearts <- (acs2017_ny$EDUC[ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$PUMA > 3800 & acs2017_ny$PUMA < 3811 & acs2017_ny$educ_advdeg) ] ) 
+educat_neighboorhoods_manhattan_liberal_arts <- (acs2017_ny$EDUC[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$PUMA > 3800 & acs2017_ny$PUMA < 3811 & acs2017_ny$educ_advdeg) ] ) 
+
+e_ducat_neighboorhoods_manhattan_finearts <- (acs2017_ny$AGE[ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$PUMA > 3800 & acs2017_ny$PUMA < 3811 ) ] ) 
+e_ducat_neighboorhoods_manhattan_liberal_arts <- (acs2017_ny$AGE[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$PUMA > 3800 & acs2017_ny$PUMA < 3811) ] ) 
+
+summary(educat_neighboorhoods_manhattan_finearts)
+summary(educat_neighboorhoods_manhattan_liberal_arts)
+196/607
+0.3228995 #proportion of fine arts major that live in neighborhoods in Manhattan that have advance degrees.
+35/74
+0.472973 #proportion of liberal art and humanities major that live in neighborhoods in Manhattan that have advance degrees
+# Comparing the educational attainments, based on the neighborhoods previously listed for Manhattan, we can see the that a higher proportion of Liberal Arts majors pursued and advance degree.
+
+
+#Additional evidence that we can look at to show the differences is comparing the means of Hispanic from the Fine Arts and Liberal Arts and Humanities that do and do not have advance education.
+finart_hispanic_advdeg <- acs2017_ny$educ_advdeg[(acs2017_ny$DEGFIELD == "Fine Arts")&(acs2017_ny$HISPAN)]
+libart_hispanic_advdeg <- acs2017_ny$educ_advdeg[(acs2017_ny$DEGFIELD == "Liberal Arts and Humanities")&(acs2017_ny$HISPAN)]
+
+lenght_finart_hispanic_advdeg <- length(which(finart_hispanic_advdeg == 1))
+59 #amount of people for this variable
+lenght_libart_hispanic_advdeg <- length(which(libart_hispanic_advdeg == 1))
+16 #amount of people for this variable
+59/225
+0.2622222 #proportion of Hispanic in fine arts with advanced degrees.
+16/69
+0.2318841 #proportion of Hispanic in liberal arts and humanities with advanced degrees.
+# The conclusion is that the proportion of Hispanics that have advanced degrees in both groups are similar to one another.
+# The confidence of the conclusions made would be 95%, with the other conclusion that I will be drawn from this evidence is the confidence interval.
+# The null hypothesis is that there is no difference between the proportion of those that have advanced degrees from the fine arts and lib art majors.
+degree_table <- matrix(c(59,166,16,53), ncol = 2, byrow = TRUE)
+row.names(degree_table) <- c("Fine Arts","Liberal Art")
+colnames(degree_table) <- c("Advance Deg", "All")
+degree_table=as.table(degree_table)
+degree_table
+
+barplot(degree_table, beside = TRUE)
+text(1.5,73,"Fine Art")
+text(2.5,25,"Lib Art")
+text(4.5, 160, "Fine Art")
+text(5.5,70, "Lib Art")
+
+prop.test(degree_table,alternative = "greater")
+z <- sqrt(0.12103)
+z
+0.3478937
+#z value of 0.3478937.
+# Since our confidence is 95%, our z test value would be 1.645.
+# Since the z value is less that 1.645, we fail to reject the null hypothesis.
+#Alpha 1- 0.95= 0.05.
+# p > alpha
+# p-value = 0.364
+# This is NOT statistically significant.
+#Therefore, we fail to reject the null hypothesis that there is no difference between proportion of advance degrees between fine arts and liberal arts majors.
