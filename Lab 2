@@ -89,109 +89,64 @@ neighboorhoods_manhattan_finearts <- (acs2017_ny$PUMA[ (acs2017_ny$DEGFIELD == "
 neighboorhoods_manhattan_liberal_arts <- (acs2017_ny$PUMA[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$PUMA > 3800 & acs2017_ny$PUMA < 3811 & acs2017_ny$Covid_risk) ] ) 
 10/96
 0.1041667
-# According to the variables above, there are 20 percent of Fine Arts majors live in the listed neighborhoods in the Manhattan, but inly 10 percent of Liberal arts majors do.
+# According to the variables above, there are 20 percent of Fine Arts majors live in the listed neighborhoods in the Manhattan, but only 10 percent of Liberal arts majors do.
 # Comparing the percentages for the proportion of Fine Arts and Liberal Arts and Humanities majors that live in these neighborhoods, however there are proportionally more Fine Arts majors than Liberal Arts majors in Manhattan.
 
 
-# The additional restrictions that we will impose when comparing a subgroup are that they are employed, are younger that 66 and are part of the risk industries affected by COVID.
-#IMPORTANT!!!!!!! (you can delete important when your done.
-finart_employed_under66 <- (acs2017_ny$Covid_risk[ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$AGE < 66 & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Covid_risk == TRUE)])
+# The additional restrictions that we will impose when comparing a subgroup are that they are employed, Hispanic and are part of the risk industries affected by COVID.
+#We will be using their mean rent.
+finearts_employed_HISPAN_covidrisk <- mean(acs2017_ny$RENT[ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Hispanic & acs2017_ny$Covid_risk)])
+
+libarts_employed_HISPAN_covidrisk <- mean(acs2017_ny$RENT[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Hispanic & acs2017_ny$Covid_risk)])
+#Difference in sample size.
+difference_in_means <- paste(finearts_employed_HISPAN_covidrisk,libarts_employed_HISPAN_covidrisk)
+
+size_finearts_employed_HISPAN_covidrisk <- length(acs2017_ny$RENT[ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Hispanic & acs2017_ny$Covid_risk)])
+size_libarts_employed_HISPAN_covidrisk <- length(acs2017_ny$RENT[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Hispanic & acs2017_ny$Covid_risk)])
+
+# Now, to calculate the standard error of the difference we use this formulas. SED = sqrt(SEM_1^2+ SEM2^2)
+#Standard error of mean for fine arts and liberal arts majors.
+
+standard_error_finearts <- std.error(acs2017_ny$RENT[ (acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Hispanic & acs2017_ny$Covid_risk)])
+standard_error_liberarts <-std.error(acs2017_ny$RENT[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Hispanic & acs2017_ny$Covid_risk)])
+
+standard_error_of_difference <- sqrt(standard_error_finearts^2 + standard_error_liberarts^2)
+list(standard_error_of_difference)
+269.4997
 
 
+ggplot(age_finearts_rentover1000_HISPAN,age_libarts_rentover1000_HISPAN)
+aes(age_finearts_rentover1000_HISPAN,age_libarts_rentover1000_HISPAN)
 
-test_subgroup <- glm(acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$Covid_risk == TRUE ~ acs2017_ny$AGE < 66 + acs2017_ny$EMPSTAT + acs2017_ny$RACE + acs2017_ny$MARST + acs2017_ny$FAMSIZE + acs2017_ny$FUELHEAT)
 
+test_subgroup <- glm(acs2017_ny$DEGFIELD == "Fine Arts" & acs2017_ny$Covid_risk == TRUE ~ acs2017_ny$EMPSTAT == 1 & acs2017_ny$Hispanic & acs2017_ny$Covid_risk)
+
+coef(test_subgroup)
 # In the console we can see the estimates, which we can compare to get the difference in outcome, as well as the standard error of difference measure.
-
-#Then we have our 97.5% confidence level.
 confint(test_subgroup)
+#Then we have our 97.5% confidence level.
+residuals(test_subgroup)
+summary(test_subgroup)
+#Now, we will calculate some of the marginal probabilities from Liberal Arts majors in the COVID affected sectors based on marital status and race.
+marst_libart_employed_under66 <- (acs2017_ny$MARST[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$AGE < 66 & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Covid_risk)])
+race_libart_employed_under66 <- (acs2017_ny$RACE[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$AGE < 66 & acs2017_ny$EMPSTAT == 1 & acs2017_ny$Covid_risk)])
 
-
-
-#Important, must have same lengths
-#THIS WORKS...
-lm(covid_risk_libarts ~ libart_huma +gender_libart)
-#THIS WORKS!!!!!!!!!!!!!!!!!!
-glm(acs2017_ny$DEGFIELD == "Fine Arts" ~ acs2017_ny$AGE + acs2017_ny$RACE)
-summary(glm(acs2017_ny$DEGFIELD == "Fine Arts" ~ acs2017_ny$AGE +  acs2017_ny$RACE))
-
-
-
-
-# Now, to calculate the standard error of the difference we use this formulas. SE x1-x2 = sqrt [ s1^2 / n1 + s2^2 / n2 ]
-sqrt(sd(finearts)^2 +sd(finart_employed_under66)^2)
-
-(sd(finearts)^2)/3491 +(sd(finart_employed_under66)^2)/2502
-standard_error <- sqrt(0.1326654)
-0.3642326
-# So the standard error of the difference of the group and the subgroup for Fine Arts is 0.364.
-# Now we will set up a confidence interval of 99% for the sub group.
-# First, we will find the margin of error using, critical value*standard error.
-# Looking at a t-table we find that with a confidence of 99% and a degrees of freedom of 2501, the critical value is
-2.576*standard_error
-margin_error_ <-0.9382632
-#Thus we have a margin of error of 0.9382632.
-# We use the difference between the population means:
-mean(finart_employed_under66)
-mean(finearts)
-44.16586+39.34253
-83.50839/2
-point_estimate <- 41.7542
-
-# Finally, we add and subtract the margin of error from the confidence intervals.
-point_estimate+margin_error_
-42.69246
-point_estimate-margin_error_
-40.81594
-#Resulting in a confident interval of:
-#(40.81594, 42.69246)
-
-# When the mean ages of Fine Arts majors from the original group and sub group differ, it is approximately by 0.94 years.
-# There difference is there, but the difference is small as can by seen that the margin of error is less than 1.
-
-
-# We have created two new subsets to make the cross table more simple, one Liberal Arts and Humanities marital status, that are under 66 and are employed, while the other is Liberal Arts and Humanities race, that are under 66 and are employed.
-marst_libart_employed_under66 <- (acs2017_ny$MARST[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$AGE < 66 & acs2017_ny$EMPSTAT == 1)])
-race_libart_employed_under66 <- (acs2017_ny$RACE[ (acs2017_ny$DEGFIELD == "Liberal Arts and Humanities" & acs2017_ny$AGE < 66 & acs2017_ny$EMPSTAT == 1)])
-#The total number of people in both samples are 456, they also have attributes that overlap, so we can make a cross table.
 cross_table <- CrossTable(marst_libart_employed_under66,race_libart_employed_under66)
 
-apply(marst_libart_employed_under66,1,sum)
+CrossTable(test_subgroup,)
 
-# By using the cross tabs with the are married with their spouse present we observe that 0.388 of people are both white and married.
-#As mentioned before, by using the cross tables to compute for marginal probabilities of someone that is married with their spouse present and is white is 0.388, or about 39 out of 100 chance.
-# In other words, the probability that someone is married, given that they are white is 0.388.
-0.388 
-#However, this way is INCORRECT.
-# We must get the probabilities using Bayes Theorem with the hypothesis stating that a fine arts major is married person with their spouse present given that they are white.
-# First we need the probability of just white people, which can be seen in the cross table at the bottom of the first column that the total proportion of white people is 0.7.
-# We will call this P_H.
-P_of_H <- 0.70
-# Next we will use the proportion of people that are married, given that they are white is 0.388, which is in the first row and first row.
-# We will call this P_E | H
-P_of_E_given_H <- 0.388
-# Two more values are needed, one of them is the total proportion that are not white, so the total number of white people, 319, is subtracted from  the total number of people are 456 to get 137.
-456-319
-# With 137 with divide that by 456 to get that total proportion of that are not white, which is 0.3004386.
-137/456
-0.3004386
-# The variable will be named P_not_H.
-P_not_H <- 0.3004386
-#Then we look for the proportion of people that are married with a spouse present and are not white which is 65/242 because we subtract the number of white people that are married with their spouses,which is 177, from the total amount of of married people with their spouses.
-242-177
-65
-#So we divide that by the total number of married people with their spouses which gives us 0.268595.
-65/242
-0.268595
-# Naming the proportion of people that are married with a spouse present and are not white P_of_E_given_not_H.
-P_of_E_given_not_H <- 0.268595
-#Thus by using Bayes Theorem, the probability that a fine arts major is married with a spouse given that they are white is 0.7709419.
+#The total number of people in race were 96 and the total in marital status is 70. What is interesting is that that the total is 69, which is less than the totals of either group.
+# By using the cross tabs, the the marginal probability of people that are married with their spouse present given that they are white is 0.391 for liberal arts and humanities majors that were in the Covid affected industries, that were younger than 66 and were employed.
+#Now to use Bayes theorem we need percentage of white people 0.667, percentage that they are married given that they are white is 0.391, the percentage of people that are not white 0.333(add the percentages of races besides white people) and the percentage are married given that they are not white 0.158.
+P_of_H <- 0.667
+P_of_E_given_H <- 0.391
+P_not_H <- 0.333
+P_of_E_given_not_H <- 0.158
+
 P_of_H*P_of_E_given_H/((P_of_H*P_of_E_given_H)+(P_not_H*P_of_E_given_not_H))
-0.700*0.388/((0.700*0.388) + (0.3004386*0.268595))
-0.7709419
-#Initially, I had computed the probability wrong, however, using Bayes Theorem it is much more accurate.
-# The table is not mutually exclusive nor it is exhaustive.
-# The probability informs that there is a high likelihood of a Fine Arts major with their spouse and is white but the probability of someone that is not married with their spouse present and is not white is unlikely.
+0.8321246
+# Bayes theorem informs that there is a high likelihood of a of a Liberal Arts major with their spouse and is white.
+#The variables are not mutually exclusive because someone can have both a marital status and a race at the same time.
 
 
 # Factors that could have influenced the difference in outcome were the size of the Fine Arts group is more than 3 times than the Liberal Arts and Humanities group. Another difference is the proportion of 4 year degree students in Fine arts that live in Manhattan is nearly twice as much as those the Liberal Arts majors that live in Manhattan, which is shown below.
