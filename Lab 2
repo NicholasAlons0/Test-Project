@@ -1,3 +1,4 @@
+Study Group: (Dawa Lama,Nickolas Alonso & Adelia Fida)
 #Firstly, we create variables for the ages of those with majors of Fine Arts & Liberal Arts and Humanities, where there will be two separate samples of people. One will consist of only those that have degrees in Fine Arts and the other will consist of those that have degrees in Liberal Arts and Humanities.
 
 finearts <- acs2017_ny$AGE[(acs2017_ny$DEGFIELD == "Fine Arts")]
