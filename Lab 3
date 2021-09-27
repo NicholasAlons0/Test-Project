@@ -11,6 +11,7 @@ housing_cost <- OWNCOST + RENT
 norm_inc_tot <- norm_varb(INCTOT)
 norm_housing_cost <- norm_varb(housing_cost)
 
+
 OWNCOST <- zap_labels(OWNCOST)
 housing_cost <- zap_labels(housing_cost)
 norm_inc_tot <- zap_labels(norm_inc_tot)
@@ -62,11 +63,6 @@ y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
 
-plot(y_hat_v1)
-plot(mean(y_hat_v1[cl_data_n1 == 1]))
-
-
-
 cl_data_n1 <- as.numeric(cl_data_n == 2)
 model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_housing_cost)
 y_hat_v1 <- fitted.values(model_ols_v1)
@@ -91,48 +87,11 @@ y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
 
-#When you add up means, they equal 1.13?
+#None of the OLS were able to predict over a value of 0.35, so the accuracy in the OLS is somewhat lower than the knn.
 
 
 
-
-
-prop.table(summary(cl_data))
-plot(cl_data_n1)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-prop.table(summary(cl_data))
-plot(cl_data_n1)
-
-
-
-
-
-
-
-
-
-
-
-
-
+# I ran the knn using the poverty level and and the income total with the notion that those in impoverished communities were more likely to be in specific boroughs.
 dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1)&(acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 66))
 attach(dat_NYC)
 summary(dat_NYC)
@@ -146,15 +105,6 @@ norm_inc_tot <- norm_varb(INCTOT)
 norm_poverty <- norm_varb(POVERTY)
 norm_famsize <- norm_varb(FAMSIZE)
 norm_migration <- norm_varb(MIGRATE1D)
-
-norm_inc_tot <- zap_labels(norm_inc_tot) 
-norm_poverty <- zap_labels(norm_poverty)
-norm_famsize <- zap_labels(norm_famsize)
-norm_migration <- zap_labels(norm_migration)
-
-
-
-
 
 data_use_prelim <- data.frame(norm_poverty,norm_inc_tot,norm_famsize,norm_migration)
 good_obs_data_use <- complete.cases(data_use_prelim,borough_f)
@@ -226,19 +176,16 @@ y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
 
-# I ran the knn using the poverty level and and the income total with the notion that those in impoverished communities were more likely to be in specific boroughs, however the accuracy is low, similar to the original model.
-# Running the same model, with hope to obtain increased accuracy, I will add family size.
-# After running family size, we get slightly increased accuracy on all front, I will assume that adding more variables will increase the accuracy of the test.
+# however the accuracy for the knn stayed low, similar to the original model.
+# As for the the OLS, the predicted values did not change significantly, where the predicted values remained low.
+# With the hope to obtain increased accuracy in both the knn and OLS, I decided to add family size.
+# Resulting in a slightly increased accuracy for the KNN I will assume that adding more variables will increase the accuracy of the test.
+# However the changes in the OLS remain low.
+
 # Now I will use poverty level, income total, family size and migration.
-# After running with migration status, the accuracy is at its slightly maintained level. 
+# After running with migration status, the accuracy in the KNN is at its remains the similar in accuracy to the previous one. 
 # Based on the idea that adding more variables will increase the accuracy of the prediction, and adding them one by one is causing minuscule changes, we are going to go and add a handful of extra variables at once.
 # So all the variables in the next batch will be the following: poverty level, income total, family size, migration, rent, cost of electricity, cost of gas, cost of water, cost of fuel for home, linguistic isolation and number of rooms.
-# After adding the extra listed variables, the accuracy of the first kth neighbor became 0.79, more than twice the accuracy of the original data set.
-# Unfortunately, the accuracy of the  third, fifth, seventh and ninth are all in the 0.50s range, but it is still better than the original 0.30.
-# The reason the accuracy of the prediction could have increase so much may be for multiple different reasons. The costs of the utilities of the linguistic isolation could have heavily gave enough information to increase the accuracy.
-# Or just the increase to variables in general could have overall increased the accuracy.
-# Nonetheless, it is safe to say that increasing the amount of variables to the knn increases the accuracy how determining which neighborhoods people reside in, however some variables weigh heavier than others, so depending on whether the added variable is a distinguishing characteristic, the model can determine the borough more accurately.
-
 
 
 
@@ -286,7 +233,7 @@ norm_rooms <- zap_labels(ROOMS)
 
 
 data_use_prelim <- data.frame(norm_poverty,norm_inc_tot,norm_famsize,norm_migration,norm_rent,norm_cost_electricity,
-norm_cost_gas,norm_cost_water,norm_cost_fuelhome,norm_linguistic,norm_rooms)
+                              norm_cost_gas,norm_cost_water,norm_cost_fuelhome,norm_linguistic,norm_rooms)
 good_obs_data_use <- complete.cases(data_use_prelim,borough_f)
 dat_use <- subset(data_use_prelim,good_obs_data_use)
 y_use <- subset(borough_f,good_obs_data_use)
@@ -311,10 +258,19 @@ for (indx in seq(1, 9, by= 2)) {
   print(c(indx,correct_rate))
 }
 
+plot(train_data)
+
+cor(train_data,test_data)
+
 cl_data_n <- as.numeric(cl_data)
 
+
+
+
 model_ols1 <- lm(cl_data_n ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
-+ train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)         
+                 + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)         
+#IMPORTANT
+coeftest(model_ols1)
 
 y_hat <- fitted.values(model_ols1)
 
@@ -325,7 +281,8 @@ mean(y_hat[cl_data_n == 4])
 mean(y_hat[cl_data_n == 5])
 
 # maybe try classifying one at a time with OLS
-
+#
+# IS MEAN Y HAT THE SAME ACCUARY TO PREDICT, EXCEPT YOU HAVE TO DO IT ONE BOROUGH AT A TIME, OR IS IT NEAREST NEIGHBOR AT A TIME?
 cl_data_n1 <- as.numeric(cl_data_n == 1)
 model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
                    + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)
@@ -335,27 +292,48 @@ mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
 
 
+
 cl_data_n1 <- as.numeric(cl_data_n == 2)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
+                  + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)
+
 y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
 
 cl_data_n1 <- as.numeric(cl_data_n == 3)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot)
+model_ols_v1 <- lm( cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
+                   + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)
 y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
 
 cl_data_n1 <- as.numeric(cl_data_n == 4)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
+                   + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)
 y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
 
 cl_data_n1 <- as.numeric(cl_data_n == 5)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
+                   + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)
 y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
+
+
+cl_data_n1 <- as.numeric(cl_data_n == 6)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
+                   + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+mean(y_hat_v1[cl_data_n1 == 0])
+
+# After adding the extra listed variables, the accuracy of the first kth neighbor became 0.79, more than twice the accuracy of the original data set.
+# Unfortunately, the accuracy of the  third, fifth, seventh and ninth are all in the 0.50s range, but it is still better than the original 0.30.
+# The reason the accuracy of the prediction could have increase so much may be for multiple different reasons. The costs of the utilities of the linguistic isolation could have heavily gave enough information to increase the accuracy.
+# Or just the increase to variables in general could have overall increased the accuracy.
+# Nonetheless, it is safe to say that increasing the amount of variables to the knn increases the accuracy how determining which neighborhoods people reside in, however some variables weigh heavier than others, so depending on whether the added variable is a distinguishing characteristic, the model can determine the borough more accurately.
+# As for the OLS
 
