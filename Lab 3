@@ -62,6 +62,10 @@ y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
 
+plot(y_hat_v1)
+plot(mean(y_hat_v1[cl_data_n1 == 1]))
+
+
 
 cl_data_n1 <- as.numeric(cl_data_n == 2)
 model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_housing_cost)
@@ -87,9 +91,35 @@ y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
 
+#When you add up means, they equal 1.13?
 
 
 
+
+
+prop.table(summary(cl_data))
+plot(cl_data_n1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+prop.table(summary(cl_data))
+plot(cl_data_n1)
 
 
 
@@ -207,9 +237,8 @@ mean(y_hat_v1[cl_data_n1 == 0])
 # Unfortunately, the accuracy of the  third, fifth, seventh and ninth are all in the 0.50s range, but it is still better than the original 0.30.
 # The reason the accuracy of the prediction could have increase so much may be for multiple different reasons. The costs of the utilities of the linguistic isolation could have heavily gave enough information to increase the accuracy.
 # Or just the increase to variables in general could have overall increased the accuracy.
-# Nonetheless, it is safe to say that increasing the amount of variables to the knn increases the accuracy how determining which neighborhoods people reside in, however some variables weigh heavier than others, so it depends whether the added variable is a distingushing characteristic in order to determine the borough more accurately.
+# Nonetheless, it is safe to say that increasing the amount of variables to the knn increases the accuracy how determining which neighborhoods people reside in, however some variables weigh heavier than others, so depending on whether the added variable is a distinguishing characteristic, the model can determine the borough more accurately.
 
-# (Do that after)In addition to adding more variables, we will change the group to those in the covid affected industries from lab 2.
 
 
 
@@ -222,6 +251,9 @@ borough_f <- factor((in_Bronx + 2*in_Manhattan + 3*in_StatenI + 4*in_Brooklyn + 
 
 norm_varb <- function(X_in) { (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
 }
+
+
+acs2017_ny$LINGISOL <- as.numeric(acs2017_ny$LINGISOL)
 
 #poverty level, income total, family size, migration, rent, 
 # cost of electricity, cost of gas, cost of water, cost of fuel for home, linguistic isolation and number of rooms.
@@ -247,7 +279,7 @@ norm_cost_electricity <- zap_labels(COSTELEC)
 norm_cost_gas <- zap_labels(COSTGAS)
 norm_cost_water <- zap_labels(COSTWATR)
 norm_cost_fuelhome <- zap_labels(COSTFUEL)
-norm_linguistic <- zap_labels(LINGISOL)
+norm_linguistic <- zap_labels(LINGISOL) 
 norm_rooms <- zap_labels(ROOMS)
 
 
@@ -281,7 +313,8 @@ for (indx in seq(1, 9, by= 2)) {
 
 cl_data_n <- as.numeric(cl_data)
 
-model_ols1 <- lm(cl_data_n ~ train_data$norm_poverty + train_data$norm_inc_tot)
+model_ols1 <- lm(cl_data_n ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
++ train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)         
 
 y_hat <- fitted.values(model_ols1)
 
@@ -294,7 +327,9 @@ mean(y_hat[cl_data_n == 5])
 # maybe try classifying one at a time with OLS
 
 cl_data_n1 <- as.numeric(cl_data_n == 1)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
+                   + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)
+
 y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
@@ -323,3 +358,4 @@ model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_to
 y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
 mean(y_hat_v1[cl_data_n1 == 0])
+
