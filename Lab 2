@@ -134,7 +134,6 @@ race_libart_employed_under66 <- (acs2017_ny$RACE[ (acs2017_ny$DEGFIELD == "Liber
 
 cross_table <- CrossTable(marst_libart_employed_under66,race_libart_employed_under66)
 
-CrossTable(test_subgroup,)
 
 #The total number of people in race were 96 and the total in marital status is 70. What is interesting is that that the total is 69, which is less than the totals of either group.
 # By using the cross tabs, the the marginal probability of people that are married with their spouse present given that they are white is 0.391 for liberal arts and humanities majors that were in the Covid affected industries, that were younger than 66 and were employed.
