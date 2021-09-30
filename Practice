@@ -1,0 +1,73 @@
+
+#What is the probability, if the true distribution has mean -1 and standard deviation of 1.5, 
+#of seeing a deviation as large (in absolute value) as 2?
+pnorm(2,-1,1.5)
+
+
+#What is the probability, if the true distribution is a Standard Normal, if seeing a value as large as 1.75?
+pnorm(1.75)
+1-0.9599408
+
+#If you observe a value of 2.1, what is the probability of observing such an extreme value, 
+#if the true distribution were Standard Normal?
+pnorm(2.1)
+
+
+# Find the area under the standard normal pdf between -1.75 and 0.
+pnorm(0)
+pnorm(-1.75)
+0.5-0.04005916
+
+
+pnorm(1.75, lower.tail = FALSE)
+
+# What values form a symmetric 90% confidence interval for the standard normal 
+#(where symmetric means that the two tails have equal probability)? A 95% confidence interval?
+#90%
+pnorm(1.645)
+pnorm(-1.645)
+#(0.04998491,0.9500151)
+
+#95%
+pnorm(1.96)
+pnorm(-1.96)
+#(0.0249979,0.9750021)
+
+# If a random variable is distributed normally with mean 2 and standard deviation of 2, what is a symmetric 90% confidence interval?
+# 90%, Mean (+/-) Standard Deviation* 1
+2-2*(1)
+2+2*(1)
+# (0,4)
+
+# What is a symmetric 95% confidence interval?
+# 95%, Mean (+/-) Standard Deviation* 2
+2-2*(2)
+2+2*(2)
+# (-2,6)
+
+# What is a symmetric 99% confidence interval?
+# 99%, Mean (+/-) Standard Deviation* 3
+2-2*(3)
+2+2*(3)
+#(-4,8)
+
+# A random variable is distributed with mean of 8 and standard deviation of 4.
+#What is the probability that we could observe a value lower than 6?
+pnorm(6,8,4)
+
+# What is the probability that we could observe a value higher than 12?
+pnorm(12,8,4,lower.tail = FALSE)
+
+#What is the probability that we’d observe a value between 6.5 and 7.5?
+(7.5-8)/4
+pnorm(-0.125)
+(6.5-8)/4
+pnorm(-0.375)
+0.4502618-0.3538302
+
+#What is the probability that we’d observe a value between 5.5 and 6.5?
+(5.5-8)/4
+pnorm(-0.625)
+(6.5-8)/4
+pnorm(-0.375)
+0.3538302-0.2659855
