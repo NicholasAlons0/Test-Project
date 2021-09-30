@@ -41,18 +41,10 @@ for (indx in seq(1, 9, by= 2)) {
 
 cl_data_n <- as.numeric(cl_data)
 
-model_ols1 <- lm(cl_data_n ~ train_data$norm_poverty + train_data$norm_inc_tot)
+model_ols1 <- lm(cl_data_n ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration)
 
 y_hat <- fitted.values(model_ols1)
-
-mean(y_hat[cl_data_n == 1])
-mean(y_hat[cl_data_n == 2])
-mean(y_hat[cl_data_n == 3])
-mean(y_hat[cl_data_n == 4])
-mean(y_hat[cl_data_n == 5])
 cl_data_n <- as.numeric(cl_data)
-
-
 # maybe try classifying one at a time with OLS
 
 cl_data_n1 <- as.numeric(cl_data_n == 1)
@@ -89,7 +81,7 @@ mean(y_hat_v1[cl_data_n1 == 0])
 # poverty level, income total, family size, migration, rent, cost of electricity, 
 # cost of gas, cost of water, cost of fuel for home, linguistic isolation and number of rooms.
 dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1)&(acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 66))
-attach(dat_NYC)
+attach(dat_NYC) #dont need to attach it? I ran this and my accuracy become 0.69, without it, it is 0.37.
 summary(dat_NYC)
 borough_f <- factor((in_Bronx + 2*in_Manhattan + 3*in_StatenI + 4*in_Brooklyn + 5*in_Queens), levels=c(1,2,3,4,5),labels = c("Bronx","Manhattan","Staten Island","Brooklyn","Queens"))
 
@@ -263,12 +255,6 @@ model_ols1 <- lm(cl_data_n ~ train_data$norm_poverty + train_data$norm_inc_tot +
                  + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)         
 y_hat <- fitted.values(model_ols1)
 
-mean(y_hat[cl_data_n == 1])
-mean(y_hat[cl_data_n == 2])
-mean(y_hat[cl_data_n == 3])
-mean(y_hat[cl_data_n == 4])
-mean(y_hat[cl_data_n == 5])
-
 cl_data_n1 <- as.numeric(cl_data_n == 1)
 model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_poverty + train_data$norm_inc_tot + train_data$norm_famsize + train_data$norm_migration + train_data$norm_rent + train_data$norm_cost_electricity
                    + train_data$norm_cost_gas + train_data$norm_cost_water + train_data$norm_cost_fuelhome + train_data$norm_linguistic + train_data$norm_rooms)
@@ -310,4 +296,11 @@ mean(y_hat_v1[cl_data_n1 == 0])
 #which that there may be an outlier in the test data that drops the accuracy of the prediction.
 
 # After classifying all the boroughs through out the different attempts, it seems that Brooklyn is consistently the easiest to classify.
+plot(cl_data_n1)
+plot(y_hat_v1)
+plot(cl_data_n)
+plot(y_hat)
+# When comparing the two, there are these long areas where there are not black spots in the Bronx. 
+# The missing areas are reflective of our exclusion of other variables from the overall NYC data compared to just the Bronx.
+
 
