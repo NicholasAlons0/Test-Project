@@ -1,0 +1,98 @@
+# When running the analysis, we will start by using the given subgroup, people 25-55, in labor force, working year round, fulltime.
+# The reason for not adding people elderly people is because when they retire, their income will decrease.
+# So, when we a run a variable that includes retired people, the relationship between wages and the variable will decrease.
+# Important factors that influence a person's wage are their education level, major, race or gender, so we will create a few
+# different regressions to run these factors. The listed variables are plausible, if you have a better education, you are more likely
+# to make a higher income. If you are an cosmetology major, compared to an engineering major, the engineering major will make more
+# money on average. If you are a women, you are more likely to make less money than a money(etc,etc.)
+
+attach(acs2017_ny)
+use_varb <- (AGE >= 25) & (AGE <= 55) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35)
+dat_use <- subset(acs2017_ny,use_varb) 
+detach()
+attach(dat_use)
+
+model_temp1 <- lm(INCWAGE ~ AGE + female + AfAm + Asian + Amindian + race_oth + Hispanic + educ_hs + educ_somecoll + educ_college + educ_advdeg)
+summary(model_temp1)
+suppressMessages(require(AER))
+NNobs <- length(INCWAGE)
+set.seed(12345) # just so you can replicate and get same "random" choices
+graph_obs <- (runif(NNobs) < 0.1) # so something like just 1/10 as many obs
+dat_graph <-subset(dat_use,graph_obs)  
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,150000), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 25:55, female = 1, AfAm = 0, Asian = 0, Amindian = 1, race_oth = 1, Hispanic = 1, educ_hs = 0, educ_somecoll = 0, educ_college = 1, educ_advdeg = 0)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2)
+to_be_predicted2 <- data.frame(AGE = 25:55, female = 1, AfAm = 0, Asian = 0, Amindian = 0, race_oth = 0, Hispanic = 0, educ_hs = 0, educ_somecoll = 0, educ_college = 0, educ_advdeg = 0)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2)
+detach()
+detach()
+# In the  first regression, most variables were statistically significant, thus rejecting the null hypothesis 
+# that the coefficients associated with the variables are equal to zero. 
+#However, the variables for Asians, American Indian, and Hispanic were not
+# as significant. Unfortunately,the overall multiple R squared is around 0.14, which is quite low, makes it more 
+# difficult to interpret the variation in data.
+
+# Additionally, we see as people's age increases, their income tends to increase as well.
+# We were curious about the predicted subgroups, some of the implemented variables were of high income 
+# earners, such as those with bachelor's degrees, while others low income earning variables, such as female
+# or they were just insignificant variables, such as Amindian. So, in the second to be predicted line,
+# we will change the predicted values in the graph to just women.
+
+# While there is little to no change in the slope of the graph (it is still a positive relationship), we so see that the curve
+# shifted downwards. The reason most likely is because this category excludes people with bachelor's degrees, while
+# the initial graph did not. As we can obviously see, women without bachelors degree make less income by wages
+# compared to college educated women.
+
+# Going into the second regression model, we will pick variables that are linked to people with higher incomes.
+# So in the second regression, we should alter the subset or independent variables.
+# However, we will also select people with low income, as to later compared the predicted values between the
+# those of higher income and those of lower income.
+# And increase the multiple R squared to make the data explain more about the relationship between the dependent
+# and independent variables.
+attach(acs2017_ny)
+use_varb <- (AGE >= 20) & (AGE <= 66) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35)
+dat_use <- subset(acs2017_ny,use_varb) 
+detach()
+attach(dat_use)
+
+model_temp1 <- lm(INCWAGE ~ AGE + female + educ_nohs + below_povertyline + educ_college + educ_advdeg + has_PvtHealthIns)
+summary(model_temp1)
+require(stargazer)
+stargazer(model_temp1, title = "Second Regression", type = "text", dep.var.labels = "INCWAGE")
+suppressMessages(require(AER))
+NNobs <- length(INCWAGE)
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.1) 
+dat_graph <-subset(dat_use,graph_obs)  
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(-50000,250000), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 25:55, female = 1, educ_nohs = 1, below_povertyline = 1, educ_college = 0, educ_advdeg = 0, has_PvtHealthIns = 0)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2)
+to_be_predicted2 <- data.frame(AGE = 25:55, female = 0, educ_nohs = 0, below_povertyline = 0, educ_college = 1, educ_advdeg = 1, has_PvtHealthIns = 1)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2)
+detach()
+detach()
+detach()
+detach(dat_use)
+
+# Since the t-stat magnitude for AGE is high, the p-value is low, and the confidence is ***, AGE is statistically significant
+# As for the t-stats, p-values and confidence intervals for the other variables all point out that they are statistically significant.
+# In multiple regression, the Null Hypothesis is that the coefficients associated with the variables is equal to zero. 
+# Our alternative hypothesis is that the coefficients are not equal to zero.
+#Since the pvalue is less than the level of significance, thus we reject the null hypothesis.
+#We can say with a 100% confidence that there is sufficient evidence to support that the coefficients are not equal to zero.
+#Therefore, there exists a relationship between the INCWAGE and the added variables.
+
+# As for the graphs, we ran the "lines" function for just those in the lower income category, were confused as to why the line did not show. After a
+# few more attempts we realized that line was there, but we just could not see it.
+# since we had purposely used the data of groups that had the lowest income in NYC, we would have to move the 
+# entire graph's vision under 0, into the range of negative wages. Then, it appeared.
+# The good news is we can see just how poor the poor really are in NYC, the bad news is the R squared is 0.1585,
+# which is not much higher than the initial graph. 
+
+coeftest(model_temp1, vcovHC)
+# When testing for heteroskedasticity using the coeftest, the intercept became more significant compared to the 
+# multiple regression above.
