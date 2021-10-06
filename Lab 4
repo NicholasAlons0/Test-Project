@@ -1,6 +1,6 @@
-# When running the analysis, we will start by using the given subgroup, people 25-55, in labor force, working year round, fulltime.
-# The reason for not adding people elderly people is because when they retire, their income will decrease.
-# So, when we a run a variable that includes retired people, the relationship between wages and the variable will decrease.
+# When running the analysis, we will start by using the given subgroup, people 25-55, in labor force, working year round, full time.
+# The reason for not adding elderly people is because when they retire, their income will decrease which
+# may cause the relationship between wages and the variable will decrease.
 # Important factors that influence a person's wage are their education level, major, race or gender, so we will create a few
 # different regressions to run these factors. The listed variables are plausible, if you have a better education, you are more likely
 # to make a higher income. If you are an cosmetology major, compared to an engineering major, the engineering major will make more
@@ -11,53 +11,51 @@ use_varb <- (AGE >= 25) & (AGE <= 55) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRS
 dat_use <- subset(acs2017_ny,use_varb) 
 detach()
 attach(dat_use)
-
 model_temp1 <- lm(INCWAGE ~ AGE + female + AfAm + Asian + Amindian + race_oth + Hispanic + educ_hs + educ_somecoll + educ_college + educ_advdeg)
 summary(model_temp1)
+require(stargazer)
+stargazer(model_temp1, title = "First Regression", type = "text", dep.var.labels = "INCWAGE")
 suppressMessages(require(AER))
 NNobs <- length(INCWAGE)
 set.seed(12345) # just so you can replicate and get same "random" choices
-graph_obs <- (runif(NNobs) < 0.1) # so something like just 1/10 as many obs
+graph_obs <- (runif(NNobs) < 0.1) # runif picks data randomly, so 1/10 as random observations from the data
 dat_graph <-subset(dat_use,graph_obs)  
-plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,150000), data = dat_graph)
-to_be_predicted2 <- data.frame(AGE = 25:55, female = 1, AfAm = 0, Asian = 0, Amindian = 1, race_oth = 1, Hispanic = 1, educ_hs = 0, educ_somecoll = 0, educ_college = 1, educ_advdeg = 0)
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 25:55, female = 1, AfAm = 1, Asian = 1, Amindian = 1, race_oth = 1, Hispanic = 1, educ_hs = 1, educ_somecoll = 1, educ_college = 1, educ_advdeg = 1)
 to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
-lines(yhat ~ AGE, data = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
 to_be_predicted2 <- data.frame(AGE = 25:55, female = 1, AfAm = 0, Asian = 0, Amindian = 0, race_oth = 0, Hispanic = 0, educ_hs = 0, educ_somecoll = 0, educ_college = 0, educ_advdeg = 0)
 to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
-lines(yhat ~ AGE, data = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "pink")
 detach()
 detach()
-# In the  first regression, most variables were statistically significant, thus rejecting the null hypothesis 
+detach()
+detach()
+
+# In the first regression, most variables were statistically significant, thus rejecting the null hypothesis 
 # that the coefficients associated with the variables are equal to zero. 
-#However, the variables for Asians, American Indian, and Hispanic were not
-# as significant. Unfortunately,the overall multiple R squared is around 0.14, which is quite low, makes it more 
-# difficult to interpret the variation in data.
-
-# Additionally, we see as people's age increases, their income tends to increase as well.
-# We were curious about the predicted subgroups, some of the implemented variables were of high income 
-# earners, such as those with bachelor's degrees, while others low income earning variables, such as female
-# or they were just insignificant variables, such as Amindian. So, in the second to be predicted line,
-# we will change the predicted values in the graph to just women.
-
-# While there is little to no change in the slope of the graph (it is still a positive relationship), we so see that the curve
-# shifted downwards. The reason most likely is because this category excludes people with bachelor's degrees, while
-# the initial graph did not. As we can obviously see, women without bachelors degree make less income by wages
-# compared to college educated women.
-
-# Going into the second regression model, we will pick variables that are linked to people with higher incomes.
-# So in the second regression, we should alter the subset or independent variables.
-# However, we will also select people with low income, as to later compared the predicted values between the
+# However, the variables for Asians and American Indian, were not as significant. 
+# Thus, we we fail to reject the null hypothesis for those specific variables and conclude there is 
+# no significant relationship between Asian/American Indian and INCWAGE.
+# For the predicted values graph there are two prediction lines, one with all the variables(the brown line) and one with 
+# just female(the pink line). When comparing the pink to the brown, we see a strong downwards shift. 
+# The reason most likely is because this category excludes people with college degrees in general
+# while the initial prediction did not. As we can obviously see, women without bachelors 
+# degree make less income by wages compared to college educated women.
+# Nonetheless, the slopes in both graph shows that people earn a higher income the older they are, since the graph
+# is positively sloped.
+# Going into the second regression model, we will pick variables that are linked to people with higher incomes, 
+# while also selecting people with low income, as to later compared the prediction lines between the
 # those of higher income and those of lower income.
-# And increase the multiple R squared to make the data explain more about the relationship between the dependent
-# and independent variables.
+# Additionally, we will be aiming to increase the multiple R squared to make the data explain more about the 
+# relationship between the dependent and independent variables.
+
 attach(acs2017_ny)
 use_varb <- (AGE >= 20) & (AGE <= 66) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35)
 dat_use <- subset(acs2017_ny,use_varb) 
 detach()
 attach(dat_use)
-
-model_temp1 <- lm(INCWAGE ~ AGE + female + educ_nohs + below_povertyline + educ_college + educ_advdeg + has_PvtHealthIns)
+model_temp1 <- lm(INCWAGE ~ AGE + female + below_povertyline + educ_nohs + educ_college + educ_advdeg + has_PvtHealthIns)
 summary(model_temp1)
 require(stargazer)
 stargazer(model_temp1, title = "Second Regression", type = "text", dep.var.labels = "INCWAGE")
@@ -67,32 +65,93 @@ set.seed(12345)
 graph_obs <- (runif(NNobs) < 0.1) 
 dat_graph <-subset(dat_use,graph_obs)  
 plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(-50000,250000), data = dat_graph)
-to_be_predicted2 <- data.frame(AGE = 25:55, female = 1, educ_nohs = 1, below_povertyline = 1, educ_college = 0, educ_advdeg = 0, has_PvtHealthIns = 0)
+to_be_predicted2 <- data.frame(AGE = 25:66, female = 1, below_povertyline = 1, educ_nohs = 1, educ_college = 0, educ_advdeg = 0, has_PvtHealthIns = 0)
 to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
-lines(yhat ~ AGE, data = to_be_predicted2)
-to_be_predicted2 <- data.frame(AGE = 25:55, female = 0, educ_nohs = 0, below_povertyline = 0, educ_college = 1, educ_advdeg = 1, has_PvtHealthIns = 1)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
+to_be_predicted2 <- data.frame(AGE = 25:66, female = 0, below_povertyline = 0, educ_nohs = 0, educ_college = 1, educ_advdeg = 1, has_PvtHealthIns = 1)
 to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
-lines(yhat ~ AGE, data = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "blue")
 detach()
 detach()
 detach()
-detach(dat_use)
+detach()
 
-# Since the t-stat magnitude for AGE is high, the p-value is low, and the confidence is ***, AGE is statistically significant
-# As for the t-stats, p-values and confidence intervals for the other variables all point out that they are statistically significant.
-# In multiple regression, the Null Hypothesis is that the coefficients associated with the variables is equal to zero. 
+# In our second regression, the t-stat magnitude for AGE is high, the p-value is low, and the confidence is ***, thus
+# AGE is statistically significant. As for the t-stats, p-values and confidence intervals for the other variables,
+# they all have t-stats that are high, their p-values are very low and they have high significance codes,
+# therefore the rest of the x variables are statistically significant.
+# In R regression, the Null Hypothesis is that the coefficients associated with the variables is equal to zero, while
 # Our alternative hypothesis is that the coefficients are not equal to zero.
-#Since the pvalue is less than the level of significance, thus we reject the null hypothesis.
-#We can say with a 100% confidence that there is sufficient evidence to support that the coefficients are not equal to zero.
-#Therefore, there exists a relationship between the INCWAGE and the added variables.
-
-# As for the graphs, we ran the "lines" function for just those in the lower income category, were confused as to why the line did not show. After a
-# few more attempts we realized that line was there, but we just could not see it.
-# since we had purposely used the data of groups that had the lowest income in NYC, we would have to move the 
-# entire graph's vision under 0, into the range of negative wages. Then, it appeared.
+# Since the p-value is less than the level of significance, thus we reject the null hypothesis.
+# We can say with a 99.9% confidence that there is sufficient evidence to support that the coefficients are not equal to zero.
+#Therefore, there exists a relationship between the INCWAGE and the added variables. However, we can see that
+# depending on the variables, the estimate is negative or positive. For examples, the estimate for the variable, 
+# has_PvtHealthIns can be interpreted as those that do have private health insurance have a higher wage 
+# because the estimate is positive.
+# As for the graphs, we ran the "lines" function, interestingly, for the lower income category (the brown line)
+# we moved the entire graph's vision under 0, into the range of negative wages. Then, the line appeared. 
+# Afterwards, using the variables associated only with high income earners to create the second line, 
+# which we can that y-intercept is much higher (the blue line).
 # The good news is we can see just how poor the poor really are in NYC, the bad news is the R squared is 0.1585,
 # which is not much higher than the initial graph. 
+# In the third regression test, we will be using log on INCWAGE.
 
-coeftest(model_temp1, vcovHC)
-# When testing for heteroskedasticity using the coeftest, the intercept became more significant compared to the 
-# multiple regression above.
+attach(acs2017_ny)
+use_varb <- (AGE >= 25) & (AGE <= 66) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35)
+dat_use <- subset(acs2017_ny,use_varb) 
+detach()
+attach(dat_use)
+model_temp1 <- lm(log1p(INCWAGE) ~ AGE + I(AGE^2)+ female + educ_nohs + below_povertyline + educ_college + educ_advdeg + has_PvtHealthIns)
+summary(model_temp1)
+bptest(model_temp1)
+require(stargazer)
+stargazer(model_temp1, title = "Third Regression", type = "text", dep.var.labels = "INCWAGE")
+suppressMessages(require(AER))
+NNobs <- length(log1p(INCWAGE))
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.1) 
+dat_graph <-subset(dat_use,graph_obs)  
+plot(log1p(INCWAGE) ~ jitter(AGE, factor = 2), pch = 04, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,15), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 25:66, female = 1, educ_nohs = 1, below_povertyline = 0, educ_college = 0, educ_advdeg = 0, has_PvtHealthIns = 0)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "blue")
+to_be_predicted2 <- data.frame(AGE = 25:66, female = 0, educ_nohs = 0, below_povertyline = 0, educ_college = 1, educ_advdeg = 1, has_PvtHealthIns = 1)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
+detach()
+detach()
+detach()
+detach()
+
+# Firstly, log made the outliers smaller. However, we can still see the inequality gap between those with low income 
+# and those with high. 
+# When testing for heteroskedasticity using the bptest function, the null hypothesis when the p-value is less than the level 
+# of significance, we reject the null that there is no heteroskedasticity in the model.
+# Since the p-value is less than 0.05, we reject the null hypothesis. We do have sufficient evidence to say that heteroscedasticity 
+# is present in the regression model, which we can also see in the graphs there are many outliers.
+# We have been using female, no_hs and below_povertyline to out of curiosity of the inequality gaps in INCWAGE, 
+# but for the sake of increasing the r squared, we will exclude them.
+# After attempting the regressions multiple times, our conclusion is that the is will be very difficult to increase the 
+# r-squared because regarding income wages of those in the labor force, there will be low income earners and high
+# income earners, and the gap between the wealthy and the not so wealthy is so great that the variation in the
+# data can only be reduced so much.
+# Regarding the link from the x variables to the y variables and not the reverse, 
+# there is a link from college education to income wages, for example: one does not make a higher income without
+# college degree, but with one people can make more INCWAGE. The education makes the income wages, the income wages
+# do not make the education. However, for other variables that may not have been the case. Like private health insurance,
+# one cannot say that private health insurance created higher income wages, it was income wages that allowed access
+# to private health insurance. While private health insurance was significant in running the regressions, that 
+# insurance as an independent variable did not necessarily cause the dependent variable.
+# Additional restrictions to the data set are changing the class of worker to only those that are working
+# for wages, because that variable also includes people that are self-employed and taking them out will
+#focuses more on people making wages.
+#In the KNN, we had a higher multiple R squared than in the multiple regression
+# However, using the linear regressions there has been a lower overall multiple r squared, 
+# most likely because there are big inequality gaps in INCWAGES. The reason there is a lower R squared 
+# is because, although the variables are significant, they do not explain much correlation with INCWAGES.
+# Possibly because the variance in income is not just based on wages, but one salaries as well.
+# Log makes the coefficients smaller, the function is used to simplify large numbers like income wages using
+# the same values, but expressing them within a smaller range compared to the original values. 
+# A relevant predicted value is the first graph, where we compared the lines for women, below the poverty line without high school
+# education vs. men with private health insurance that have a bachelors or a master. 
+
