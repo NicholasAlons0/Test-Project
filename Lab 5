@@ -1,0 +1,19 @@
+
+attach(acs2017_ny)
+use_varb <- (AGE >= 25) & (AGE <= 55) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35) & (Hispanic == 1) & (female == 0)
+dat_use <- subset(acs2017_ny,use_varb) 
+detach()
+attach(dat_use)
+
+model_temp1 <- lm(INCWAGE ~ AGE + I(AGE^2))
+summary(model_temp1)
+suppressMessages(require(AER))
+NNobs <- length(INCWAGE)
+set.seed(12345) # just so you can replicate and get same "random" choices
+graph_obs <- (runif(NNobs) < 0.1) # runif picks data randomly, so 1/10 as random observations from the data
+dat_graph <-subset(dat_use,graph_obs)  
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = dat_graph)
+# Add variables from regression to predicted2
+to_be_predicted2 <- data.frame(AGE = 25:55)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
