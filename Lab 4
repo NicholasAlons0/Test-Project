@@ -148,7 +148,8 @@ detach()
 #In the KNN, we had a higher multiple R squared than in the multiple regression
 # However, using the linear regressions there has been a lower overall multiple r squared, 
 # most likely because there are big inequality gaps in INCWAGES. The reason there is a lower R squared 
-# is because, although the variables are significant, they do not explain much correlation with INCWAGES.
+# is because, although the variables are significant, they are other variables, such as income total
+# that demonstrate higher correlation.
 # Possibly because the variance in income is not just based on wages, but one salaries as well.
 # Log makes the coefficients smaller, the function is used to simplify large numbers like income wages using
 # the same values, but expressing them within a smaller range compared to the original values. 
