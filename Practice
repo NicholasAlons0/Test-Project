@@ -1,25 +1,22 @@
-
 #What is the probability, if the true distribution has mean -1 and standard deviation of 1.5, 
 #of seeing a deviation as large (in absolute value) as 2?
 pnorm(2,-1,1.5)
 
-
+pnorm(20.84,11,8.2, lower.tail = FALSE)
+pnorm(-6.6,-5,4)
+pnorm(8.85,12,6.3)
+0.3085375*2
 #What is the probability, if the true distribution is a Standard Normal, if seeing a value as large as 1.75?
-pnorm(1.75)
-1-0.9599408
+pnorm(1.75,lower.tail = FALSE)
 
 #If you observe a value of 2.1, what is the probability of observing such an extreme value, 
 #if the true distribution were Standard Normal?
 pnorm(2.1)
 
-
 # Find the area under the standard normal pdf between -1.75 and 0.
 pnorm(0)
 pnorm(-1.75)
 0.5-0.04005916
-
-
-pnorm(1.75, lower.tail = FALSE)
 
 # What values form a symmetric 90% confidence interval for the standard normal 
 #(where symmetric means that the two tails have equal probability)? A 95% confidence interval?
@@ -70,4 +67,338 @@ pnorm(-0.375)
 pnorm(-0.625)
 (6.5-8)/4
 pnorm(-0.375)
+0.3538302-0.2659855
+
+#Normal Distribution To The Left
+pnorm(2.36,2,4)
+#Normal Distribution To The Right
+pnorm(2.9,4,2.2,lower.tail = FALSE)
+
+# For a Normal Distribution that has mean -10 and standard deviation 6.8 , 
+# what is the area in both tails farther from the mean than 4.96 ?
+(-10-4.96)/6.8
+(-10+4.96)/6.8 
+pnorm(-0.74)
+pnorm(-2.2)
+0.7564466-0.22965
+
+#What is the probability, 
+# if the true distribution is a Standard Normal, of seeing a deviation from zero as large (in absolute value) as 1.9?
+pnorm(1.9)
+pnorm(-1.9)
+0.9712834-0.02871656
+
+#What is the probability, if the true distribution is a Standard Normal, if seeing a value as large as 1.75?
+pnorm(1.75,lower.tail = FALSE)
+
+#Normal Distribution To The Left
+pnorm(2.36,2,4)
+
+#Normal Distribution To The Right
+pnorm(2.9,4,2.2,lower.tail = FALSE)
+
+#For a Normal Distribution with mean 8 and standard deviation 4.2, what values leave probability 0.046 in both tails? A. (-4.3807, 12.3807) B. (-0.0906, 3.9002) C. (-0.3807, 16.3807) D. (2.4201, 13.5799)
+
+pnorm(-0.3807,8,4.2)
+pnorm(16.3807,8,4.2,lower.tail = FALSE)
+0.02299938*2
+
+#What is the probability, if the true distribution is a Standard Normal, 
+#of seeing a deviation from zero as large (in absolute value) as -1.5?
+pnorm(-1.5)
+pnorm(1.5)
+0.9331928-0.0668072
+
+#What is the probability, if the true distribution has mean -1 and standard deviation of 1.5, 
+#of seeing a deviation as large (in absolute value) as 2?
+pnorm(2,-1,1.5)
+
+#What is the probability, if the true distribution is a Standard Normal, if seeing a value as large as 1.75?
+pnorm(1.75)
+1-0.9599408
+
+#If you observe a value of 2.1, what is the probability of observing such an extreme value, 
+#if the true distribution were Standard Normal?
+pnorm(2.1)
+
+# Find the area under the standard normal pdf between -1.75 and 0.
+pnorm(0)
+pnorm(-1.75)
+0.5-0.04005916
+
+# If a random variable is distributed normally with mean 2 and standard deviation of 2, what is a symmetric 90% confidence interval?
+# 90%, Mean (+/-) Standard Deviation* 1
+2-2*(1)
+2+2*(1)
+# (0,4)
+
+# What is a symmetric 95% confidence interval?
+# 95%, Mean (+/-) Standard Deviation* 2
+2-2*(2)
+2+2*(2)
+# (-2,6)
+
+# What is a symmetric 99% confidence interval?
+# 99%, Mean (+/-) Standard Deviation* 3
+2-2*(3)
+2+2*(3)
+#(-4,8)
+
+# A random variable is distributed with mean of 8 and standard deviation of 4.
+# a)What is the probability that we could observe a value lower than 6?
+pnorm(6,8,4)
+
+# b) What is the probability that we could observe a value higher than 12?
+pnorm(12,8,4,lower.tail = FALSE)
+
+# c) What is the probability that we’d observe a value between 6.5 and 7.5?
+(7.5-8)/4
+pnorm(-0.125)
+(6.5-8)/4
+pnorm(-0.375)
+0.4502618-0.3538302
+
+# d) What is the probability that we’d observe a value between 5.5 and 6.5?
+(5.5-8)/4
+pnorm(-0.625)
+(6.5-8)/4
+pnorm(-0.375)
+0.3538302-0.2659855
+
+#A regression coefficient is estimated to be equal to 7.02 with standard error 5.4 ; there are 17 degrees of freedom. 
+#What is the p-value (from the t-statistic) against the null hypothesis of zero.
+7.02/5.4 = 1.3
+pt(1.3,17, lower.tail = FALSE)
+0.1054759*2
+
+# A regression coefficient is estimated to be equal to -9.2 with standard error 4.6 ; there are 18 degrees of freedom. 
+# What is the p-value (from the t-statistic) against the null hypothesis of zero?
+-9.2/4.6
+pt(-2,18)
+0.03041073*2
+
+
+
+#PROBLEM 2??? how to get pvalue?
+#t-stat is estimate/std.error
+
+
+#NUMBER 3
+#FIRST, lets create a subset to work with the entire test.
+attach(acs2017_ny)
+dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) & (acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55))
+detach()
+attach(dat_NYC)
+
+#Comparing Groups
+#Educational attainments for people that work at home.
+wrk_home_edu <- EDUC[TRANWORK == 70]
+summary(wrk_home_edu)
+
+#Educational attainments for people that commute in the subway.
+wrk_subway_edu <- EDUCD[TRANWORK == 33]
+summary(wrk_subway_edu)
+
+
+#Likelihood that works from home with a 4 year degree
+wrk_home_4year <- (TRANWORK == 70) & (educ_college) 
+summary(as.numeric(wrk_home_4year))
+summary(wrk_home_4year)
+
+
+# given that someone is female, likelihood that she works from home.
+wrk_home_female <- (female) & (TRANWORK == 70)
+summary(as.numeric(wrk_home_female))
+summary(wrk_home_female)
+
+
+#Given that someone is male, likelihood that he works from home.
+wrk_home_male <- (female == 0) & (TRANWORK == 70)
+summary(as.numeric(wrk_home_male))
+summary(wrk_home_male)
+
+
+#Create confidence interval and p-value
+table <- table(TRANWORK == 70, TRANWORK == 33)
+prop.test(table)
+prop.table(table)
+
+
+
+#NUMBER 4, 2019
+attach(acs2017_ny)
+dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) &(acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55)) 
+detach()
+attach(dat_NYC)
+
+WORKHOMENV <- (TRANWORK == 70)
+WORKSUBWAYNV <- (TRANWORK == 33)
+model_temp1 <- lm(TRANTIME ~ WORKHOMENV + WORKSUBWAYNV + AGE  + AfAm + educ_nohs + educ_hs + educ_somecoll
+                  + educ_college + educ_advdeg)
+summary(model_temp1)
+confint(model_temp1)
+# By running the regression, all the variables except for educ_somecoll, are significant because the p-value is 
+# significantly below the level of significance, therefore we reject the null hypothesis that there is no 
+# relationship between the independent variables, and conclude that the alternative hypothesis holds significance, 
+#that there is a relationship between the independent and dependent variables.
+# The null hypothesis in this case is that the education dummies have no relationship to TRANTIME, 
+# while the alternative hypothesis is that there is a relationship with TRANTIME.
+require(stargazer)
+stargazer(model_temp1, title = "Regression", type = "text", dep.var.labels = "INCWAGE")
+suppressMessages(require(AER))
+NNobs <- length(TRANTIME)
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.1) 
+dat_graph <- subset(dat_NYC,graph_obs)  
+plot(TRANTIME ~ jitter(AGE, factor = 2), pch = 4, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,150), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 20:55,  WORKHOMENV = 0, WORKSUBWAYNV = 0, AfAm = 1, educ_nohs = 0, educ_hs = 0, educ_somecoll = 1, educ_college = 0, educ_advdeg = 0)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+# Calculate predicted values for some people and assess if these seem plausible.
+# Perhaps a graph of data and predicted values.
+# ERROR WITH LAST LINE
+detach()
+
+
+
+#PROBLEM 5 KNN
+attach(acs2017_ny)
+dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) & (acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55))
+detach()
+attach(dat_NYC)
+summary(dat_NYC)
+commute_indx <- factor((Commute_car + 2*Commute_bus + 3*Commute_subway + 4*Commute_rail + 5*Commute_other), levels=c(1,2,3,4,5),labels = c("Car","Bus","Subway","Rail","Other"))
+
+norm_varb <- function(X_in) { (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
+}
+
+#Variables to predict commute.
+
+norm_inc_tot <- norm_varb(INCTOT)
+norm_poverty <- norm_varb(POVERTY)
+norm_rent <- norm_varb(RENT)
+norm_cost_electricity <- norm_varb(COSTELEC)
+norm_cost_gas <- norm_varb(COSTGAS)
+norm_cost_water <- norm_varb(COSTWATR)
+norm_cost_fuelhome <- norm_varb(COSTFUEL)
+norm_puma <- norm_varb(PUMA)
+norm_white <- norm_varb(white)
+norm_gq <- norm_varb(GQ)
+norm_pvt_insurance <- norm_varb(has_PvtHealthIns)
+
+data_use_prelim <- data.frame(norm_inc_tot,norm_poverty,norm_rent,norm_cost_electricity,norm_cost_gas,norm_cost_water,
+                    norm_cost_fuelhome,norm_puma, norm_white, norm_gq, norm_pvt_insurance)
+good_obs_data_use <- complete.cases(data_use_prelim,commute_indx)
+dat_use <- subset(data_use_prelim,good_obs_data_use)
+y_use <- subset(commute_indx,good_obs_data_use)
+
+set.seed(12345)
+NN_obs <- sum(good_obs_data_use == 1)
+select1 <- (runif(NN_obs) < 0.9)
+train_data <- subset(dat_use,select1)
+test_data <- subset(dat_use,(!select1))
+cl_data <- y_use[select1]
+true_data <- y_use[!select1]
+
+summary(cl_data)
+prop.table(summary(cl_data))
+summary(train_data)
+require(class)
+for (indx in seq(1, 9, by= 2)) {
+  pred_borough <- knn(train_data, test_data, cl_data, k = indx, l = 0, prob = FALSE, use.all = TRUE)
+  num_correct_labels <- sum(pred_borough == true_data)
+  correct_rate <- num_correct_labels/length(true_data)
+  print(c(indx,correct_rate))
+}
+# In this Knn, the accuracy is in the 0.40s, however when adding TRANWORK the accuracy is
+# extremely high, at 0.85(which makes sense since this is literally says how they commute to work.)
+# Additionally, we increased  the amount of variables to the knn in order to increase the accuracy 
+# of predicting which type of method people used to commute.
+# Furthermore, we switched up the train and test data, to a 0.9/0.1 ratio, instead of 0.8 to 0.2, to increase 
+# the accuracy even further.
+# In conclusion, the KNN is a decent predictor when aiming at the commuting methods of people that live in
+# NYC depending on the added variables.
+cl_data_n <- as.numeric(cl_data)
+model_ols1 <- lm(cl_data_n ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                 + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                 + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                 + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)         
+y_hat <- fitted.values(model_ols1)
+summary(model_ols_v1)
+mean(y_hat[cl_data_n == 1])
+mean(y_hat[cl_data_n == 2])
+mean(y_hat[cl_data_n == 3])
+mean(y_hat[cl_data_n == 4])
+mean(y_hat[cl_data_n == 5])
+
+cl_data_n1 <- as.numeric(cl_data_n == 1)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                    + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+
+cl_data_n1 <- as.numeric(cl_data_n == 2)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+
+cl_data_n1 <- as.numeric(cl_data_n == 3)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+
+cl_data_n1 <- as.numeric(cl_data_n == 4)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+
+cl_data_n1 <- as.numeric(cl_data_n == 5)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+detach()
+detach()
+
+
+
+#Consider an election with generic candidates X vs Y (which we could interpret as chromosomes but not necessarily!).
+# A) Candidate X had the support of 54% of the voters in the latest poll, which had 200 people. 
+# What is a 90% confidence interval for the actual level of support?
+# B) If the polling organization were to add 100 more people to the sample size, how much would the 90% confidence interval change?
+# C) Last month’s poll had the candidate supported by 51% – both the previous poll and the current poll had 200 people. 
+# Is the difference in polling statistically significant?
+# D) Candidate X must win 2 particular states in order to win the election; the forecast says she has a 60% chance of winning each state individually. 
+# Your friend, a wannabe statistician, explains that a 0.6 chance of winning one state and a 0.6 chance of winning the other means only a 0.6*0.6= 0.36 chance of winning both - 
+# so the “favorite” is actually not the favorite! Explain why your friend is wrong.
+
+# A) To get x, do 200*0.54=108
+prop.test(108,200,0.54, alternative = c("two.sided"),conf.level = 0.90, correct = TRUE)
+#90 percent confidence interval:
+# 0.3142488 0.4083449
+
+# B) To get x, do 300*0.54=162
+prop.test(162,300,0.54, alternative = c("two.sided"),conf.level = 0.90, correct = TRUE)
+
+# C)  FOR TWO SAMPLE Z TEST
+# 200*0.54=108 and 200*0.51*=102
+polling <- matrix(c(108,200,102,200), ncol = 2,byrow = TRUE)
+prop.test(polling)
+#Fail to reject the null and conclude there is no significant difference between the two.
+# D) both probability chances are independent, combined probability = (0.60+0.60)/2 = .60
+
+
 0.3538302-0.2659855
