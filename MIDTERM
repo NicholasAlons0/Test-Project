@@ -1,0 +1,790 @@
+
+attach(Household_Pulse_data)
+summary(Household_Pulse_data)
+no_nas <- na.omit(Household_Pulse_data)
+detach()
+attach(no_nas)
+region_north <- xtabs(~ EEDUC + RECVDVACC + REGION) 
+summary(as.numeric(region_north))
+summary(region_north)
+
+# we will create a subset
+dat_subset <-  as.logical(ED)
+dat_use <- subset(Household_Pulse_data, dat_subset)
+attach(dat_subset)
+
+newyork <- EST_ST == 36
+summary(newyork)
+
+northeast <-  REGION == 1
+#subset
+
+
+education3 <- as.numeric(EEDUC)
+regions <- as.numeric(REGION)
+
+vaccine <- as.numeric(RECVDVACC)
+
+
+#REGSSION FOR FIRST QUESITION
+regressions <- lm(vaccine ~ EEDUC*REGION)
+summary(regressions)
+
+# PEOPLE with an advance degree, from the south region are not as significant because the 
+# t value is to close to zero, the p value is above the level of significance.
+# Thus, I fail to reject the null hypothesis for people in the south with an advance 
+# degree have and conclude there is no significant relationship between getting the vaccine and
+# and people in the south with an advance degree.
+# Compared to people in with education high school oin region west, that have a tstat that 
+# is far away from  zero and a pvalue below the level of significance, I can say with 99%
+# confidence that we reject th null hypothesis that there is no relationship between getting the 
+#vaccine and are in favor of the alternative hypothesis that there is a relationship.
+# the same would apply, to the variabels taht have no significance stars, we fail to reject trhe null
+# hypothess that there is no reltionship. whereas, all the variables taht have at least one star,
+# we reject the null hypothesis dependeing the level of significane
+
+
+genderid <- as.numeric(GENID_DESCRIBE)
+regressions3 <- lm(genderid ~ EEDUC*RECVDVACC)
+summary(regressions3)
+
+# In the regression, the Null Hypothesis is that there is no significant difference or relationship between the genderID
+# and educations and people the recieve the vaccine,
+# while the alternative hypothesis states there is a significant difference or relationship.
+# The t-stats, p-values and confidence intervals of the someone with advance education,
+# that have received the vaccine is significant because of the p value that is 0.0056, which
+# below the level of significance and has a t-stats of 2.767, which is decently far from 0,
+#therefore we reject the null hypothesis that there is no relationship and conclude that
+# there is a relationship between genderID and people advance education, that have received the vaccine.
+# for the ones with no significance, like somecollege and no covid vaccine, 
+# we fail to reject the null hypothesis and conclude there is no relationship between genderID AND 
+# education level or people that not get the covid vaccine.
+
+
+
+
+
+summary(northeast)
+variable <- (EEDUC) & (REGION == 1) & (RECVDVACC == 1)
+
+alamba <-  (EST_ST == 01)
+summary(alamba)
+xtabs(EEDUC, RECVDVACC)
+
+GENID_DESCRIBE
+
+
+northeast <-na.omit(REGION == 1)
+summary(northeast)
+south <- na.omit(REGION == 2)
+summary(south)
+
+
+# We will run a regression attempting to compare people's income based on if they are Hispanic, if they
+# volunteer, 
+#hypothesis test would be using a subgroup of people
+#WE WANTED TO USE OUR Regressions to test for people based on their income, using the depend t variables 
+# for childfoof, with income as the dependent variable and if the kids had food 
+# and based of people that reported if their children would enroll in school as the independent variables.
+
+sexual <- na.omit(SEXUAL_ORIENTATION)
+
+child_food <- as.numeric(  CHILDFOOD)
+summary(ENROLLNONE)
+summary(INCOME)
+
+
+
+income1 <- as.numeric( INCOME)
+hispan <- RHISPANIC
+
+regression <- lm(income1 ~  hispan)
+summary(regression)
+
+# In the regression, the Null Hypothesis is that there is no significant difference or relationship between the income
+# and hispanic, while the alternative hypothesis states there is a significant difference or relationship.
+# The t-stats, p-values and confidence intervals of the hispanic have t-stats are far away from 0, 
+# the p-values are less than the level of significance and the coefficients fall within the confidence intervals.
+# Therefore, the independent variables are statistically significant.
+# Thus, we reject the null hypothesis that there is no significant difference, in favor of the alternative
+# hypothesis to support that there is a difference between the income and hispan variable.
+# Therefore, there is a relationship between income and hispan. 
+
+#KNN
+summary(race)
+
+blavck <- as.numeric(RRACE)
+hispan2 <- as.numeric(RHISPANIC)
+indx <- factor((blavck + 2*hispan2), levels=c(1,2), labels = c("BLACK" , "HISPAN"))
+
+
+
+indx <- factor(RRACE)
+#HAD COVID IS FACTOR
+
+norm_varb <- function(X_in) {
+  (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
+}
+
+race <- as.numeric(RRACE)
+norm_race <- norm_varb(race)
+
+data_use_prelim <- data.frame(norm_race)
+good_obs_data_use <- complete.cases(data_use_prelim,ANYWORK)
+dat_use <- subset(data_use_prelim,good_obs_data_use)
+y_use <- subset(ANYWORK,good_obs_data_use)
+set.seed(12345)
+NN_obs <- sum(good_obs_data_use == 1)
+select1 <- (runif(NN_obs) < 0.9)
+train_data <- subset(Household_Pulse_data,select1)
+test_data <- subset(Household_Pulse_data,(!select1))
+cl_data <- y_use[select1]
+true_data <- y_use[!select1]
+summary(cl_data)
+
+prop.table(summary(cl_data))
+
+summary(train_data)
+
+
+for (indx in seq(1, 9, by= 2)) {
+  pred_hadcovid <- knn(train_data, test_data, cl_data, k = indx, l = 0, prob = FALSE, use.all = TRUE)
+  num_correct_labels <- sum(pred_hadcovid == true_data)
+  correct_rate <- num_correct_labels/length(true_data)
+  print(c(indx,correct_rate))
+}
+#unable to see the find, but I beileve that minorities are more likely to have covid because
+# of social norms, it would be a good variabel to use for prediction.
+
+
+#Some interesting findings
+summary(SEXUAL_ORIENTATION)
+# were that unlike the acs data, there is multiple sexual identifications in this data set.
+
+covid <- table(RECVDVACC)
+prop.table(covid)
+#we know that 87 percent of people got the vaccine, where 11 percent did not.
+
+
+#All of the work on this exam is my own, answered honestly as rules state.
+#Name: Nicholas Alonso
+#  Date: 10/14/2021
+
+#CONSOLE OUTPUT
+
+
+attach(Household_Pulse_data)
+> summary(Household_Pulse_data)
+        RHISPANIC       RRACE                EEDUC               MS        EGENID_BIRTH  
+ Not Hispanic:62660   White:56938   less than hs:  411   NA       :  881   male  :27592  
+ Hispanic    : 6454   Black: 5412   some hs     :  936   married  :40036   female:41522  
+                      Asian: 3561   HS diploma  : 7857   widowed  : 3872                 
+                      Other: 3203   some coll   :14596   divorced :10310                 
+                                    assoc deg   : 7508   separated: 1214                 
+                                    bach deg    :20075   never    :12801                 
+                                    adv deg     :17731                                   
+     GENID_DESCRIBE       SEXUAL_ORIENTATION                      KIDS_LT5Y    
+ NA         : 1131   NA            : 1506    NA                        :62342  
+ male       :26796   gay or lesbian: 2343    Yes children under 5 in HH: 6772  
+ female     :40263   straight      :61238                                      
+ transgender:  202   bisexual      : 2288                                      
+ other      :  722   something else:  871                                      
+                     dont know     :  868                                      
+                                                                               
+                     KIDS_5_11Y                        KIDS_12_17Y   
+ NA                       :58467   NA                        :58046  
+ Yes children 5 - 11 in HH:10647   Yes children 12 - 17 in HH:11068  
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                              ENROLLNONE                  RECVDVACC    
+ NA                                :64285   NA                 :  851  
+ children not in any type of school: 4829   yes got vaxx       :60326  
+                                            no did not get vaxx: 7937  
+                                                                       
+                                                                       
+                                                                       
+                                                                       
+                      DOSESRV                          GETVACRV    
+ NA                       : 9105   NA                      :61159  
+ yes got all doses        :57762   definitely will get vaxx:  609  
+ yes plan to get all doses: 1993   probably will get vaxx  :  731  
+ no will not get all doses:  254   unsure about vaxx       : 1584  
+                                   probably not            : 1599  
+                                   definitely not          : 3432  
+                                                                   
+                               KIDDOSES                        KIDGETVAC    
+ NA                                :58318   NA                      :65384  
+ Yes kids got or will get all doses: 7135   definitely will get vaxx:  487  
+ no kids did not or will not       : 3661   probably will get vaxx  :  439  
+                                            unsure about vaxx       :  736  
+                                            probably not            :  593  
+                                            definitely not          : 1036  
+                                            dont know yet           :  439  
+                      HADCOVID                      WRKLOSSRV                              ANYWORK     
+ NA                       : 1363   NA                    : 1961   NA                           : 2135  
+ yes doctor told had covid: 9122   yes recent HH job loss: 8058   yes employment in last 7 days:39237  
+ no did not               :58221   no recent HH job loss :59095   no employment in last 7 days :27742  
+ not sure                 :  408                                                                       
+                                                                                                       
+                                                                                                       
+                                                                                                       
+                KINDWORK                RSNNOWRKRV                                         CHLDCARE    
+ NA                 :30540   NA              :42659   NA                                       :58419  
+ work for govt      : 6378   retired         :15024   yes impacts to childcare because pandemic: 2566  
+ work for private co:21370   other           : 4027   no                                       : 8129  
+ work for nonprofit : 5055   sick or disabled: 1451                                                    
+ self employed      : 4966   caring for kids : 1329                                                    
+ work in family biz :  805   laid off        : 1164                                                    
+                             (Other)         : 3460                                                    
+                          CURFOODSUF                                                  CHILDFOOD    
+ NA                            : 6770   NA                                                 :64258  
+ had enough food               :49234   often kids not eating enough because couldnt afford:  271  
+ had enough but not what wanted: 9947   sometimes kids not eating enough                   : 1191  
+ sometimes not enough food     : 2486   kids got enough food                               : 3394  
+ often not enough food         :  677                                                              
+                                                                                                   
+                                                                                                   
+                                            ANXIOUS     
+ NA                                             : 7946  
+ no anxiety over past 2 wks                     :26611  
+ several days anxiety over past 2 wks           :19794  
+ more than half the days anxiety over past 2 wks: 6140  
+ nearly every day anxiety                       : 8623  
+                                                        
+                                                        
+                                             WORRY                                 TENURE     
+ NA                                             : 8016   NA                           :11103  
+ no worry over past 2 wks                       :31876   housing owned free and clear :16738  
+ several days worried over past 2 wks           :17936   housing owned with mortgage  :28016  
+ more than half the days worried over past 2 wks: 4979   housing rented               :12579  
+ nearly every day worry                         : 6307   housing occupied without rent:  678  
+                                                                                              
+                                                                                              
+                                LIVQTRRV                RENTCUR                     MORTCUR     
+ live in detached 1 family          :41348   NA             :56572   NA                 :41200  
+ NA                                 :11336   current on rent:11239   current on mortgage:26462  
+ live in bldg w 5+ apts             : 6731   behind on rent : 1303   behind on mortgage : 1452  
+ live in 1 family attached to others: 4628                                                      
+ live in mobile home                : 1781                                                      
+ live in building with 3-4 apts     : 1737                                                      
+ (Other)                            : 1553                                                      
+                                        EVICT      
+ NA                                        :67859  
+ very likely evicted in next 2 months      :  207  
+ somewhat likely evicted in next 2 months  :  377  
+ not very likely evicted in next 2 months  :  345  
+ not at all likely evicted in next 2 months:  326  
+                                                   
+                                                   
+                                          FORCLOSE               EST_ST     
+ NA                                           :67695   California   : 5359  
+ very likely forclosed in next 2 months       :   65   Texas        : 3766  
+ somewhat likely forclosed in next 2 months   :  218   Florida      : 2728  
+ not very likely forclosed in next 2 months   :  474   Washington   : 2634  
+ not at all forclosed evicted in next 2 months:  662   Massachusetts: 1965  
+                                                       Oregon       : 1934  
+                                                       (Other)      :50728  
+                   PRIVHLTH                      PUBHLTH            REGION     
+ has private health ins:46869   has public health ins:23346   Northeast:10478  
+ no private health ins :11275   no public health ins :33381   South    :22680  
+ NA                    :10970   NA                   :12387   Midwest  :13651  
+                                                              West     :22305  
+                                                                               
+                                                                               
+                                                                               
+                     INCOME      Num_kids_Pub_School Num_kids_Priv_School Num_kids_homeschool
+ NA                     :20335   Min.   :0.00        Min.   :0.00         Min.   :0.00       
+ HH income $75 - 99.9   :10117   1st Qu.:1.00        1st Qu.:0.00         1st Qu.:0.00       
+ HH income $35k - 49.9  : 9330   Median :2.00        Median :1.00         Median :1.00       
+ HH income $50k - 74.9  : 7830   Mean   :1.71        Mean   :1.03         Mean   :0.87       
+ HH income $150 - 199   : 6117   3rd Qu.:2.00        3rd Qu.:2.00         3rd Qu.:2.00       
+ HH income $25k - $34.9k: 5805   Max.   :4.00        Max.   :2.00         Max.   :2.00       
+ (Other)                : 9580   NA's   :55108       NA's   :66430        NA's   :67421      
+        Works_onsite            works_remote            Shop_in_store  
+ NA           : 6350   NA             : 8022   NA              : 6873  
+ worked onsite:34918   worked remotely:22863   shopped in store:53576  
+ no           :27846   no             :38229   no              : 8665  
+                                                                       
+                                                                       
+                                                                       
+                                                                       
+                 eat_in_restaurant
+ NA                       : 7217  
+ eat at restaurant indoors:32405  
+ no                       :29492  
+                                  
+                                  
+                                  
+                                  
+> no_nas <- na.omit(Household_Pulse_data)
+> detach()
+> attach(no_nas)
+> region_north <- xtabs(~ EEDUC + RECVDVACC + REGION) 
+> summary(as.numeric(region_north))
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  0.000   0.000   3.000   9.333  11.000  72.000 
+> summary(region_north)
+Call: xtabs(formula = ~EEDUC + RECVDVACC + REGION)
+Number of cases in table: 784 
+Number of factors: 3 
+Test for independence of all factors:
+	Chisq = 110.02, df = 72, p-value = 0.00263
+	Chi-squared approximation may be incorrect
+> # we will create a subset
+> dat_subset <-  as.logical(ED)
+Error: object 'ED' not found
+> dat_use <- subset(Household_Pulse_data, dat_subset)
+Error in eval(e, x, parent.frame()) : object 'dat_subset' not found
+> attach(dat_subset)
+Error in attach(dat_subset) : object 'dat_subset' not found
+> newyork <- EST_ST == 36
+> summary(newyork)
+   Mode   FALSE 
+logical     784 
+> northeast <-  REGION == 1
+> education3 <- as.numeric(EEDUC)
+> regions <- as.numeric(REGION)
+> vaccine <- as.numeric(RECVDVACC)
+> #REGSSION FOR FIRST QUESITION
+> regressions <- lm(vaccine ~ EEDUC*REGION)
+> summary(regressions)
+
+Call:
+lm(formula = vaccine ~ EEDUC * REGION)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.0833 -0.2400 -0.1273  0.0000  0.9444 
+
+Coefficients: (1 not defined because of singularities)
+                                Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                    2.000e+00  2.835e-01   7.055 3.89e-12 ***
+EEDUCsome hs                   6.000e-01  3.354e-01   1.789   0.0740 .  
+EEDUCHS diploma                4.000e-01  3.105e-01   1.288   0.1981    
+EEDUCsome coll                 8.333e-02  2.950e-01   0.282   0.7777    
+EEDUCassoc deg                 2.500e-01  3.062e-01   0.817   0.4145    
+EEDUCbach deg                  4.933e-15  2.928e-01   0.000   1.0000    
+EEDUCadv deg                   9.375e-02  2.922e-01   0.321   0.7484    
+REGIONSouth                    4.286e-01  3.214e-01   1.333   0.1828    
+REGIONMidwest                  5.000e-01  3.472e-01   1.440   0.1502    
+REGIONWest                    -3.044e-15  4.009e-01   0.000   1.0000    
+EEDUCsome hs:REGIONSouth      -7.286e-01  3.893e-01  -1.872   0.0616 .  
+EEDUCHS diploma:REGIONSouth   -3.503e-01  3.555e-01  -0.985   0.3247    
+EEDUCsome coll:REGIONSouth    -2.100e-01  3.362e-01  -0.625   0.5324    
+EEDUCassoc deg:REGIONSouth    -2.286e-01  3.532e-01  -0.647   0.5177    
+EEDUCbach deg:REGIONSouth     -1.886e-01  3.329e-01  -0.566   0.5712    
+EEDUCadv deg:REGIONSouth      -4.668e-01  3.325e-01  -1.404   0.1608    
+EEDUCsome hs:REGIONMidwest    -6.000e-01  4.391e-01  -1.366   0.1723    
+EEDUCHS diploma:REGIONMidwest -5.667e-01  3.815e-01  -1.485   0.1378    
+EEDUCsome coll:REGIONMidwest  -1.987e-01  3.653e-01  -0.544   0.5866    
+EEDUCassoc deg:REGIONMidwest  -3.125e-01  3.794e-01  -0.824   0.4104    
+EEDUCbach deg:REGIONMidwest   -3.393e-01  3.588e-01  -0.946   0.3447    
+EEDUCadv deg:REGIONMidwest    -4.665e-01  3.584e-01  -1.301   0.1935    
+EEDUCsome hs:REGIONWest               NA         NA      NA       NA    
+EEDUCHS diploma:REGIONWest    -1.222e-01  4.309e-01  -0.284   0.7768    
+EEDUCsome coll:REGIONWest      1.567e-01  4.131e-01   0.379   0.7046    
+EEDUCassoc deg:REGIONWest      8.333e-02  4.278e-01   0.195   0.8456    
+EEDUCbach deg:REGIONWest       1.967e-01  4.107e-01   0.479   0.6321    
+EEDUCadv deg:REGIONWest        1.736e-02  4.095e-01   0.042   0.9662    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4009 on 757 degrees of freedom
+Multiple R-squared:  0.09784,	Adjusted R-squared:  0.06686 
+F-statistic: 3.158 on 26 and 757 DF,  p-value: 2.815e-07
+
+> genderid <- as.numeric(GENID_DESCRIBE)
+> regressions3 <- lm(genderid ~ EEDUC*RECVDVACC)
+> summary(regressions3)
+
+Call:
+lm(formula = genderid ~ EEDUC * RECVDVACC)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-1.5854 -0.6605  0.3063  0.3395  2.4186 
+
+Coefficients: (5 not defined because of singularities)
+                                             Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                                   5.10833    0.65504   7.798 2.04e-14 ***
+EEDUCsome hs                                 -0.40000    0.33513  -1.194 0.233011    
+EEDUCHS diploma                              -0.59231    0.28706  -2.063 0.039416 *  
+EEDUCsome coll                               -3.10833    0.88014  -3.532 0.000438 ***
+EEDUCassoc deg                               -0.68000    0.28799  -2.361 0.018464 *  
+EEDUCbach deg                                -0.75897    0.27924  -2.718 0.006716 ** 
+EEDUCadv deg                                 -0.10833    0.28898  -0.375 0.707857    
+RECVDVACCyes got vaxx                        -2.30833    0.68091  -3.390 0.000734 ***
+RECVDVACCno did not get vaxx                 -1.70833    0.59997  -2.847 0.004526 ** 
+EEDUCsome hs:RECVDVACCyes got vaxx            0.05455    0.42223   0.129 0.897247    
+EEDUCHS diploma:RECVDVACCyes got vaxx         0.37370    0.35355   1.057 0.290844    
+EEDUCsome coll:RECVDVACCyes got vaxx          3.00203    0.90129   3.331 0.000907 ***
+EEDUCassoc deg:RECVDVACCyes got vaxx          0.66049    0.35485   1.861 0.063085 .  
+EEDUCbach deg:RECVDVACCyes got vaxx           0.64203    0.33826   1.898 0.058064 .  
+EEDUCadv deg:RECVDVACCyes got vaxx           -0.03120    0.34594  -0.090 0.928157    
+EEDUCsome hs:RECVDVACCno did not get vaxx          NA         NA      NA       NA    
+EEDUCHS diploma:RECVDVACCno did not get vaxx       NA         NA      NA       NA    
+EEDUCsome coll:RECVDVACCno did not get vaxx   2.29370    0.84496   2.715 0.006785 ** 
+EEDUCassoc deg:RECVDVACCno did not get vaxx        NA         NA      NA       NA    
+EEDUCbach deg:RECVDVACCno did not get vaxx         NA         NA      NA       NA    
+EEDUCadv deg:RECVDVACCno did not get vaxx          NA         NA      NA       NA    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.5879 on 768 degrees of freedom
+Multiple R-squared:  0.07124,	Adjusted R-squared:  0.0531 
+F-statistic: 3.927 on 15 and 768 DF,  p-value: 7.48e-07
+
+> summary(northeast)
+   Mode   FALSE 
+logical     784 
+> variable <- (EEDUC) & (REGION == 1) & (RECVDVACC == 1)
+Warning message:
+In Ops.factor((EEDUC), (REGION == 1)) : ‘&’ not meaningful for factors
+> alamba <-  (EST_ST == 01)
+> summary(alamba)
+   Mode   FALSE 
+logical     784 
+> xtabs(EEDUC, RECVDVACC)
+Error in formula.default(object, env = baseenv()) : invalid formula
+> GENID_DESCRIBE
+  [1] female      male        female      female      female      male        male        male       
+  [9] female      male        male        female      male        female      female      male       
+ [17] female      female      female      NA          female      female      female      female     
+ [25] male        female      male        female      female      female      female      female     
+ [33] female      female      female      female      female      female      female      male       
+ [41] female      female      female      female      female      female      male        male       
+ [49] female      male        male        female      male        female      male        male       
+ [57] female      female      other       male        male        female      male        male       
+ [65] female      female      female      female      male        female      female      male       
+ [73] female      other       female      female      female      female      female      female     
+ [81] male        other       male        female      female      female      male        female     
+ [89] male        female      male        female      male        female      female      male       
+ [97] other       male        female      female      male        male        female      female     
+[105] male        female      female      male        male        female      female      male       
+[113] male        female      female      male        male        female      female      female     
+[121] male        female      female      male        female      female      male        female     
+[129] male        male        female      male        transgender male        male        male       
+[137] male        female      male        female      female      male        female      female     
+[145] male        female      male        female      male        transgender female      female     
+[153] male        male        female      male        female      female      male        male       
+[161] female      female      male        female      male        male        female      female     
+[169] female      male        female      male        female      female      female      male       
+[177] male        female      female      female      female      male        female      female     
+[185] female      male        female      female      female      male        male        female     
+[193] female      female      female      female      male        female      male        male       
+[201] female      female      male        female      female      male        female      male       
+[209] female      male        male        male        female      male        female      male       
+[217] male        female      female      female      female      female      male        male       
+[225] male        female      female      female      female      female      female      female     
+[233] female      female      female      female      female      female      female      male       
+[241] female      male        male        male        female      male        female      female     
+[249] female      male        female      female      female      female      female      male       
+[257] male        female      female      female      female      male        female      male       
+[265] male        female      female      male        female      male        transgender female     
+[273] female      female      female      male        other       male        male        male       
+[281] female      male        female      male        male        female      female      male       
+[289] male        female      female      male        male        female      female      male       
+[297] male        female      male        female      female      female      female      male       
+[305] male        female      female      female      male        female      female      female     
+[313] female      male        male        female      male        male        male        male       
+[321] male        male        male        female      male        female      female      female     
+[329] female      female      female      female      female      male        male        female     
+[337] male        male        male        female      female      female      male        male       
+[345] female      female      female      male        male        female      female      female     
+[353] female      male        female      female      female      female      male        female     
+[361] female      female      NA          female      female      male        male        male       
+[369] female      male        male        female      other       female      male        female     
+[377] female      female      male        female      male        male        female      female     
+[385] female      female      female      female      female      female      female      female     
+[393] male        female      male        female      female      female      female      female     
+[401] female      female      female      female      other       male        male        male       
+[409] female      female      other       male        female      female      female      female     
+[417] female      female      female      female      male        female      female      male       
+[425] transgender male        female      female      male        female      transgender male       
+[433] male        male        female      male        female      female      female      male       
+[441] female      male        female      female      female      male        female      male       
+[449] female      female      female      female      female      female      male        female     
+[457] female      female      female      male        female      female      male        male       
+[465] male        male        male        other       female      male        female      male       
+[473] female      male        male        male        female      female      female      female     
+[481] female      female      female      male        male        female      female      female     
+[489] male        male        male        female      male        female      male        female     
+[497] female      female      female      female      male        male        female      male       
+[505] female      female      female      other       female      female      male        female     
+[513] female      female      female      male        female      female      male        female     
+[521] female      male        female      female      male        male        female      male       
+[529] male        female      female      female      female      male        female      female     
+[537] male        female      female      male        male        female      female      female     
+[545] female      male        female      male        female      female      female      female     
+[553] male        female      male        female      female      female      male        female     
+[561] female      male        female      female      male        female      female      male       
+[569] male        male        female      other       transgender male        male        male       
+[577] female      female      female      female      male        male        female      male       
+[585] female      female      female      female      male        male        female      female     
+[593] female      female      female      female      female      female      male        male       
+[601] male        other       female      female      female      female      female      female     
+[609] female      female      male        male        male        female      female      female     
+[617] female      female      male        female      female      female      male        female     
+[625] female      male        female      transgender female      female      female      female     
+[633] male        female      female      female      female      female      female      male       
+[641] male        female      male        female      male        female      male        male       
+[649] female      female      female      female      male        female      transgender male       
+[657] female      male        female      female      male        female      male        female     
+[665] female      female      female      female      female      female      female      male       
+[673] female      male        male        female      male        female      female      female     
+[681] female      female      female      female      male        female      female      female     
+[689] male        male        female      female      female      male        female      female     
+[697] female      male        other       female      female      female      other       female     
+[705] female      male        male        female      male        female      female      male       
+[713] female      female      female      female      female      male        female      female     
+[721] female      female      female      female      male        male        female      female     
+[729] female      male        female      female      female      female      male        female     
+[737] female      female      male        female      female      male        female      male       
+[745] female      male        female      female      male        female      female      female     
+[753] male        female      female      female      female      female      male        male       
+[761] female      male        female      female      male        female      female      female     
+[769] female      female      male        male        other       female      male        female     
+[777] female      male        other       female      male        female      other       female     
+Levels: NA male female transgender other
+> northeast <-na.omit(REGION == 1)
+> summary(northeast)
+   Mode   FALSE 
+logical     784 
+> south <- na.omit(REGION == 2)
+> summary(south)
+   Mode   FALSE 
+logical     784 
+> sexual <- na.omit(SEXUAL_ORIENTATION)
+> child_food <- as.numeric(  CHILDFOOD)
+> summary(ENROLLNONE)
+                                NA children not in any type of school 
+                               784                                  0 
+> summary(INCOME)
+                      NA HH income less than $25k  HH income $25k - $34.9k    HH income $35k - 49.9 
+                     217                       44                       65                       88 
+   HH income $50k - 74.9     HH income $75 - 99.9    HH income $100k - 149     HH income $150 - 199 
+                      95                      129                       62                       84 
+       HH income $200k + 
+                       0 
+> income1 <- as.numeric( INCOME)
+> hispan <- RHISPANIC
+> regression <- lm(income1 ~  hispan)
+> summary(regression)
+
+Call:
+lm(formula = income1 ~ hispan)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-3.1579 -2.6300 -0.1579  1.8421  4.3700 
+
+Coefficients:
+               Estimate Std. Error t value Pr(>|t|)    
+(Intercept)      4.1579     0.0935  44.469   <2e-16 ***
+hispanHispanic  -0.5279     0.2618  -2.016   0.0441 *  
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 2.445 on 782 degrees of freedom
+Multiple R-squared:  0.005172,	Adjusted R-squared:  0.0039 
+F-statistic: 4.066 on 1 and 782 DF,  p-value: 0.0441
+
+> #KNN
+> summary(race)
+Error in summary(race) : object 'race' not found
+> blavck <- as.numeric(RRACE)
+> hispan2 <- as.numeric(RHISPANIC)
+> indx <- factor((blavck + 2*hispan2), levels=c(1,2), labels = c("BLACK" , "HISPAN"))
+> indx <- factor(RRACE)
+> norm_varb <- function(X_in) {
++   (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
++ }
+> race <- as.numeric(RRACE)
+> norm_race <- norm_varb(race)
+> data_use_prelim <- data.frame(norm_race)
+> good_obs_data_use <- complete.cases(data_use_prelim,ANYWORK)
+> dat_use <- subset(data_use_prelim,good_obs_data_use)
+> y_use <- subset(ANYWORK,good_obs_data_use)
+> set.seed(12345)
+> NN_obs <- sum(good_obs_data_use == 1)
+> select1 <- (runif(NN_obs) < 0.9)
+> train_data <- subset(Household_Pulse_data,select1)
+> test_data <- subset(Household_Pulse_data,(!select1))
+> cl_data <- y_use[select1]
+> true_data <- y_use[!select1]
+> summary(cl_data)
+                           NA yes employment in last 7 days  no employment in last 7 days 
+                           24                           470                           205 
+> prop.table(summary(cl_data))
+                           NA yes employment in last 7 days  no employment in last 7 days 
+                   0.03433476                    0.67238913                    0.29327611 
+> summary(train_data)
+        RHISPANIC       RRACE                EEDUC               MS        EGENID_BIRTH  
+ Not Hispanic:55856   White:50717   less than hs:  351   NA       :  792   male  :24627  
+ Hispanic    : 5762   Black: 4857   some hs     :  827   married  :35637   female:36991  
+                      Asian: 3190   HS diploma  : 7014   widowed  : 3471                 
+                      Other: 2854   some coll   :13025   divorced : 9188                 
+                                    assoc deg   : 6719   separated: 1085                 
+                                    bach deg    :17908   never    :11445                 
+                                    adv deg     :15774                                   
+     GENID_DESCRIBE       SEXUAL_ORIENTATION                      KIDS_LT5Y    
+ NA         : 1016   NA            : 1334    NA                        :55579  
+ male       :23911   gay or lesbian: 2094    Yes children under 5 in HH: 6039  
+ female     :35885   straight      :54635                                      
+ transgender:  171   bisexual      : 2028                                      
+ other      :  635   something else:  764                                      
+                     dont know     :  763                                      
+                                                                               
+                     KIDS_5_11Y                        KIDS_12_17Y   
+ NA                       :52173   NA                        :51807  
+ Yes children 5 - 11 in HH: 9445   Yes children 12 - 17 in HH: 9811  
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                                                                     
+                              ENROLLNONE                  RECVDVACC    
+ NA                                :57287   NA                 :  752  
+ children not in any type of school: 4331   yes got vaxx       :53770  
+                                            no did not get vaxx: 7096  
+                                                                       
+                                                                       
+                                                                       
+                                                                       
+                      DOSESRV                          GETVACRV    
+ NA                       : 8132   NA                      :54504  
+ yes got all doses        :51485   definitely will get vaxx:  539  
+ yes plan to get all doses: 1774   probably will get vaxx  :  654  
+ no will not get all doses:  227   unsure about vaxx       : 1412  
+                                   probably not            : 1441  
+                                   definitely not          : 3068  
+                                                                   
+                               KIDDOSES                        KIDGETVAC    
+ NA                                :52043   NA                      :58301  
+ Yes kids got or will get all doses: 6313   definitely will get vaxx:  428  
+ no kids did not or will not       : 3262   probably will get vaxx  :  401  
+                                            unsure about vaxx       :  652  
+                                            probably not            :  523  
+                                            definitely not          :  920  
+                                            dont know yet           :  393  
+                      HADCOVID                      WRKLOSSRV                              ANYWORK     
+ NA                       : 1200   NA                    : 1720   NA                           : 1887  
+ yes doctor told had covid: 8134   yes recent HH job loss: 7186   yes employment in last 7 days:34959  
+ no did not               :51920   no recent HH job loss :52712   no employment in last 7 days :24772  
+ not sure                 :  364                                                                       
+                                                                                                       
+                                                                                                       
+                                                                                                       
+                KINDWORK                RSNNOWRKRV                                         CHLDCARE    
+ NA                 :27244   NA              :38000   NA                                       :52109  
+ work for govt      : 5725   retired         :13414   yes impacts to childcare because pandemic: 2291  
+ work for private co:19040   other           : 3579   no                                       : 7218  
+ work for nonprofit : 4472   sick or disabled: 1282                                                    
+ self employed      : 4425   caring for kids : 1202                                                    
+ work in family biz :  712   laid off        : 1028                                                    
+                             (Other)         : 3113                                                    
+                          CURFOODSUF                                                  CHILDFOOD    
+ NA                            : 6017   NA                                                 :57281  
+ had enough food               :43869   often kids not eating enough because couldnt afford:  235  
+ had enough but not what wanted: 8895   sometimes kids not eating enough                   : 1072  
+ sometimes not enough food     : 2233   kids got enough food                               : 3030  
+ often not enough food         :  604                                                              
+                                                                                                   
+                                                                                                   
+                                            ANXIOUS     
+ NA                                             : 7067  
+ no anxiety over past 2 wks                     :23732  
+ several days anxiety over past 2 wks           :17647  
+ more than half the days anxiety over past 2 wks: 5481  
+ nearly every day anxiety                       : 7691  
+                                                        
+                                                        
+                                             WORRY                                 TENURE     
+ NA                                             : 7124   NA                           : 9924  
+ no worry over past 2 wks                       :28425   housing owned free and clear :14874  
+ several days worried over past 2 wks           :16005   housing owned with mortgage  :24941  
+ more than half the days worried over past 2 wks: 4437   housing rented               :11270  
+ nearly every day worry                         : 5627   housing occupied without rent:  609  
+                                                                                              
+                                                                                              
+                                LIVQTRRV                RENTCUR                     MORTCUR     
+ live in detached 1 family          :36814   NA             :50384   NA                 :36767  
+ NA                                 :10134   current on rent:10052   current on mortgage:23551  
+ live in bldg w 5+ apts             : 5998   behind on rent : 1182   behind on mortgage : 1300  
+ live in 1 family attached to others: 4145                                                      
+ live in mobile home                : 1588                                                      
+ live in building with 3-4 apts     : 1555                                                      
+ (Other)                            : 1384                                                      
+                                        EVICT      
+ NA                                        :60481  
+ very likely evicted in next 2 months      :  184  
+ somewhat likely evicted in next 2 months  :  337  
+ not very likely evicted in next 2 months  :  323  
+ not at all likely evicted in next 2 months:  293  
+                                                   
+                                                   
+                                          FORCLOSE               EST_ST     
+ NA                                           :60347   California   : 4801  
+ very likely forclosed in next 2 months       :   59   Texas        : 3370  
+ somewhat likely forclosed in next 2 months   :  195   Florida      : 2426  
+ not very likely forclosed in next 2 months   :  432   Washington   : 2341  
+ not at all forclosed evicted in next 2 months:  585   Massachusetts: 1742  
+                                                       Oregon       : 1724  
+                                                       (Other)      :45214  
+                   PRIVHLTH                      PUBHLTH            REGION     
+ has private health ins:41821   has public health ins:20754   Northeast: 9332  
+ no private health ins :10048   no public health ins :29812   South    :20241  
+ NA                    : 9749   NA                   :11052   Midwest  :12133  
+                                                              West     :19912  
+                                                                               
+                                                                               
+                                                                               
+                     INCOME      Num_kids_Pub_School Num_kids_Priv_School Num_kids_homeschool
+ NA                     :18146   Min.   :0.00        Min.   :0.00         Min.   :0.00       
+ HH income $75 - 99.9   : 9003   1st Qu.:1.00        1st Qu.:0.00         1st Qu.:0.00       
+ HH income $35k - 49.9  : 8335   Median :2.00        Median :1.00         Median :1.00       
+ HH income $50k - 74.9  : 6958   Mean   :1.71        Mean   :1.03         Mean   :0.87       
+ HH income $150 - 199   : 5489   3rd Qu.:2.00        3rd Qu.:2.00         3rd Qu.:2.00       
+ HH income $25k - $34.9k: 5161   Max.   :4.00        Max.   :2.00         Max.   :2.00       
+ (Other)                : 8526   NA's   :49206       NA's   :59226        NA's   :60108      
+        Works_onsite            works_remote            Shop_in_store  
+ NA           : 5639   NA             : 7127   NA              : 6107  
+ worked onsite:31103   worked remotely:20402   shopped in store:47762  
+ no           :24876   no             :34089   no              : 7749  
+                                                                       
+                                                                       
+                                                                       
+                                                                       
+                 eat_in_restaurant
+ NA                       : 6414  
+ eat at restaurant indoors:28877  
+ no                       :26327  
+                                  
+                                  
+                                  
+                                  
+> for (indx in seq(1, 9, by= 2)) {
++   pred_hadcovid <- knn(train_data, test_data, cl_data, k = indx, l = 0, prob = FALSE, use.all = TRUE)
++   num_correct_labels <- sum(pred_hadcovid == true_data)
++   correct_rate <- num_correct_labels/length(true_data)
++   print(c(indx,correct_rate))
++ }
+Error in knn(train_data, test_data, cl_data, k = indx, l = 0, prob = FALSE,  : 
+  could not find function "knn"
+> #Some interesting findings
+> summary(SEXUAL_ORIENTATION)
+            NA gay or lesbian       straight       bisexual something else      dont know 
+             6             17            708             30             11             12 
+> covid <- table(RECVDVACC)
+> prop.table(covid)
+RECVDVACC
+                 NA        yes got vaxx no did not get vaxx 
+         0.00255102          0.78316327          0.21428571 
+> 
+> 
+> #All of the work on this exam is my own, answered honestly as rules state.
+> #All of the work on this exam is my own, answered honestly as rules state.
+> #Name: Nicholas Alonso
