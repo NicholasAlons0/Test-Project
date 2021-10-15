@@ -178,7 +178,6 @@ pt(-2,18)
 0.03041073*2
 
 
-
 #PROBLEM 2??? how to get pvalue?
 #t-stat is estimate/std.error
 
@@ -191,23 +190,31 @@ detach()
 attach(dat_NYC)
 
 #Comparing Groups
+home <- TRANWORK == 70
+subway <- TRANWORK == 33
+summary(as.numeric(home))
+summary(as.numeric(subway))
+
 #Educational attainments for people that work at home.
 wrk_home_edu <- EDUC[TRANWORK == 70]
 summary(wrk_home_edu)
 
+female_home <- (TRANWORK == 70) & (female == 1)
+summary(female_home)
+summary(as.numeric(female_home))
+
+
 #Educational attainments for people that commute in the subway.
 wrk_subway_edu <- EDUCD[TRANWORK == 33]
 summary(wrk_subway_edu)
-
 
 #Likelihood that works from home with a 4 year degree
 wrk_home_4year <- (TRANWORK == 70) & (educ_college) 
 summary(as.numeric(wrk_home_4year))
 summary(wrk_home_4year)
 
-
 # given that someone is female, likelihood that she works from home.
-wrk_home_female <- (female) & (TRANWORK == 70)
+wrk_home_female <- (female == 1) & (TRANWORK == 70)
 summary(as.numeric(wrk_home_female))
 summary(wrk_home_female)
 
@@ -219,10 +226,11 @@ summary(wrk_home_male)
 
 
 #Create confidence interval and p-value
-table <- table(TRANWORK == 70, TRANWORK == 33)
+table <- table(wrk_home_female, wrk_home_male)
 prop.test(table)
-prop.table(table)
 
+confint(wrk_home_female, wrk_home_male)
+confint(table)
 
 
 #NUMBER 4, 2019
@@ -233,14 +241,13 @@ attach(dat_NYC)
 
 WORKHOMENV <- (TRANWORK == 70)
 WORKSUBWAYNV <- (TRANWORK == 33)
-model_temp1 <- lm(TRANTIME ~ WORKHOMENV + WORKSUBWAYNV + AGE  + AfAm + educ_nohs + educ_hs + educ_somecoll
-                  + educ_college + educ_advdeg)
+model_temp1 <- lm(TRANTIME ~ AGE  + AfAm + educ_nohs + educ_hs + educ_somecoll + educ_college + educ_advdeg)
 summary(model_temp1)
 confint(model_temp1)
 # By running the regression, all the variables except for educ_somecoll, are significant because the p-value is 
 # significantly below the level of significance, therefore we reject the null hypothesis that there is no 
 # relationship between the independent variables, and conclude that the alternative hypothesis holds significance, 
-#that there is a relationship between the independent and dependent variables.
+# that there is a relationship between the independent and dependent variables.
 # The null hypothesis in this case is that the education dummies have no relationship to TRANTIME, 
 # while the alternative hypothesis is that there is a relationship with TRANTIME.
 require(stargazer)
@@ -251,13 +258,15 @@ set.seed(12345)
 graph_obs <- (runif(NNobs) < 0.1) 
 dat_graph <- subset(dat_NYC,graph_obs)  
 plot(TRANTIME ~ jitter(AGE, factor = 2), pch = 4, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,150), data = dat_graph)
-to_be_predicted2 <- data.frame(AGE = 20:55,  WORKHOMENV = 0, WORKSUBWAYNV = 0, AfAm = 1, educ_nohs = 0, educ_hs = 0, educ_somecoll = 1, educ_college = 0, educ_advdeg = 0)
+to_be_predicted2 <- data.frame(AGE = 20:55, AfAm = 1, educ_nohs = 0, educ_hs = 0, educ_somecoll = 1, educ_college = 0, educ_advdeg = 0)
 to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
 # Calculate predicted values for some people and assess if these seem plausible.
 # Perhaps a graph of data and predicted values.
-# ERROR WITH LAST LINE
 detach()
-
+detach()
+detach()
+detach()
+detach()
 
 
 #PROBLEM 5 KNN
@@ -266,13 +275,11 @@ dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) & (acs2017_ny$AGE > 20) &
 detach()
 attach(dat_NYC)
 summary(dat_NYC)
-commute_indx <- factor((Commute_car + 2*Commute_bus + 3*Commute_subway + 4*Commute_rail + 5*Commute_other), levels=c(1,2,3,4,5),labels = c("Car","Bus","Subway","Rail","Other"))
+educ_indx <- factor((educ_nohs + 2*educ_hs + 3*educ_somecoll + 4*educ_college + 5*educ_advdeg), levels=c(1,2,3,4,5),labels = c("No HS","HS","SmColl","Bach","Adv"))
 
 norm_varb <- function(X_in) { (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
 }
-
 #Variables to predict commute.
-
 norm_inc_tot <- norm_varb(INCTOT)
 norm_poverty <- norm_varb(POVERTY)
 norm_rent <- norm_varb(RENT)
@@ -287,9 +294,9 @@ norm_pvt_insurance <- norm_varb(has_PvtHealthIns)
 
 data_use_prelim <- data.frame(norm_inc_tot,norm_poverty,norm_rent,norm_cost_electricity,norm_cost_gas,norm_cost_water,
                     norm_cost_fuelhome,norm_puma, norm_white, norm_gq, norm_pvt_insurance)
-good_obs_data_use <- complete.cases(data_use_prelim,commute_indx)
+good_obs_data_use <- complete.cases(data_use_prelim,educ_indx)
 dat_use <- subset(data_use_prelim,good_obs_data_use)
-y_use <- subset(commute_indx,good_obs_data_use)
+y_use <- subset(educ_indx,good_obs_data_use)
 
 set.seed(12345)
 NN_obs <- sum(good_obs_data_use == 1)
@@ -313,8 +320,6 @@ for (indx in seq(1, 9, by= 2)) {
 # extremely high, at 0.85(which makes sense since this is literally says how they commute to work.)
 # Additionally, we increased  the amount of variables to the knn in order to increase the accuracy 
 # of predicting which type of method people used to commute.
-# Furthermore, we switched up the train and test data, to a 0.9/0.1 ratio, instead of 0.8 to 0.2, to increase 
-# the accuracy even further.
 # In conclusion, the KNN is a decent predictor when aiming at the commuting methods of people that live in
 # NYC depending on the added variables.
 cl_data_n <- as.numeric(cl_data)
@@ -370,10 +375,6 @@ model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_povert
                    + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
 y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
-detach()
-detach()
-
-
 
 #Consider an election with generic candidates X vs Y (which we could interpret as chromosomes but not necessarily!).
 # A) Candidate X had the support of 54% of the voters in the latest poll, which had 200 people. 
@@ -401,4 +402,243 @@ prop.test(polling)
 # D) both probability chances are independent, combined probability = (0.60+0.60)/2 = .60
 
 
-0.3538302-0.2659855
+#Do a statistical test of the difference in average age between working people 
+#in the Bronx vs working people in Brooklyn. What is the 95% confidence interval for the 
+#difference in means?
+attach(acs2017_ny)
+difference_age <- lm(AGE ~ in_Bronx + in_Brooklyn)
+confint(difference_age)
+
+
+#difference of averege is depdent variables in regression?
+#the null hypothesis is that their is no difference in wages between the independet variables
+
+PUMA <- as.factor(PUMA)
+
+levels_n <- read.csv("PUMA_levels.csv")
+levels_orig <- levels(PUMA) 
+levels_new <- join(data.frame(levels_orig),data.frame(levels_n))
+levels(PUMA) <- levels_new$New_Level
+
+
+
+age_bronx <- AGE[in_Bronx == 1]
+age_brooklyn <- AGE[in_Brooklyn == 1]
+
+table <- table(age_bronx,age_brooklyn, col = 2)
+
+confusionMatrix(age_bronx,age_brooklyn)
+
+
+#Using the PUMS data, can you narrow this further - 
+# what are the socioeconomic of bus/subway in the various boroughs? 
+# What is the wealthiest PUMA area and how do the people living there tend to commute?
+
+
+
+summary(INCWAGE[ Commute_bus == 1 & in_Bronx == 1])
+summary(bus_wage1)
+
+bus_wage2 <- INCWAGE[ Commute_bus == 1 & in_Manhattan == 1]
+summary(bus_wage2)
+
+bus_wage3 <- INCWAGE[ Commute_bus == 1 & in_StatenI == 1]
+summary(bus_wage3)
+
+bus_wage4 <- INCWAGE[ Commute_bus == 1 & in_Brooklyn == 1]
+summary(bus_wage4)
+
+bus_wage5 <- INCWAGE[ Commute_bus == 1 & in_Queens == 1]
+summary(bus_wage5)
+
+
+
+sub_wage1 <- INCWAGE[ Commute_subway == 1 & in_Bronx == 1]
+summary(sub_wage1)
+
+sub_wage2 <- INCWAGE[ Commute_subway == 1 & in_Manhattan == 1]
+summary(sub_wage2)
+
+sub_wage3 <- INCWAGE[ Commute_subway == 1 & in_StatenI == 1]
+summary(sub_wage3)
+
+sub_wage4 <- INCWAGE[ Commute_subway ==  1 & in_Brooklyn == 1]
+summary(sub_wage4)
+
+sub_wage5 <- INCWAGE[ Commute_subway ==  1 & in_Queens == 1]
+summary(sub_wage5)
+
+
+subway_wage <- INCWAGE[Commute_subway == 1]
+summary(subway_wage)
+
+summary(PUMA)
+
+
+puma_wage_bronx <- INCWAGE[PUMA > 3700 & PUMA < 3711]
+summary(puma_wage_bronx)
+
+
+puma_wage_manhat <- INCWAGE[PUMA > 3800 & PUMA < 3811]
+summary(puma_wage_manhat)
+
+
+puma_wage_staten <- INCWAGE[PUMA > 3901 & PUMA < 3904]
+summary(puma_wage_staten)
+
+puma_wage_brooklyn <- INCWAGE[PUMA > 4000 & PUMA < 4019]
+summary(puma_wage_brooklyn)
+
+puma_wage_queens <- INCWAGE[PUMA > 4100 & PUMA < 4115]
+summary(puma_wage_queens)
+
+#The highest wages from PUMA are those in Manhattan.
+#
+commute_manhat <- TRANWORK[PUMA > 3800 & PUMA < 3811]
+summary(commute_manhat)
+#MEDIAN is 33, so most tend to commute using subway.
+
+attach(acs2017_ny)
+dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) & (acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55))
+detach()
+attach(dat_NYC)
+summary(dat_NYC)
+commute_indx <- factor((Commute_car + 2*Commute_bus + 3*Commute_subway + 4*Commute_rail + 5*Commute_other), levels=c(1,2,3,4,5),labels = c("Car","Bus","Subway","Rail","Other"))
+
+norm_varb <- function(X_in) { (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
+}
+
+#Variables to predict commute.
+
+norm_inc_tot <- norm_varb(INCTOT)
+norm_poverty <- norm_varb(POVERTY)
+norm_rent <- norm_varb(RENT)
+norm_cost_electricity <- norm_varb(COSTELEC)
+norm_cost_gas <- norm_varb(COSTGAS)
+norm_cost_water <- norm_varb(COSTWATR)
+norm_cost_fuelhome <- norm_varb(COSTFUEL)
+norm_puma <- norm_varb(PUMA)
+norm_white <- norm_varb(white)
+norm_gq <- norm_varb(GQ)
+norm_pvt_insurance <- norm_varb(has_PvtHealthIns)
+
+data_use_prelim <- data.frame(norm_inc_tot,norm_poverty,norm_rent,norm_cost_electricity,norm_cost_gas,norm_cost_water,
+                              norm_cost_fuelhome,norm_puma, norm_white, norm_gq, norm_pvt_insurance)
+good_obs_data_use <- complete.cases(data_use_prelim,commute_indx)
+dat_use <- subset(data_use_prelim,good_obs_data_use)
+y_use <- subset(commute_indx,good_obs_data_use)
+
+set.seed(12345)
+NN_obs <- sum(good_obs_data_use == 1)
+select1 <- (runif(NN_obs) < 0.9)
+train_data <- subset(dat_use,select1)
+test_data <- subset(dat_use,(!select1))
+cl_data <- y_use[select1]
+true_data <- y_use[!select1]
+
+summary(cl_data)
+prop.table(summary(cl_data))
+summary(train_data)
+require(class)
+for (indx in seq(1, 9, by= 2)) {
+  pred_borough <- knn(train_data, test_data, cl_data, k = indx, l = 0, prob = FALSE, use.all = TRUE)
+  num_correct_labels <- sum(pred_borough == true_data)
+  correct_rate <- num_correct_labels/length(true_data)
+  print(c(indx,correct_rate))
+}
+# In this Knn, the accuracy is in the 0.40s, however when adding TRANWORK the accuracy is
+# extremely high, at 0.85(which makes sense since this is literally says how they commute to work.)
+# Additionally, we increased  the amount of variables to the knn in order to increase the accuracy 
+# of predicting which type of method people used to commute.
+# Furthermore, we switched up the train and test data, to a 0.9/0.1 ratio, instead of 0.8 to 0.2, to increase 
+# the accuracy even further.
+# In conclusion, the KNN is a decent predictor when aiming at the commuting methods of people that live in
+# NYC depending on the added variables.
+cl_data_n <- as.numeric(cl_data)
+model_ols1 <- lm(cl_data_n ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                 + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                 + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                 + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)         
+y_hat <- fitted.values(model_ols1)
+summary(model_ols_v1)
+mean(y_hat[cl_data_n == 1])
+mean(y_hat[cl_data_n == 2])
+mean(y_hat[cl_data_n == 3])
+mean(y_hat[cl_data_n == 4])
+mean(y_hat[cl_data_n == 5])
+
+cl_data_n1 <- as.numeric(cl_data_n == 1)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+
+cl_data_n1 <- as.numeric(cl_data_n == 2)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+
+cl_data_n1 <- as.numeric(cl_data_n == 3)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+
+cl_data_n1 <- as.numeric(cl_data_n == 4)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+
+cl_data_n1 <- as.numeric(cl_data_n == 5)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
+                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
+                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
+                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+detach()
+detach()
+
+attach(acs2017_ny)
+dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) &(acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55))
+detach()
+attach(dat_NYC)
+WORKHOMENV <- (TRANWORK == 70)
+WORKSUBWAYNV <-  (TRANWORK == 33)
+model_temp1 <- lm(TRANTIME ~ WORKHOMENV + WORKSUBWAYNV + AGE  + AfAm + educ_nohs + educ_hs + educ_somecoll
+                  + educ_college + educ_advdeg)
+summary(model_temp1)
+confint(model_temp1)
+
+# The null hypothesis in this case is that the education dummies have no relationship to TRANTIME, 
+# while the alternative hypothesis is that there is a relationship with TRANTIME.
+# nohs= realtion
+# hs= realtion
+#somecoll= no realtion
+#colle= realtionship
+#advance= NA
+require(stargazer)
+stargazer(model_temp1, title = "Regression", type = "text", dep.var.labels = "INCWAGE")
+suppressMessages(require(AER))
+NNobs <- length(TRANTIME)
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.1) 
+dat_graph <- subset(dat_NYC,graph_obs)  
+plot(TRANTIME ~ jitter(AGE, factor = 2), pch = 4, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,150), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 20:55,  WORKHOMENV = 1, WORKSUBWAYNV = 1, AGE = 1, AfAm = 1, educ_nohs = 1, educ_hs = 1, educ_somecoll = 1, educ_college = 1, educ_advdeg = 0)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+
+#Error: variables ‘WORKHOMENV’, ‘WORKSUBWAYNV’ were specified with different types from the fit
+#Error only with created variables, all other variables will graph normally.
+
