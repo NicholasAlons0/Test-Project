@@ -1,304 +1,181 @@
-#What is the probability, if the true distribution has mean -1 and standard deviation of 1.5, 
-#of seeing a deviation as large (in absolute value) as 2?
-pnorm(2,-1,1.5)
+attach(Household_Pulse_data)
+summary(Household_Pulse_data)
+detach()
+#REGSSION FOR FIRST QUESITION
+regressions <- lm(RECVDVACC ~ EEDUC*REGION)
+summary(regressions)
 
-pnorm(20.84,11,8.2, lower.tail = FALSE)
-pnorm(-6.6,-5,4)
-pnorm(8.85,12,6.3)
-0.3085375*2
-#What is the probability, if the true distribution is a Standard Normal, if seeing a value as large as 1.75?
-pnorm(1.75,lower.tail = FALSE)
+regressions <- lm(vaccine ~ education*regions)
+summary(regressions)
 
-#If you observe a value of 2.1, what is the probability of observing such an extreme value, 
-#if the true distribution were Standard Normal?
-pnorm(2.1)
+variabl<-lm(as.numeric(EEDUC)~ RECVDVACC* REGION)
+summary(variabl)
 
-# Find the area under the standard normal pdf between -1.75 and 0.
-pnorm(0)
-pnorm(-1.75)
-0.5-0.04005916
+# People with an advance degree, from the south region are not as significant because the 
+# t value is to close to zero, the p value is above the level of significance.
+# Thus, I fail to reject the null hypothesis for people in the south with an advance 
+# degree have and conclude there is no significant relationship between getting the vaccine and
+# and people in the south with an advance degree.
+# Compared to people in with education high school in region west, that have a t-stat that 
+# is far away from  zero and a p_value below the level of significance, I can say with 99%
+# confidence that we reject th null hypothesis that there is no relationship between getting the 
+#vaccine and are in favor of the alternative hypothesis that there is a relationship.
+# the same would apply, to the variables that have no significance stars, we fail to reject trhe null
+# hypotheses that there is no relationship. whereas, all the variables that have at least one star,
+# we reject the null hypothesis depending the level of significance
 
-# What values form a symmetric 90% confidence interval for the standard normal 
-#(where symmetric means that the two tails have equal probability)? A 95% confidence interval?
-#90%
-pnorm(1.645)
-pnorm(-1.645)
-#(0.04998491,0.9500151)
+regression11<-lm(as.numeric(RECVDVACC)~ EEDUC* GENID_DESCRIBE)
+summary(regression11)
 
-#95%
-pnorm(1.96)
-pnorm(-1.96)
-#(0.0249979,0.9750021)
+genderid <- as.numeric(GENID_DESCRIBE)
+regressions3 <- lm(genderid ~ EEDUC*RECVDVACC)
+summary(regressions3)
 
-# If a random variable is distributed normally with mean 2 and standard deviation of 2, what is a symmetric 90% confidence interval?
-# 90%, Mean (+/-) Standard Deviation* 1
-2-2*(1)
-2+2*(1)
-# (0,4)
-
-# What is a symmetric 95% confidence interval?
-# 95%, Mean (+/-) Standard Deviation* 2
-2-2*(2)
-2+2*(2)
-# (-2,6)
-
-# What is a symmetric 99% confidence interval?
-# 99%, Mean (+/-) Standard Deviation* 3
-2-2*(3)
-2+2*(3)
-#(-4,8)
-
-# A random variable is distributed with mean of 8 and standard deviation of 4.
-#What is the probability that we could observe a value lower than 6?
-pnorm(6,8,4)
-
-# What is the probability that we could observe a value higher than 12?
-pnorm(12,8,4,lower.tail = FALSE)
-
-#What is the probability that we’d observe a value between 6.5 and 7.5?
-(7.5-8)/4
-pnorm(-0.125)
-(6.5-8)/4
-pnorm(-0.375)
-0.4502618-0.3538302
-
-#What is the probability that we’d observe a value between 5.5 and 6.5?
-(5.5-8)/4
-pnorm(-0.625)
-(6.5-8)/4
-pnorm(-0.375)
-0.3538302-0.2659855
-
-#Normal Distribution To The Left
-pnorm(2.36,2,4)
-#Normal Distribution To The Right
-pnorm(2.9,4,2.2,lower.tail = FALSE)
-
-# For a Normal Distribution that has mean -10 and standard deviation 6.8 , 
-# what is the area in both tails farther from the mean than 4.96 ?
-(-10-4.96)/6.8
-(-10+4.96)/6.8 
-pnorm(-0.74)
-pnorm(-2.2)
-0.7564466-0.22965
-
-#What is the probability, 
-# if the true distribution is a Standard Normal, of seeing a deviation from zero as large (in absolute value) as 1.9?
-pnorm(1.9)
-pnorm(-1.9)
-0.9712834-0.02871656
-
-#What is the probability, if the true distribution is a Standard Normal, if seeing a value as large as 1.75?
-pnorm(1.75,lower.tail = FALSE)
-
-#Normal Distribution To The Left
-pnorm(2.36,2,4)
-
-#Normal Distribution To The Right
-pnorm(2.9,4,2.2,lower.tail = FALSE)
-
-#For a Normal Distribution with mean 8 and standard deviation 4.2, what values leave probability 0.046 in both tails? A. (-4.3807, 12.3807) B. (-0.0906, 3.9002) C. (-0.3807, 16.3807) D. (2.4201, 13.5799)
-
-pnorm(-0.3807,8,4.2)
-pnorm(16.3807,8,4.2,lower.tail = FALSE)
-0.02299938*2
-
-#What is the probability, if the true distribution is a Standard Normal, 
-#of seeing a deviation from zero as large (in absolute value) as -1.5?
-pnorm(-1.5)
-pnorm(1.5)
-0.9331928-0.0668072
-
-#What is the probability, if the true distribution has mean -1 and standard deviation of 1.5, 
-#of seeing a deviation as large (in absolute value) as 2?
-pnorm(2,-1,1.5)
-
-#What is the probability, if the true distribution is a Standard Normal, if seeing a value as large as 1.75?
-pnorm(1.75)
-1-0.9599408
-
-#If you observe a value of 2.1, what is the probability of observing such an extreme value, 
-#if the true distribution were Standard Normal?
-pnorm(2.1)
-
-# Find the area under the standard normal pdf between -1.75 and 0.
-pnorm(0)
-pnorm(-1.75)
-0.5-0.04005916
-
-# If a random variable is distributed normally with mean 2 and standard deviation of 2, what is a symmetric 90% confidence interval?
-# 90%, Mean (+/-) Standard Deviation* 1
-2-2*(1)
-2+2*(1)
-# (0,4)
-
-# What is a symmetric 95% confidence interval?
-# 95%, Mean (+/-) Standard Deviation* 2
-2-2*(2)
-2+2*(2)
-# (-2,6)
-
-# What is a symmetric 99% confidence interval?
-# 99%, Mean (+/-) Standard Deviation* 3
-2-2*(3)
-2+2*(3)
-#(-4,8)
-
-# A random variable is distributed with mean of 8 and standard deviation of 4.
-# a)What is the probability that we could observe a value lower than 6?
-pnorm(6,8,4)
-
-# b) What is the probability that we could observe a value higher than 12?
-pnorm(12,8,4,lower.tail = FALSE)
-
-# c) What is the probability that we’d observe a value between 6.5 and 7.5?
-(7.5-8)/4
-pnorm(-0.125)
-(6.5-8)/4
-pnorm(-0.375)
-0.4502618-0.3538302
-
-# d) What is the probability that we’d observe a value between 5.5 and 6.5?
-(5.5-8)/4
-pnorm(-0.625)
-(6.5-8)/4
-pnorm(-0.375)
-0.3538302-0.2659855
-
-#A regression coefficient is estimated to be equal to 7.02 with standard error 5.4 ; there are 17 degrees of freedom. 
-#What is the p-value (from the t-statistic) against the null hypothesis of zero.
-7.02/5.4 = 1.3
-pt(1.3,17, lower.tail = FALSE)
-0.1054759*2
-
-# A regression coefficient is estimated to be equal to -9.2 with standard error 4.6 ; there are 18 degrees of freedom. 
-# What is the p-value (from the t-statistic) against the null hypothesis of zero?
--9.2/4.6
-pt(-2,18)
-0.03041073*2
-
-
-#PROBLEM 2??? how to get pvalue?
-#t-stat is estimate/std.error
+# In the regression, the Null Hypothesis is that there is no significant difference or relationship between the genderID
+# and educations and people the receive the vaccine,
+# while the alternative hypothesis states there is a significant difference or relationship.
+# The t-stats, p-values and confidence intervals of the someone with advance education,
+# that have received the vaccine is significant because of the p value that is 0.0056, which
+# below the level of significance and has a t-stats of 2.767, which is decently far from 0,
+#therefore we reject the null hypothesis that there is no relationship and conclude that
+# there is a relationship between genderID and people advance education, that have received the vaccine.
+# for the ones with no significance, like somecollege and no covid vaccine, 
+# we fail to reject the null hypothesis and conclude there is no relationship between genderID AND 
+# education level or people that not get the covid vaccine.
 
 
 #NUMBER 3
-#FIRST, lets create a subset to work with the entire test.
-attach(acs2017_ny)
-dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) & (acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55))
-detach()
-attach(dat_NYC)
 
-#Comparing Groups
-home <- TRANWORK == 70
-subway <- TRANWORK == 33
-summary(as.numeric(home))
-summary(as.numeric(subway))
+#so I will make Hispanic into a numeric in order to subset it.
+summary(Household_Pulse_data$RHISPANIC)
+length(Household_Pulse_data$RHISPANIC)
 
-#Educational attainments for people that work at home.
-wrk_home_edu <- EDUC[TRANWORK == 70]
-summary(wrk_home_edu)
+# I also changed the list of variables to numeric so that I can potentially use in the analysis. 
+Household_Pulse_data$RHISPANIC <- as.numeric(Household_Pulse_data$RHISPANIC)
+Household_Pulse_data$RRACE <- as.numeric(Household_Pulse_data$RRACE)
+Household_Pulse_data$EEDUC <- as.numeric(Household_Pulse_data$EEDUC)
+Household_Pulse_data$RECVDVACC <- as.numeric(Household_Pulse_data$RECVDVACC)
+Household_Pulse_data$INCOME <- as.numeric(Household_Pulse_data$INCOME)
+Household_Pulse_data$ANXIOUS <- as.numeric(Household_Pulse_data$ANXIOUS)
+Household_Pulse_data$REGION <- as.numeric(Household_Pulse_data$REGION)
+Household_Pulse_data$GENID_DESCRIBE <- as.numeric(Household_Pulse_data$GENID_DESCRIBE)
+Household_Pulse_data$PRIVHLTH <- as.numeric(Household_Pulse_data$PRIVHLTH)
+Household_Pulse_data$SEXUAL_ORIENTATION <- as.numeric(Household_Pulse_data$SEXUAL_ORIENTATION)
 
-female_home <- (TRANWORK == 70) & (female == 1)
-summary(female_home)
-summary(as.numeric(female_home))
-
-
-#Educational attainments for people that commute in the subway.
-wrk_subway_edu <- EDUCD[TRANWORK == 33]
-summary(wrk_subway_edu)
-
-#Likelihood that works from home with a 4 year degree
-wrk_home_4year <- (TRANWORK == 70) & (educ_college) 
-summary(as.numeric(wrk_home_4year))
-summary(wrk_home_4year)
-
-# given that someone is female, likelihood that she works from home.
-wrk_home_female <- (female == 1) & (TRANWORK == 70)
-summary(as.numeric(wrk_home_female))
-summary(wrk_home_female)
+#First, just to see if we have separate subgroups
+list(Household_Pulse_data$INCOME)
+list(dat_hispan$INCOME)
+# Seems like we do.
+summary(Household_Pulse_data)
+summary(dat_hispan)
+#Comparing the summaries, we see that dat_hispan is indeed a subgroup of just Hispanics.
+# I would like to explore differences between household income of the entire sample vs. just subgroup of Hispanics.
+# Might be interesting to look at Hispanics, going into the analysis with the assumption that 
+# they will have a lower income overall household income compare to the sample. 
+# Or since they make less income, there may be a relationship with anxiety levels there 
 
 
-#Given that someone is male, likelihood that he works from home.
-wrk_home_male <- (female == 0) & (TRANWORK == 70)
-summary(as.numeric(wrk_home_male))
-summary(wrk_home_male)
+# Explore where subgroup differs from sample.
+hispanic_income <- (Household_Pulse_data$RHISPANIC == 2) & (Household_Pulse_data$INCOME)
+regression1 <-  lm(Household_Pulse_data$INCOME ~ hispanic_income)
+summary(regression1)
+confint(regression1)
+# The subgroup of Hispanics does differ from the entire sample, the regression shows
+# the coefficient is negative, meaning they make less income compare to the rest of the 
+# sample. The Null Hypothesis states there is no significant difference between the dependent
+# and independent variables, while the alternative hypothesis states there is a significant difference.
+# As for the t-stats, p-values and confidence intervals of the independent variables,
+# they all have t-stats is -24.75, the p-values is 2e-16, which is less than the level of significance,
+# therefore the the subgroup of Hispanics are statistically significant.
+# Thus, we reject the null hypothesis that there is no difference and deem there is sufficient evidence
+# to support that the coefficients are different from 0. Additionally, the coefficient falls within
+# the the confidence interval at a confidence level of 95%, ranging from -0.8334076 -0.7111021,
+# meaning it is expected to cover the true population proportion of Hispanics 95% of the time.
+# Since the coefficient of the regression falls within the interval, we are 95% confident that is the true 
+# mean of Hispanics, which in this case demonstrates Hispanics have less than the rest of the sample.
+
+#SUBSET
+# The second way we interpreted to run the regression was using a direct subset of Hispanics.
+dat_hispan <- subset(Household_Pulse_data, Household_Pulse_data$RHISPANIC == 2) 
+# I created the subset of just Hispanics, by changing the the factor to numeric
+# then sub-setting the data.
+
+hispanic_income <-  dat_hispan$INCOME
+
+regression2 <- lm(SEXUAL_ORIENTATION ~ dat_hispan$SEXUAL_ORIENTATION)
 
 
-#Create confidence interval and p-value
-table <- table(wrk_home_female, wrk_home_male)
-prop.test(table)
-
-confint(wrk_home_female, wrk_home_male)
-confint(table)
-
-
-#NUMBER 4, 2019
-attach(acs2017_ny)
-dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) &(acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55)) 
-detach()
-attach(dat_NYC)
-
-WORKHOMENV <- (TRANWORK == 70)
-WORKSUBWAYNV <- (TRANWORK == 33)
-model_temp1 <- lm(TRANTIME ~ AGE  + AfAm + educ_nohs + educ_hs + educ_somecoll + educ_college + educ_advdeg)
-summary(model_temp1)
-confint(model_temp1)
-# By running the regression, all the variables except for educ_somecoll, are significant because the p-value is 
-# significantly below the level of significance, therefore we reject the null hypothesis that there is no 
-# relationship between the independent variables, and conclude that the alternative hypothesis holds significance, 
-# that there is a relationship between the independent and dependent variables.
-# The null hypothesis in this case is that the education dummies have no relationship to TRANTIME, 
-# while the alternative hypothesis is that there is a relationship with TRANTIME.
-require(stargazer)
-stargazer(model_temp1, title = "Regression", type = "text", dep.var.labels = "INCWAGE")
-suppressMessages(require(AER))
-NNobs <- length(TRANTIME)
-set.seed(12345) 
-graph_obs <- (runif(NNobs) < 0.1) 
-dat_graph <- subset(dat_NYC,graph_obs)  
-plot(TRANTIME ~ jitter(AGE, factor = 2), pch = 4, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,150), data = dat_graph)
-to_be_predicted2 <- data.frame(AGE = 20:55, AfAm = 1, educ_nohs = 0, educ_hs = 0, educ_somecoll = 1, educ_college = 0, educ_advdeg = 0)
-to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
-# Calculate predicted values for some people and assess if these seem plausible.
-# Perhaps a graph of data and predicted values.
-detach()
-detach()
-detach()
-detach()
-detach()
+#For the regression, we divide the different income levels, with people making less than $25,000 the lowest
+#and people that make at most $199,999 the highest. While intentionally leaving out the group that made over $200,000 
+#because adding all the different ranges of a single dummy would make one in the regression an NA.
+incomeless25 <-  dat_hispan$INCOME == 1
+income25_35 <- dat_hispan$INCOME == 2
+income35_45 <- dat_hispan$INCOME == 3
+income50_75 <- dat_hispan$INCOME == 4
+income75_99 <- dat_hispan$INCOME == 5
+income100_149 <- dat_hispan$INCOME == 6
+income150_199 <- dat_hispan$INCOME == 7
 
 
-#PROBLEM 5 KNN
-attach(acs2017_ny)
-dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) & (acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55))
-detach()
-attach(dat_NYC)
-summary(dat_NYC)
-educ_indx <- factor((educ_nohs + 2*educ_hs + 3*educ_somecoll + 4*educ_college + 5*educ_advdeg), levels=c(1,2,3,4,5),labels = c("No HS","HS","SmColl","Bach","Adv"))
+
+# We wanted to see whether people would have or not have health insurance based on their income level, so 
+# the dependent variable is private health insurance, while the independents are the different income levels.
+regression <- lm(dat_hispan$PRIVHLTH ~ incomeless25 + income25_35 + income35_45 + income50_75 + 
+                   income75_99 + income100_149 +income150_199 )
+summary(regression)
+confint(regression)
+anova(regression)
+# DIFFERENT WAY FOR CONFIDENCE INTERVALS?...
+
+# The null hypothesis is that there is no difference from Hispanics with private health insurance to the different
+# levels of income. The regression shows Hispanics with an income of $75,000 or higher has no significant difference because
+# they most likely already have private health insurance. So in the case of the variables of Hispanics
+# with an income of $75,000 or higher, we fail to reject the null hypothesis because we can see all their p-values
+# are higher 0.50819 or higher, which is well above the level of significance and 
+# conclude there is no significant difference between those that have private health insurance and those that are wealthy.
+# Which makes sense due to the fact that wealthy Hispanics are more likely to afford private
+# health insurance. Whereas, Hispanics that have an income of $74,999 or lower demonstrate that there is a significant
+# difference because Hispanics with low incomes most likely do NOT have private health insurance. So, Hispanics
+# that have an income of $74,999 or lower we reject the null hypothesis (because we can see the p-values that
+# are all lower than 0.00134, which is well below the level of significance) in favor of the alternative hypothesis,
+# which is there is a significant difference between Hispanics that own private health insurance and people
+# with lower income. Ultimately demonstrating a difference from private health insurance and
+# Hispanics that do have health insurance, that can be interpreted as, poor Hispanics cannot afford to 
+# pay for private health insurance, which is why there is a difference.
+# Additionally, when checking whther the coefficient falls within
+# the the confidence interval at a confidence level of 95%, ranging from -0.8334076 -0.7111021,
+# meaning it is expected to cover the true population proportion of Hispanics 95% of the time.
+# Since the coefficient of the regression falls within the interval, we are 95% confident that is the true 
+# mean of Hispanics, which in this case demonstrates Hispanics have less than the rest of the sample.
+
+
+
+# MAYBE TALK ABOUT CONFIDENCE INTERVALS SOME MORE
+confint()
+
+#Now For a Knn of different education levels
+less_highschool <- dat_hispan$EEDUC == 1
+some_highschool <- dat_hispan$EEDUC == 2
+highschool <- dat_hispan$EEDUC == 3
+some_college <- dat_hispan$EEDUC == 4
+associates <- dat_hispan$EEDUC == 5
+bacholers <-   dat_hispan$EEDUC == 6
+graduate <- dat_hispan$EEDUC == 7
+
+#delete associates, higher accuracy...
+educ_indx <- factor((less_highschool + 2*some_highschool + 3*highschool + 4*some_college + 5*associates), levels=c(1,2,3,4,5),labels = c("Less HS","Some HS","HS","Some College", "Associates"))
 
 norm_varb <- function(X_in) { (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
 }
-#Variables to predict commute.
-norm_inc_tot <- norm_varb(INCTOT)
-norm_poverty <- norm_varb(POVERTY)
-norm_rent <- norm_varb(RENT)
-norm_cost_electricity <- norm_varb(COSTELEC)
-norm_cost_gas <- norm_varb(COSTGAS)
-norm_cost_water <- norm_varb(COSTWATR)
-norm_cost_fuelhome <- norm_varb(COSTFUEL)
-norm_puma <- norm_varb(PUMA)
-norm_white <- norm_varb(white)
-norm_gq <- norm_varb(GQ)
-norm_pvt_insurance <- norm_varb(has_PvtHealthIns)
 
-data_use_prelim <- data.frame(norm_inc_tot,norm_poverty,norm_rent,norm_cost_electricity,norm_cost_gas,norm_cost_water,
-                    norm_cost_fuelhome,norm_puma, norm_white, norm_gq, norm_pvt_insurance)
+norm_income <- norm_varb(dat_hispan$INCOME)
+norm_private_insurance <- norm_varb(dat_hispan$PRIVHLTH)
+
+data_use_prelim <- data.frame(norm_income, norm_private_insurance)
 good_obs_data_use <- complete.cases(data_use_prelim,educ_indx)
 dat_use <- subset(data_use_prelim,good_obs_data_use)
 y_use <- subset(educ_indx,good_obs_data_use)
-
-set.seed(12345)
+set.seed(1)
 NN_obs <- sum(good_obs_data_use == 1)
 select1 <- (runif(NN_obs) < 0.9)
 train_data <- subset(dat_use,select1)
@@ -316,329 +193,72 @@ for (indx in seq(1, 9, by= 2)) {
   correct_rate <- num_correct_labels/length(true_data)
   print(c(indx,correct_rate))
 }
-# In this Knn, the accuracy is in the 0.40s, however when adding TRANWORK the accuracy is
-# extremely high, at 0.85(which makes sense since this is literally says how they commute to work.)
-# Additionally, we increased  the amount of variables to the knn in order to increase the accuracy 
-# of predicting which type of method people used to commute.
-# In conclusion, the KNN is a decent predictor when aiming at the commuting methods of people that live in
-# NYC depending on the added variables.
-cl_data_n <- as.numeric(cl_data)
-model_ols1 <- lm(cl_data_n ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                 + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                 + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                 + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)         
-y_hat <- fitted.values(model_ols1)
-summary(model_ols_v1)
-mean(y_hat[cl_data_n == 1])
-mean(y_hat[cl_data_n == 2])
-mean(y_hat[cl_data_n == 3])
-mean(y_hat[cl_data_n == 4])
-mean(y_hat[cl_data_n == 5])
-
-cl_data_n1 <- as.numeric(cl_data_n == 1)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                    + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
-
-cl_data_n1 <- as.numeric(cl_data_n == 2)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
-
-cl_data_n1 <- as.numeric(cl_data_n == 3)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
-
-cl_data_n1 <- as.numeric(cl_data_n == 4)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
-
-cl_data_n1 <- as.numeric(cl_data_n == 5)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
+#THIS WORKKKSSS!!!!!!!!!!
 
-#Consider an election with generic candidates X vs Y (which we could interpret as chromosomes but not necessarily!).
-# A) Candidate X had the support of 54% of the voters in the latest poll, which had 200 people. 
-# What is a 90% confidence interval for the actual level of support?
-# B) If the polling organization were to add 100 more people to the sample size, how much would the 90% confidence interval change?
-# C) Last month’s poll had the candidate supported by 51% – both the previous poll and the current poll had 200 people. 
-# Is the difference in polling statistically significant?
-# D) Candidate X must win 2 particular states in order to win the election; the forecast says she has a 60% chance of winning each state individually. 
-# Your friend, a wannabe statistician, explains that a 0.6 chance of winning one state and a 0.6 chance of winning the other means only a 0.6*0.6= 0.36 chance of winning both - 
-# so the “favorite” is actually not the favorite! Explain why your friend is wrong.
+# another hypothesis test could be people that have lower incomes are
+# more anxious.
 
-# A) To get x, do 200*0.54=108
-prop.test(108,200,0.54, alternative = c("two.sided"),conf.level = 0.90, correct = TRUE)
-#90 percent confidence interval:
-# 0.3142488 0.4083449
+#money causes pvt insurance, not insurance causes money....
 
-# B) To get x, do 300*0.54=162
-prop.test(162,300,0.54, alternative = c("two.sided"),conf.level = 0.90, correct = TRUE)
 
-# C)  FOR TWO SAMPLE Z TEST
-# 200*0.54=108 and 200*0.51*=102
-polling <- matrix(c(108,200,102,200), ncol = 2,byrow = TRUE)
-prop.test(polling)
-#Fail to reject the null and conclude there is no significant difference between the two.
-# D) both probability chances are independent, combined probability = (0.60+0.60)/2 = .60
+#hard to interpret.....
+no_anxious <- dat_hispan$ANXIOUS == 1
+some_anxious <- dat_hispan$ANXIOUS == 2
+very_anxious <- dat_hispan$ANXIOUS == 3
+extremely_anxious <- dat_hispan$ANXIOUS == 4
 
+regression1 <- lm(dat_hispan$INCOME ~ no_anxious + some_anxious + very_anxious + extremely_anxious )
 
-#Do a statistical test of the difference in average age between working people 
-#in the Bronx vs working people in Brooklyn. What is the 95% confidence interval for the 
-#difference in means?
-attach(acs2017_ny)
-difference_age <- lm(AGE ~ in_Bronx + in_Brooklyn)
-confint(difference_age)
+summary(regression1)
+# The last regression, we want to see whether people's income would affect their level of anxiety.
+# For the dependent variable, we set it to Hispanics that make a $150,000-$199,999 income
+# and the independent variables are the levels of anxiety.
+# The first p-value we see the p-value is below the level of significance, 
+# there for there is a difference between Hispanics that are not anxious and Hispanics that are 
+# wealthy. The reasons may be because wealthy people have 
+# which makes sense considering that having less money
+# is more likely to cause stress over financial issues. In this case, it is actually the lack of
+# money that may be the cause of anxiety, and not anxiety that is the cause of lack of money.
 
+#do all the basics for the questions, and where is says impress me, go all out, create a bunch of different 
+#subgroups, graphs, etc.
 
-#difference of averege is depdent variables in regression?
-#the null hypothesis is that their is no difference in wages between the independet variables
 
-PUMA <- as.factor(PUMA)
 
-levels_n <- read.csv("PUMA_levels.csv")
-levels_orig <- levels(PUMA) 
-levels_new <- join(data.frame(levels_orig),data.frame(levels_n))
-levels(PUMA) <- levels_new$New_Level
 
+xtabs(~ INCOME + EVICT + REGION) 
+# An interesting cross tabs is that
+# People that have a higher income are less likely to get evicted, while people with 
+# less income are more likely to get evicted.
 
+educationsample <- Household_Pulse_data$EEDUC
+summary(educationsample)
+table(educationsample)
+length(educationsample)
 
-age_bronx <- AGE[in_Bronx == 1]
-age_brooklyn <- AGE[in_Brooklyn == 1]
+educationsubgroup <- dat_hispan$EEDUC
+summary(educationsubgroup)
+table(educationsubgroup)
+length(educationsubgroup)
 
-table <- table(age_bronx,age_brooklyn, col = 2)
+# When compare the proportions from the sample and subgroup, we can see the difference in median,
+# where the sample has both a greater mean and median than the sample does, indicating that
+# Hispanics have a lower overall educational level compared to everyone in the sample.
 
-confusionMatrix(age_bronx,age_brooklyn)
 
+#All of the work on this exam is my own, answered honestly as rules state.
+#Name: Nicholas Alonso
+#  Date: 10/22/2021
 
-#Using the PUMS data, can you narrow this further - 
-# what are the socioeconomic of bus/subway in the various boroughs? 
-# What is the wealthiest PUMA area and how do the people living there tend to commute?
 
 
 
-summary(INCWAGE[ Commute_bus == 1 & in_Bronx == 1])
-summary(bus_wage1)
 
-bus_wage2 <- INCWAGE[ Commute_bus == 1 & in_Manhattan == 1]
-summary(bus_wage2)
 
-bus_wage3 <- INCWAGE[ Commute_bus == 1 & in_StatenI == 1]
-summary(bus_wage3)
 
-bus_wage4 <- INCWAGE[ Commute_bus == 1 & in_Brooklyn == 1]
-summary(bus_wage4)
-
-bus_wage5 <- INCWAGE[ Commute_bus == 1 & in_Queens == 1]
-summary(bus_wage5)
-
-
-
-sub_wage1 <- INCWAGE[ Commute_subway == 1 & in_Bronx == 1]
-summary(sub_wage1)
-
-sub_wage2 <- INCWAGE[ Commute_subway == 1 & in_Manhattan == 1]
-summary(sub_wage2)
-
-sub_wage3 <- INCWAGE[ Commute_subway == 1 & in_StatenI == 1]
-summary(sub_wage3)
-
-sub_wage4 <- INCWAGE[ Commute_subway ==  1 & in_Brooklyn == 1]
-summary(sub_wage4)
-
-sub_wage5 <- INCWAGE[ Commute_subway ==  1 & in_Queens == 1]
-summary(sub_wage5)
-
-
-subway_wage <- INCWAGE[Commute_subway == 1]
-summary(subway_wage)
-
-summary(PUMA)
-
-
-puma_wage_bronx <- INCWAGE[PUMA > 3700 & PUMA < 3711]
-summary(puma_wage_bronx)
-
-
-puma_wage_manhat <- INCWAGE[PUMA > 3800 & PUMA < 3811]
-summary(puma_wage_manhat)
-
-
-puma_wage_staten <- INCWAGE[PUMA > 3901 & PUMA < 3904]
-summary(puma_wage_staten)
-
-puma_wage_brooklyn <- INCWAGE[PUMA > 4000 & PUMA < 4019]
-summary(puma_wage_brooklyn)
-
-puma_wage_queens <- INCWAGE[PUMA > 4100 & PUMA < 4115]
-summary(puma_wage_queens)
-
-#The highest wages from PUMA are those in Manhattan.
-#
-commute_manhat <- TRANWORK[PUMA > 3800 & PUMA < 3811]
-summary(commute_manhat)
-#MEDIAN is 33, so most tend to commute using subway.
-
-attach(acs2017_ny)
-dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) & (acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55))
-detach()
-attach(dat_NYC)
-summary(dat_NYC)
-commute_indx <- factor((Commute_car + 2*Commute_bus + 3*Commute_subway + 4*Commute_rail + 5*Commute_other), levels=c(1,2,3,4,5),labels = c("Car","Bus","Subway","Rail","Other"))
-
-norm_varb <- function(X_in) { (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
-}
-
-#Variables to predict commute.
-
-norm_inc_tot <- norm_varb(INCTOT)
-norm_poverty <- norm_varb(POVERTY)
-norm_rent <- norm_varb(RENT)
-norm_cost_electricity <- norm_varb(COSTELEC)
-norm_cost_gas <- norm_varb(COSTGAS)
-norm_cost_water <- norm_varb(COSTWATR)
-norm_cost_fuelhome <- norm_varb(COSTFUEL)
-norm_puma <- norm_varb(PUMA)
-norm_white <- norm_varb(white)
-norm_gq <- norm_varb(GQ)
-norm_pvt_insurance <- norm_varb(has_PvtHealthIns)
-
-data_use_prelim <- data.frame(norm_inc_tot,norm_poverty,norm_rent,norm_cost_electricity,norm_cost_gas,norm_cost_water,
-                              norm_cost_fuelhome,norm_puma, norm_white, norm_gq, norm_pvt_insurance)
-good_obs_data_use <- complete.cases(data_use_prelim,commute_indx)
-dat_use <- subset(data_use_prelim,good_obs_data_use)
-y_use <- subset(commute_indx,good_obs_data_use)
-
-set.seed(12345)
-NN_obs <- sum(good_obs_data_use == 1)
-select1 <- (runif(NN_obs) < 0.9)
-train_data <- subset(dat_use,select1)
-test_data <- subset(dat_use,(!select1))
-cl_data <- y_use[select1]
-true_data <- y_use[!select1]
-
-summary(cl_data)
-prop.table(summary(cl_data))
-summary(train_data)
-require(class)
-for (indx in seq(1, 9, by= 2)) {
-  pred_borough <- knn(train_data, test_data, cl_data, k = indx, l = 0, prob = FALSE, use.all = TRUE)
-  num_correct_labels <- sum(pred_borough == true_data)
-  correct_rate <- num_correct_labels/length(true_data)
-  print(c(indx,correct_rate))
-}
-# In this Knn, the accuracy is in the 0.40s, however when adding TRANWORK the accuracy is
-# extremely high, at 0.85(which makes sense since this is literally says how they commute to work.)
-# Additionally, we increased  the amount of variables to the knn in order to increase the accuracy 
-# of predicting which type of method people used to commute.
-# Furthermore, we switched up the train and test data, to a 0.9/0.1 ratio, instead of 0.8 to 0.2, to increase 
-# the accuracy even further.
-# In conclusion, the KNN is a decent predictor when aiming at the commuting methods of people that live in
-# NYC depending on the added variables.
-cl_data_n <- as.numeric(cl_data)
-model_ols1 <- lm(cl_data_n ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                 + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                 + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                 + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)         
-y_hat <- fitted.values(model_ols1)
-summary(model_ols_v1)
-mean(y_hat[cl_data_n == 1])
-mean(y_hat[cl_data_n == 2])
-mean(y_hat[cl_data_n == 3])
-mean(y_hat[cl_data_n == 4])
-mean(y_hat[cl_data_n == 5])
-
-cl_data_n1 <- as.numeric(cl_data_n == 1)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
-
-cl_data_n1 <- as.numeric(cl_data_n == 2)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
-
-cl_data_n1 <- as.numeric(cl_data_n == 3)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
-
-cl_data_n1 <- as.numeric(cl_data_n == 4)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
-
-cl_data_n1 <- as.numeric(cl_data_n == 5)
-model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_inc_tot + train_data$norm_poverty + train_data$norm_rent
-                   + train_data$norm_cost_electricity + train_data$norm_cost_gas + train_data$norm_cost_water
-                   + train_data$norm_cost_fuelhome + train_data$norm_puma 
-                   + train_data$norm_white + train_data$norm_pvt_insurance + train_data$norm_gq)
-y_hat_v1 <- fitted.values(model_ols_v1)
-mean(y_hat_v1[cl_data_n1 == 1])
-detach()
-detach()
-
-attach(acs2017_ny)
-dat_NYC <- subset(acs2017_ny, (acs2017_ny$in_NYC == 1) &(acs2017_ny$AGE > 20) & (acs2017_ny$AGE < 55))
-detach()
-attach(dat_NYC)
-WORKHOMENV <- (TRANWORK == 70)
-WORKSUBWAYNV <-  (TRANWORK == 33)
-model_temp1 <- lm(TRANTIME ~ WORKHOMENV + WORKSUBWAYNV + AGE  + AfAm + educ_nohs + educ_hs + educ_somecoll
-                  + educ_college + educ_advdeg)
-summary(model_temp1)
-confint(model_temp1)
-
-# The null hypothesis in this case is that the education dummies have no relationship to TRANTIME, 
-# while the alternative hypothesis is that there is a relationship with TRANTIME.
-# nohs= realtion
-# hs= realtion
-#somecoll= no realtion
-#colle= realtionship
-#advance= NA
-require(stargazer)
-stargazer(model_temp1, title = "Regression", type = "text", dep.var.labels = "INCWAGE")
-suppressMessages(require(AER))
-NNobs <- length(TRANTIME)
-set.seed(12345) 
-graph_obs <- (runif(NNobs) < 0.1) 
-dat_graph <- subset(dat_NYC,graph_obs)  
-plot(TRANTIME ~ jitter(AGE, factor = 2), pch = 4, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,150), data = dat_graph)
-to_be_predicted2 <- data.frame(AGE = 20:55,  WORKHOMENV = 1, WORKSUBWAYNV = 1, AGE = 1, AfAm = 1, educ_nohs = 1, educ_hs = 1, educ_somecoll = 1, educ_college = 1, educ_advdeg = 0)
-to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
-
-#Error: variables ‘WORKHOMENV’, ‘WORKSUBWAYNV’ were specified with different types from the fit
-#Error only with created variables, all other variables will graph normally.
+#if we want to use this, must change public health to numeric...
+white_healthinurance <- (Household_Pulse_data$RRACE == 1) & (Household_Pulse_data$PRIVHLTH)
+black_healthinsurance <- (Household_Pulse_data$RRACE == 2) & (Household_Pulse_data$PRIVHLTH)
+dhdhdhdh <- lm(Household_Pulse_data$PUBHLTH ~  white_healthinurance + black_healthinsurance)
+summary(dhdhdhdh)
 
