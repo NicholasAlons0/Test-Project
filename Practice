@@ -2,65 +2,57 @@ attach(Household_Pulse_data)
 summary(Household_Pulse_data)
 detach()
 #REGSSION FOR FIRST QUESITION
-regressions <- lm(RECVDVACC ~ EEDUC*REGION)
-summary(regressions)
-
-regressions <- lm(vaccine ~ education*regions)
-summary(regressions)
-  
-
-
-
 question1 <-lm(as.numeric(EEDUC)~ RECVDVACC* REGION)
 summary(question1)
 anova(question1)
-Anova(question1)
-TukeyHSD(question1)
-aov((EEDUC ~ RECVDVACC + REGION))
+confint(question1)
+#THIS WORKS?!!!!!!!!! INTERPRET!
+TukeyHSD(aov(question1))
+# yes got vaxx:South-yes got vaxx:Northeast p-value is 0.0000185, at 0.001 level of significance,
+# there is a signifcant difference
 
+#this is it?!...
+question1 <-lm(as.numeric(RECVDVACC)~ EEDUC* REGION)
+summary(question1)
+anova(question1)
+confint(question1)
+#THIS WORKS?!!!!!!!!! INTERPRET!
+TukeyHSD(aov(question1))
+# The null hypothesis states there is no difference in the amount of people vaccinated
+# between people in the south with a bachelors degree and people in the north
+# with less than a high school education. The alternative hypothesis states there is a
+# significant difference in between the groups. The level of confidence is 99%, so the 
+# level of significance is 0.01. In this case, the p-value is 0.0000259, which is less than
+# the level of significance, therefore we reject the null hypothesis in favor of the 
+# alternative and conclude there is a significant difference between the means of
+# of people in the south with a bachelors degree and people in the north
+# with less than a high school education.
+#                                         diff            lwr           upr           p adj
+#bach deg:South-less than hs:Northeast  -0.2648268467 -0.4473442937 -8.230940e-02 0.0000259
 
-# run regions separately
-
-# People with an advance degree, from the south region are not as significant because the 
-# t value is to close to zero, the p value is above the level of significance.
-# Thus, I fail to reject the null hypothesis for people in the south with an advance 
-# degree have and conclude there is no significant relationship between getting the vaccine and
-# and people in the south with an advance degree.
-# Compared to people in with education high school in region west, that have a t-stat that 
-# is far away from  zero and a p_value below the level of significance, I can say with 99%
-# confidence that we reject th null hypothesis that there is no relationship between getting the 
-#vaccine and are in favor of the alternative hypothesis that there is a relationship.
-# the same would apply, to the variables that have no significance stars, we fail to reject the null
-# hypotheses that there is no relationship. whereas, all the variables that have at least one star,
-# we reject the null hypothesis depending the level of significance
 
 regression11<-lm(as.numeric(RECVDVACC)~ EEDUC* GENID_DESCRIBE)
 summary(regression11)
+TukeyHSD(aov(regression11))
 
-genderid <- as.numeric(GENID_DESCRIBE)
-regressions3 <- lm(genderid ~ EEDUC*RECVDVACC)
-summary(regressions3)
+# The null hypothesis states there is no difference in the amount of people vaccinated
+# between females with a bachelors degree and males
+# with less than a high school education. The alternative hypothesis states there is a
+# significant difference in between the groups. The level of confidence is 99%, so the 
+# level of significance is 0.01. In this case, the p-value is 0.0000168, which is less than
+# the level of significance, therefore we reject the null hypothesis in favor of the 
+# alternative and conclude there is a significant difference between the vaccination levels
+# of females with a bachelors degree and males with less than a high school education.
+#                                                     diff            lwr           upr       p adj
+# adv deg:female-less than hs:male                -1.464736e-01 -2.474503e-01 -0.0454968465 0.0000168
 
-# In the regression, the Null Hypothesis is that there is no significant difference or relationship between the genderID
-# and educations and people the receive the vaccine,
-# while the alternative hypothesis states there is a significant difference or relationship.
-# The t-stats, p-values and confidence intervals of the someone with advance education,
-# that have received the vaccine is significant because of the p value that is 0.0056, which
-# below the level of significance and has a t-stats of 2.767, which is decently far from 0,
-#therefore we reject the null hypothesis that there is no relationship and conclude that
-# there is a relationship between genderID and people advance education, that have received the vaccine.
-# for the ones with no significance, like somecollege and no covid vaccine, 
-# we fail to reject the null hypothesis and conclude there is no relationship between genderID AND 
-# education level or people that not get the covid vaccine.
+
 
 
 #NUMBER 3
-
 #so I will make Hispanic into a numeric in order to subset it.
 summary(Household_Pulse_data$RHISPANIC)
 length(Household_Pulse_data$RHISPANIC)
-
-
 
 # I also changed the list of variables to numeric so that I can potentially use in the analysis. 
 Household_Pulse_data$RHISPANIC <- as.numeric(Household_Pulse_data$RHISPANIC)
@@ -73,7 +65,6 @@ Household_Pulse_data$REGION <- as.numeric(Household_Pulse_data$REGION)
 Household_Pulse_data$GENID_DESCRIBE <- as.numeric(Household_Pulse_data$GENID_DESCRIBE)
 Household_Pulse_data$PRIVHLTH <- as.numeric(Household_Pulse_data$PRIVHLTH)
 Household_Pulse_data$PUBHLTH <- as.numeric(Household_Pulse_data$PUBHLTH)
-
 Household_Pulse_data$SEXUAL_ORIENTATION <- as.numeric(Household_Pulse_data$SEXUAL_ORIENTATION)
 Household_Pulse_data$ENROLLNONE <- as.numeric(Household_Pulse_data$ENROLLNONE)
 Household_Pulse_data$KIDS_LT5Y <- as.numeric(Household_Pulse_data$KIDS_LT5Y)
