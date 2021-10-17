@@ -92,15 +92,11 @@ summary(hispanic_subgroup)
 # Hispanics will have a lower overall household income compared to the sample. 
 
 # Exploring where subgroup differs from sample.
- hispanic_income <- (Household_Pulse_data$RHISPANIC == 2) & (Household_Pulse_data$INCOME)
+hispanic_income <- (Household_Pulse_data$RHISPANIC == 2) & (Household_Pulse_data$INCOME)
 regression12 <-  lm(Household_Pulse_data$INCOME ~ hispanic_income)
 summary(regression12)
 confint(regression12)
-
 anova(regression12)
-#same as:
-summary(aov(Household_Pulse_data$INCOME ~ hispanic_income))
-
 # When checking for summary, we are testing to see if the subgroup of Hispanics does differ from the entire sample. 
 # The Null Hypothesis states there is no significant difference between the dependent
 # and independent variables, while the alternative hypothesis states there is a significant difference.
@@ -114,24 +110,14 @@ summary(aov(Household_Pulse_data$INCOME ~ hispanic_income))
 # For the anova test, the null hypothesis for anova is that the means are equal to each other, while the 
 # alternative hypothesis is that the means differ. Since a p-value of 2.2e-16 is less than a level of 
 # significance of 0.001, we reject null in favor of the alternative hypothesis that not all means are equal.
-
-#RESIDUALS MEANING????
-#RESIDUALS MEANING????
-#RESIDUALS MEANING????
-
-# However, anova the residual sum of squares is 393666, since it is vary big this might indicate it is a
-# poor fit for this data. Also, low multiple R-^2, may affect variation significance...
-#??? 
 # Thus the mean incomes of the Hispanics is different compared to the rest of the of the sample.
+# Something to note is anova shows the residual sum of squares is 393666, since it is vary big this might indicate the 
+# variables are a poor fit for this data. Also,the multiple R^2 is 0.008, since it is very low this 
+# may affect variation significance
 
-
-
-
-#SUBSET
 # The second way I interpreted to run the regression was using a direct subset of Hispanics.
 # I created the subset of just Hispanics, by changing the the factor to numeric
 # then sub-setting the data.
-#IGNOR RED, STILL RUNS....
 hispanic_subgroup <- subset(Household_Pulse_data, Household_Pulse_data$RHISPANIC == 2) 
 
 #For the regression, we divide the different income levels, with people making less than $25,000 the lowest
@@ -154,7 +140,6 @@ summary(regression)
 stargazer(regression, type = "text")
 confint(regression)
 anova(regression)
-TukeyHSD(aov(regression))
 # We will analyze the summary at a 99% level of confidence.
 # The null hypothesis for summary states there is no difference from Hispanics with private health insurance to the 
 # different levels of income. The regression shows Hispanics that make more than $75,000 have are not significantly 
@@ -164,19 +149,21 @@ TukeyHSD(aov(regression))
 # health insurance. On the other hand, Hispanics that have an income of $74,999 or lower are significantly
 # different because the highest p-values, which is 0.00134, is well below the level of significance.
 # So, we reject the null hypothesis in favor of the alternative hypothesis, stating there is a significant 
-# difference between Hispanics that own private health insurance and people with lower income. 
-# Now we will analyze the ANOVA test at a level of significance of 0.001.
-# The null hypothesis for anova is that the means are equal to each other,
-# while the alternative hypothesis is that the means differ.
-# For Hispanics that make less than $75,000 we reject the null that means are equal, in favor
-# of the alternative hypothesis that the means are different for the those that 
+# difference between Hispanics that own private health insurance and people with lower income. Now we will analyze the 
+# ANOVA test at a level of significance of 0.001. The null hypothesis for anova is that the means are equal to each other,
+# while the alternative hypothesis is that the means differ. For Hispanics that make less than $75,000 we reject the 
+# null that means are equal, in favor of the alternative hypothesis that the means are different for the those that 
 # have private health insurance because the smallest F-value is 21.0398, and the largest p-value is 4.584e-06.
 # However, for people that make more than 75,000 we fail to reject the null hypothesis and deem there 
 # is no difference in means between people that make more than 75,000 and those that have private health insurance
 # because the largest f-value is 0.8540 and the smallest p-value is 0.3555.
+# Something to note is anova shows the residual sum of squares is 2656, ideally we would want a sum of
+# square that is 0 to be a perfect fit for our model. While this regression's residuals Sum Sq is not 0, it
+# still has a lower Sum Sq compared to the previous regression, in this case this regression fits the model
+# better. Additionally, the multiple R^2 is 0.379, which is much higher than the first regression, which shows
+# the independent variable does explain the variation better than the first model.
+# may affect variation significance.
 
-
-#TRY TO INTERPRET RESIDUALS!!!!!
 
 #Now For a KNN of different education levels
 # we created different variables for the educational levels of our subgroup of Hispanics.
@@ -188,7 +175,8 @@ associates <- hispanic_subgroup$EEDUC == 5
 bacholers <-   hispanic_subgroup$EEDUC == 6
 graduate <- hispanic_subgroup$EEDUC == 7
 
-
+# We will create a factor with just the variables for less than high school to some college education. 
+# Then, use the norm variables of income and private halth insurance to predict the educational levels. 
 educ_indx <- factor((less_highschool + 2*some_highschool + 3*highschool + 4*some_college), levels=c(1,2,3,4),labels = c("Less HS","Some HS","HS","Some College"))
 norm_varb <- function(X_in) { (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
 }
@@ -216,11 +204,6 @@ for (indx in seq(1, 9, by= 2)) {
   correct_rate <- num_correct_labels/length(true_data)
   print(c(indx,correct_rate))
 }
-#THIS WORKKKSSS!!!!!!!!!!
-# When attempting to predict different educational levels, use create dummies from less than 
-# high school to some college education. Then, use use the norm variables of Income and Private
-# health insurance to predict the listed educational levels. Using 
-# this KNN model, we can predict the first nearest neighbor with a 55 percent accuracy.
 cl_data_n <- as.numeric(cl_data)
 model_ols1 <- lm(cl_data_n ~ train_data$norm_income + train_data$norm_private_insurance)         
 y_hat <- fitted.values(model_ols1)
@@ -240,11 +223,18 @@ cl_data_n1 <- as.numeric(cl_data_n == 4)
 model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_income + train_data$norm_private_insurance)
 y_hat_v1 <- fitted.values(model_ols_v1)
 mean(y_hat_v1[cl_data_n1 == 1])
-# Using the OLS to predict the accuracy oh education levels is only worthwhile for those with
-# some college education, with a 0.52% accuracy, however
-# every other educational group has a poor accuracy.
+# After running the KNN, the accuracy of the first kth neighbor became 0.55, while the accuracy of the 
+# third, fifth, seventh and ninth neighbors are all in the 0.50s range. 
+# Whereas the accuracy of the simple regression had lowest as 0.06, for less than high school education
+# and the highest as 0.52 for those with some college education.
+# Overall, in the KNN and has decent accuracy to predicted based on education levels, however
+# the simple linear regression is only able to predict some education levels better while other are a poor 
+# predictor. Additionally, when comparing the KNN to the regression, the KNN gave a higher accuracy out of the two.
+# The reason the accuracy of the prediction could have increase because income or private health insurance
+# could have weighed significantly in the aspect of classification.
 
-#I used a regression, to test the levels of anxiety of wealthy Hispanics.
+
+# I used a regression, to test the levels of anxiety of wealthy Hispanics.
 # For the dependent variable, we set it to Hispanics that make a $150,000-$199,999 income
 # and the independent variables are the levels of anxiety.
 no_anxious <- hispanic_subgroup$ANXIOUS == 1
@@ -254,12 +244,6 @@ extremely_anxious <- hispanic_subgroup$ANXIOUS == 4
 regression1 <- lm(income150_199 ~ no_anxious + some_anxious + very_anxious + extremely_anxious )
 summary(regression1)
 anova(regression1) 
-
-#sum of residuals squared??? important???
-#fix wording
-
-#Residuals are errors, sum of residuals squared is sum of errors
-
 # Using ANOVA, for Hispanics that are not anxious, the p-value is 1.804e-15, which is below the level of 
 # significance of 0.001, thus we reject the null hypothesis indicating conclude there the means for non-anxious
 # Hispanics and Hispanics wealthy are different. To further prove this statement, we can observe the other levels 
@@ -273,12 +257,6 @@ anova(regression1)
 # friends or colleagues that will ridicule them for the anxiety they are facing. Therefore, the anxiety levels 
 # by wealthier people are higher in the data only because they are more likely to report their struggles. Nonetheless,
 # I conclude that Hispanics from that wealth distribution are in fact anxious to some degree.
-
-
-
-#do all the basics for the questions, and where is says impress me, go all out, create a bunch of different 
-#subgroups, graphs, etc.
-
 
 xtabs(~ INCOME + EVICT + REGION) 
 # An interesting cross tabs is that
@@ -297,34 +275,9 @@ length(educationsubgroup)
 # When compare the proportions from the sample and subgroup, we can see the difference in median,
 # where the sample has both a greater mean and median than the sample does, indicating that
 # Hispanics have a lower overall educational level compared to everyone in the sample.
-
+xtabs(~ PRIVHLTH + PUBHLTH + RRACE)
 
 # All of the work on this exam is my own, answered honestly as rules state.
 # Name: Nicholas Alonso
 #  Date: 10/22/2021
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#if we want to use this, must change public health to numeric...
-white_healthinurance <- (Household_Pulse_data$RRACE == 1) & (Household_Pulse_data$PUBHLTH)
-black_healthinsurance <- (Household_Pulse_data$RRACE == 2) & (Household_Pulse_data$PUBHLTH)
-white_private <- (Household_Pulse_data$RRACE == 1) & (Household_Pulse_data$PRIVHLTH)
-black_private <- (Household_Pulse_data$RRACE == 2) & (Household_Pulse_data$PRIVHLTH)
-health_insurance <- lm(Household_Pulse_data$PRIVHLTH ~   white_private + black_private)
-summary(health_insurance)
-xtabs
-summary(xtabs(~ white_healthinurance + black_healthinsurance)) 
-
 
