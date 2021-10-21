@@ -1,0 +1,1747 @@
+attach(Household_Pulse_data)
+summary(Household_Pulse_data)
+#REGSSION FOR FIRST QUESITION
+question1 <-lm(as.numeric(RECVDVACC)~ EEDUC* REGION)
+summary(question1)
+anova(question1)
+confint(question1)
+TukeyHSD(aov(question1))
+# The null hypothesis states there is no difference in the amount of people vaccinated
+# between people in the south with a bachelors degree and people in the north
+# with less than a high school education. The alternative hypothesis states there is a
+# significant difference in between the groups. The level of confidence is 99%, so the 
+# level of significance is 0.01. In this case, the p-value is 0.0000259, which is less than
+# the level of significance, therefore we reject the null hypothesis in favor of the 
+# alternative and conclude there is a significant difference between the means of
+# of people in the south with a bachelors degree and people in the north
+# with less than a high school education.
+#                                         diff            lwr           upr           p adj
+#bach deg:South-less than hs:Northeast  -0.2648268467 -0.4473442937 -8.230940e-02 0.0000259
+
+question2<-lm(as.numeric(RECVDVACC)~ EEDUC* GENID_DESCRIBE)
+summary(question2)
+TukeyHSD(aov(question2))
+
+# The null hypothesis states there is no difference in the amount of people vaccinated
+# between females with a bachelors degree and males
+# with less than a high school education. The alternative hypothesis states there is a
+# significant difference in between the groups. The level of confidence is 99%, so the 
+# level of significance is 0.01. In this case, the p-value is 0.0000168, which is less than
+# the level of significance, therefore we reject the null hypothesis in favor of the 
+# alternative and conclude there is a significant difference between the vaccination levels
+# of females with a bachelors degree and males with less than a high school education.
+#                                                     diff            lwr           upr       p adj
+# adv deg:female-less than hs:male                -1.464736e-01 -2.474503e-01 -0.0454968465 0.0000168
+
+
+
+
+#NUMBER 3
+# I also changed the list of variables to numeric so that I can potentially use in the analysis. 
+# Must change to numeric for analysis.
+summary(Household_Pulse_data$RHISPANIC)
+length(Household_Pulse_data$RHISPANIC)
+Household_Pulse_data$RHISPANIC <- as.numeric(Household_Pulse_data$RHISPANIC)
+Household_Pulse_data$RRACE <- as.numeric(Household_Pulse_data$RRACE)
+Household_Pulse_data$EEDUC <- as.numeric(Household_Pulse_data$EEDUC)
+Household_Pulse_data$RECVDVACC <- as.numeric(Household_Pulse_data$RECVDVACC)
+Household_Pulse_data$INCOME <- as.numeric(Household_Pulse_data$INCOME)
+Household_Pulse_data$ANXIOUS <- as.numeric(Household_Pulse_data$ANXIOUS)
+Household_Pulse_data$REGION <- as.numeric(Household_Pulse_data$REGION)
+Household_Pulse_data$GENID_DESCRIBE <- as.numeric(Household_Pulse_data$GENID_DESCRIBE)
+Household_Pulse_data$PRIVHLTH <- as.numeric(Household_Pulse_data$PRIVHLTH)
+Household_Pulse_data$PUBHLTH <- as.numeric(Household_Pulse_data$PUBHLTH)
+Household_Pulse_data$SEXUAL_ORIENTATION <- as.numeric(Household_Pulse_data$SEXUAL_ORIENTATION)
+Household_Pulse_data$ENROLLNONE <- as.numeric(Household_Pulse_data$ENROLLNONE)
+Household_Pulse_data$KIDS_LT5Y <- as.numeric(Household_Pulse_data$KIDS_LT5Y)
+Household_Pulse_data$EST_ST <- as.numeric(Household_Pulse_data$EST_ST)
+
+
+# When comparing the summaries of the subgroup and sample, we see that hispanic_subgroup 
+# is indeed a subgroup of just Hispanics. This subgroup is interesting because
+# one could explore differences between of household income from the subgroup and the sample.
+# Additionally, it might be interesting to go into the analysis with the assumption that 
+# Hispanics will have a lower overall household income compared to the sample. 
+
+# Exploring where subgroup differs from sample.
+hispanic_income <- (Household_Pulse_data$RHISPANIC == 2) & (Household_Pulse_data$INCOME)
+summary(hispanic_income)
+regression12 <-  lm(Household_Pulse_data$INCOME ~ hispanic_income)
+summary(regression12)
+confint(regression12)
+anova(regression12)
+# When checking for summary, we are testing to see if the subgroup of Hispanics does differ from the entire sample. 
+# The Null Hypothesis states there is no significant difference between the dependent
+# and independent variables, while the alternative hypothesis states there is a significant difference.
+# The t-stat is -24.75, p-values is 2e-16, which is less than the level of significance, therefore the 
+# subgroup of Hispanics are statistically significant. Thus, we reject the null hypothesis that there 
+# is no difference and deem there is sufficient evidence to support that the coefficients are different
+# from the sample. Additionally, the coefficient falls within the confidence interval at a confidence level of 95%,
+# ranging from -0.8334076 -0.7111021, meaning the interval is expected to cover the true population proportion of 
+# Hispanics 95% of the time. Since the coefficient of the regression falls within the interval, we are 95% confident
+# the coefficient represents the true mean of Hispanics, showing that Hispanics have less income than the rest of the sample.
+# For the anova test, the null hypothesis for anova is that the means are equal to each other, while the 
+# alternative hypothesis is that the means differ. Since a p-value of 2.2e-16 is less than a level of 
+# significance of 0.001, we reject null in favor of the alternative hypothesis that not all means are equal.
+# Thus the mean incomes of the Hispanics is different compared to the rest of the of the sample.
+# Something to note is anova shows the residual sum of squares is 393666, since it is vary big this might indicate the 
+# variables are a poor fit for this data. Also,the multiple R^2 is 0.008, since it is very low this 
+# may affect variation significance.
+
+# The second way I interpreted to run the regression was using a direct subset of Hispanics.
+# I created the subset of just Hispanics, by changing the the factor to numeric
+# then sub-setting the data.
+#so I will make Hispanic into a numeric in order to subset it.
+# Additionally,or the regression, we divide the different income levels, with people making less than $25,000 the lowest
+#and people that make at most $199,999 the highest. While intentionally leaving out the group that made over $200,000 
+#because adding all the different ranges of a single dummy would make one in the regression an NA.
+# I wanted to test whether there is a relationship between Hispanics' health insurance and their income level, so 
+# the dependent variable is private health insurance, while the independents are the different income levels.
+hispanic_subgroup <- subset(Household_Pulse_data, Household_Pulse_data$RHISPANIC == 2) 
+list(Household_Pulse_data$INCOME)
+list(hispanic_subgroup$INCOME)
+summary(Household_Pulse_data)
+summary(hispanic_subgroup)
+#First, just to see if we have separate subgroups
+# Seems like we do.
+
+incomeless25 <-  hispanic_subgroup$INCOME == 1
+income25_35 <- hispanic_subgroup$INCOME == 2
+income35_45 <- hispanic_subgroup$INCOME == 3
+income50_75 <- hispanic_subgroup$INCOME == 4
+income75_99 <- hispanic_subgroup$INCOME == 5
+income100_149 <- hispanic_subgroup$INCOME == 6
+income150_199 <- hispanic_subgroup$INCOME == 7
+regression <- lm(hispanic_subgroup$PRIVHLTH ~ incomeless25 + income25_35 + income35_45 + income50_75 + 
+                   income75_99 + income100_149 +income150_199 )
+summary(regression)
+stargazer(regression, type = "text")
+confint(regression)
+anova(regression)
+# We will analyze the summary at a 99% level of confidence.
+# The null hypothesis for summary states there is no difference from Hispanics with private health insurance to the 
+# different levels of income. The regression shows Hispanics that make more than $75,000 have are not significantly 
+# different. Since the lowest p-value is 0.50819, which is well above the level of significance. So we fail to reject 
+# the null hypothesis and conclude there is no significant difference between those with private health insurance and
+# those that are wealthy. Which makes sense due to the fact that wealthy Hispanics are more likely to afford private
+# health insurance. On the other hand, Hispanics that have an income of $74,999 or lower are significantly
+# different because the highest p-values, which is 0.00134, is well below the level of significance.
+# So, we reject the null hypothesis in favor of the alternative hypothesis, stating there is a significant 
+# difference between Hispanics that own private health insurance and people with lower income. Now we will analyze the 
+# ANOVA test at a level of significance of 0.001. The null hypothesis for anova is that the means are equal to each other,
+# while the alternative hypothesis is that the means differ. For Hispanics that make less than $75,000 we reject the 
+# null that means are equal, in favor of the alternative hypothesis that the means are different for the those that 
+# have private health insurance because the smallest F-value is 21.0398, and the largest p-value is 4.584e-06.
+# However, for people that make more than 75,000 we fail to reject the null hypothesis and deem there 
+# is no difference in means between people that make more than 75,000 and those that have private health insurance
+# because the largest f-value is 0.8540 and the smallest p-value is 0.3555.
+# Something to note is anova shows the residual sum of squares is 2656, ideally we would want a sum of
+# square that is 0 to be a perfect fit for our model. While this regression's residuals Sum Sq is not 0, it
+# still has a lower Sum Sq compared to the previous regression, in this case this regression fits the model
+# better. Additionally, the multiple R^2 is 0.379, which is much higher than the first regression, which shows
+# the independent variable does explain the variation better than the first model.
+# may affect variation significance.
+
+
+#Now For a KNN of different education levels
+# we created different variables for the educational levels of our subgroup of Hispanics.
+# We will create a factor with just the variables for less than high school to some college education. 
+# Then, use the norm variables of income and private halth insurance to predict the educational levels. 
+less_highschool <- hispanic_subgroup$EEDUC == 1
+some_highschool <- hispanic_subgroup$EEDUC == 2
+highschool <- hispanic_subgroup$EEDUC == 3
+some_college <- hispanic_subgroup$EEDUC == 4
+associates <- hispanic_subgroup$EEDUC == 5
+bacholers <-   hispanic_subgroup$EEDUC == 6
+graduate <- hispanic_subgroup$EEDUC == 7
+educ_indx <- factor((less_highschool + 2*some_highschool + 3*highschool + 4*some_college), levels=c(1,2,3,4),labels = c("Less HS","Some HS","HS","Some College"))
+norm_varb <- function(X_in) { (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
+}
+norm_income <- norm_varb(hispanic_subgroup$INCOME)
+norm_private_insurance <- norm_varb(hispanic_subgroup$PRIVHLTH)
+data_use_prelim <- data.frame(norm_income,norm_private_insurance)
+good_obs_data_use <- complete.cases(data_use_prelim,educ_indx)
+dat_use <- subset(data_use_prelim,good_obs_data_use)
+y_use <- subset(educ_indx,good_obs_data_use)
+set.seed(1)
+NN_obs <- sum(good_obs_data_use == 1)
+select1 <- (runif(NN_obs) < 0.9)
+train_data <- subset(dat_use,select1)
+test_data <- subset(dat_use,(!select1))
+cl_data <- y_use[select1]
+true_data <- y_use[!select1]
+summary(cl_data)
+prop.table(summary(cl_data))
+summary(train_data)
+require(class)
+for (indx in seq(1, 9, by= 2)) {
+  pred_borough <- knn(train_data, test_data, cl_data, k = indx, l = 0, prob = FALSE, use.all = TRUE)
+  num_correct_labels <- sum(pred_borough == true_data)
+  correct_rate <- num_correct_labels/length(true_data)
+  print(c(indx,correct_rate))
+}
+cl_data_n <- as.numeric(cl_data)
+model_ols1 <- lm(cl_data_n ~ train_data$norm_income + train_data$norm_private_insurance)         
+y_hat <- fitted.values(model_ols1)
+cl_data_n1 <- as.numeric(cl_data_n == 1)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_income + train_data$norm_private_insurance)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+cl_data_n1 <- as.numeric(cl_data_n == 2)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_income + train_data$norm_private_insurance)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+cl_data_n1 <- as.numeric(cl_data_n == 3)
+model_ols_v1 <- lm( cl_data_n1 ~ train_data$norm_income + train_data$norm_private_insurance)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+cl_data_n1 <- as.numeric(cl_data_n == 4)
+model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_income + train_data$norm_private_insurance)
+y_hat_v1 <- fitted.values(model_ols_v1)
+mean(y_hat_v1[cl_data_n1 == 1])
+# After running the KNN, the accuracy of the first kth neighbor became 0.55, while the accuracy of the 
+# third, fifth, seventh and ninth neighbors are all in the 0.50s range. 
+# Whereas the accuracy of the simple regression had lowest as 0.06, for less than high school education
+# and the highest as 0.52 for those with some college education.
+# Overall, in the KNN and has decent accuracy to predicted based on education levels, however
+# the simple linear regression is only able to predict some education levels better while other are a poor 
+# predictor. Additionally, when comparing the KNN to the regression, the KNN gave a higher accuracy out of the two.
+# The reason the accuracy of the prediction could have increase because income or private health insurance
+# could have weighed significantly in the aspect of classification.
+
+# I used a regression, to test the levels of anxiety of wealthy Hispanics.
+# For the dependent variable, we set it to Hispanics that make a $150,000-$199,999 income
+# and the independent variables are the levels of anxiety.
+no_anxious <- hispanic_subgroup$ANXIOUS == 1
+some_anxious <- hispanic_subgroup$ANXIOUS == 2
+very_anxious <- hispanic_subgroup$ANXIOUS == 3
+extremely_anxious <- hispanic_subgroup$ANXIOUS == 4
+regression1 <- lm(income150_199 ~ no_anxious + some_anxious + very_anxious + extremely_anxious )
+summary(regression1)
+anova(regression1) 
+# Using ANOVA, for Hispanics that are not anxious, the p-value is 1.804e-15, which is below the level of 
+# significance of 0.001, thus we reject the null hypothesis indicating conclude there the means for non-anxious
+# Hispanics and Hispanics wealthy are different. To further prove this statement, we can observe the other levels 
+# of anxiety. For the categories "some", "very" and "extremely" anxious, the lowest 0.1530 is p-value, which above 
+# the level of significance of 0.001 thus we fail to reject the null hypothesis, indicating there is no difference
+# in the means of wealthy people and those that have anxiety. Thus, I can conclude that wealthy Hispanics show that 
+# they are anxious, what I believe to be more likely is that although wealthy Hispanics may face similar stress to others, 
+# they may also face less social stigma regarding openness of anxiety. For example, in a poorer social groups 
+# or even social class, one may be more likely to be ridiculed for discussing their anxieties,
+# however someone that is wealthier will be surrounded by a higher social class, and thus have less 
+# friends or colleagues that will ridicule them for the anxiety they are facing. Therefore, the anxiety levels 
+# by wealthier people are higher in the data only because they are more likely to report their struggles. Nonetheless,
+# I conclude that Hispanics from that wealth distribution are in fact anxious to some degree.
+
+xtabs(~ INCOME + EVICT + REGION) 
+# An interesting cross tabs is that
+# People that have a higher income are less likely to get evicted, while people with 
+# less income are more likely to get evicted.
+
+educationsample <- Household_Pulse_data$EEDUC
+summary(educationsample)
+table(educationsample)
+length(educationsample)
+
+educationsubgroup <- hispanic_subgroup$EEDUC
+summary(educationsubgroup)
+table(educationsubgroup)
+length(educationsubgroup)
+# When compare the proportions from the sample and subgroup, we can see the difference in median,
+# where the sample has both a greater mean and median than the sample does, indicating that
+# Hispanics have a lower overall educational level compared to everyone in the sample.
+xtabs(~ PRIVHLTH + PUBHLTH + RRACE)
+
+
+
+impress <-lm(as.numeric(RRACE)~ HADCOVID * RECVDVACC)
+summary(impress)
+anova(impress)
+confint(impress)
+TukeyHSD(aov(impress))
+
+
+# All of the work on this exam is my own, answered honestly as rules state.
+# Name: Nicholas Alonso
+#  Date: 10/22/2021
+
+> attach(Household_Pulse_data)
+> summary(Household_Pulse_data)
+        RHISPANIC       RRACE                EEDUC               MS        EGENID_BIRTH       GENID_DESCRIBE 
+ Not Hispanic:62660   White:56938   less than hs:  411   NA       :  881   male  :27592   NA         : 1131  
+ Hispanic    : 6454   Black: 5412   some hs     :  936   married  :40036   female:41522   male       :26796  
+                      Asian: 3561   HS diploma  : 7857   widowed  : 3872                  female     :40263  
+                      Other: 3203   some coll   :14596   divorced :10310                  transgender:  202  
+                                    assoc deg   : 7508   separated: 1214                  other      :  722  
+                                    bach deg    :20075   never    :12801                                     
+                                    adv deg     :17731                                                       
+      SEXUAL_ORIENTATION                      KIDS_LT5Y                         KIDS_5_11Y                        KIDS_12_17Y   
+ NA            : 1506    NA                        :62342   NA                       :58467   NA                        :58046  
+ gay or lesbian: 2343    Yes children under 5 in HH: 6772   Yes children 5 - 11 in HH:10647   Yes children 12 - 17 in HH:11068  
+ straight      :61238                                                                                                           
+ bisexual      : 2288                                                                                                           
+ something else:  871                                                                                                           
+ dont know     :  868                                                                                                           
+                                                                                                                                
+                              ENROLLNONE                  RECVDVACC                          DOSESRV     
+ NA                                :64285   NA                 :  851   NA                       : 9105  
+ children not in any type of school: 4829   yes got vaxx       :60326   yes got all doses        :57762  
+                                            no did not get vaxx: 7937   yes plan to get all doses: 1993  
+                                                                        no will not get all doses:  254  
+                                                                                                         
+                                                                                                         
+                                                                                                         
+                     GETVACRV                                   KIDDOSES                        KIDGETVAC    
+ NA                      :61159   NA                                :58318   NA                      :65384  
+ definitely will get vaxx:  609   Yes kids got or will get all doses: 7135   definitely will get vaxx:  487  
+ probably will get vaxx  :  731   no kids did not or will not       : 3661   probably will get vaxx  :  439  
+ unsure about vaxx       : 1584                                              unsure about vaxx       :  736  
+ probably not            : 1599                                              probably not            :  593  
+ definitely not          : 3432                                              definitely not          : 1036  
+                                                                             dont know yet           :  439  
+                      HADCOVID                      WRKLOSSRV                              ANYWORK                     KINDWORK    
+ NA                       : 1363   NA                    : 1961   NA                           : 2135   NA                 :30540  
+ yes doctor told had covid: 9122   yes recent HH job loss: 8058   yes employment in last 7 days:39237   work for govt      : 6378  
+ no did not               :58221   no recent HH job loss :59095   no employment in last 7 days :27742   work for private co:21370  
+ not sure                 :  408                                                                        work for nonprofit : 5055  
+                                                                                                        self employed      : 4966  
+                                                                                                        work in family biz :  805  
+                                                                                                                                   
+            RSNNOWRKRV                                         CHLDCARE                              CURFOODSUF   
+ NA              :42659   NA                                       :58419   NA                            : 6770  
+ retired         :15024   yes impacts to childcare because pandemic: 2566   had enough food               :49234  
+ other           : 4027   no                                       : 8129   had enough but not what wanted: 9947  
+ sick or disabled: 1451                                                     sometimes not enough food     : 2486  
+ caring for kids : 1329                                                     often not enough food         :  677  
+ laid off        : 1164                                                                                           
+ (Other)         : 3460                                                                                           
+                                               CHILDFOOD                                                ANXIOUS     
+ NA                                                 :64258   NA                                             : 7946  
+ often kids not eating enough because couldnt afford:  271   no anxiety over past 2 wks                     :26611  
+ sometimes kids not eating enough                   : 1191   several days anxiety over past 2 wks           :19794  
+ kids got enough food                               : 3394   more than half the days anxiety over past 2 wks: 6140  
+                                                             nearly every day anxiety                       : 8623  
+                                                                                                                    
+                                                                                                                    
+                                             WORRY                                 TENURE     
+ NA                                             : 8016   NA                           :11103  
+ no worry over past 2 wks                       :31876   housing owned free and clear :16738  
+ several days worried over past 2 wks           :17936   housing owned with mortgage  :28016  
+ more than half the days worried over past 2 wks: 4979   housing rented               :12579  
+ nearly every day worry                         : 6307   housing occupied without rent:  678  
+                                                                                              
+                                                                                              
+                                LIVQTRRV                RENTCUR                     MORTCUR     
+ live in detached 1 family          :41348   NA             :56572   NA                 :41200  
+ NA                                 :11336   current on rent:11239   current on mortgage:26462  
+ live in bldg w 5+ apts             : 6731   behind on rent : 1303   behind on mortgage : 1452  
+ live in 1 family attached to others: 4628                                                      
+ live in mobile home                : 1781                                                      
+ live in building with 3-4 apts     : 1737                                                      
+ (Other)                            : 1553                                                      
+                                        EVICT                                                FORCLOSE               EST_ST     
+ NA                                        :67859   NA                                           :67695   California   : 5359  
+ very likely evicted in next 2 months      :  207   very likely forclosed in next 2 months       :   65   Texas        : 3766  
+ somewhat likely evicted in next 2 months  :  377   somewhat likely forclosed in next 2 months   :  218   Florida      : 2728  
+ not very likely evicted in next 2 months  :  345   not very likely forclosed in next 2 months   :  474   Washington   : 2634  
+ not at all likely evicted in next 2 months:  326   not at all forclosed evicted in next 2 months:  662   Massachusetts: 1965  
+                                                                                                          Oregon       : 1934  
+                                                                                                          (Other)      :50728  
+                   PRIVHLTH                      PUBHLTH            REGION                          INCOME      Num_kids_Pub_School
+ has private health ins:46869   has public health ins:23346   Northeast:10478   NA                     :20335   Min.   :0.00       
+ no private health ins :11275   no public health ins :33381   South    :22680   HH income $75 - 99.9   :10117   1st Qu.:1.00       
+ NA                    :10970   NA                   :12387   Midwest  :13651   HH income $35k - 49.9  : 9330   Median :2.00       
+                                                              West     :22305   HH income $50k - 74.9  : 7830   Mean   :1.71       
+                                                                                HH income $150 - 199   : 6117   3rd Qu.:2.00       
+                                                                                HH income $25k - $34.9k: 5805   Max.   :4.00       
+                                                                                (Other)                : 9580   NA's   :55108      
+ Num_kids_Priv_School Num_kids_homeschool        Works_onsite            works_remote            Shop_in_store  
+ Min.   :0.00         Min.   :0.00        NA           : 6350   NA             : 8022   NA              : 6873  
+ 1st Qu.:0.00         1st Qu.:0.00        worked onsite:34918   worked remotely:22863   shopped in store:53576  
+ Median :1.00         Median :1.00        no           :27846   no             :38229   no              : 8665  
+ Mean   :1.03         Mean   :0.87                                                                              
+ 3rd Qu.:2.00         3rd Qu.:2.00                                                                              
+ Max.   :2.00         Max.   :2.00                                                                              
+ NA's   :66430        NA's   :67421                                                                             
+                 eat_in_restaurant
+ NA                       : 7217  
+ eat at restaurant indoors:32405  
+ no                       :29492  
+                                  
+                                  
+                                  
+                                  
+> #REGSSION FOR FIRST QUESITION
+> vaccinated <- Household_Pulse_data$RECVDVACC == "yes got vaxx"
+> regressions <- aov(vaccinated ~ EEDUC*REGION)
+> summary(regressions)
+                Df Sum Sq Mean Sq F value   Pr(>F)    
+EEDUC            6    277   46.13 432.386  < 2e-16 ***
+REGION           3     17    5.60  52.503  < 2e-16 ***
+EEDUC:REGION    18      6    0.34   3.183 5.58e-06 ***
+Residuals    69086   7371    0.11                     
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> anova(regressions)
+Analysis of Variance Table
+
+Response: vaccinated
+                Df Sum Sq Mean Sq  F value    Pr(>F)    
+EEDUC            6  276.8  46.132 432.3858 < 2.2e-16 ***
+REGION           3   16.8   5.602  52.5032 < 2.2e-16 ***
+EEDUC:REGION    18    6.1   0.340   3.1833 5.583e-06 ***
+Residuals    69086 7370.9   0.107                       
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> TukeyHSD(aov(regressions))
+  Tukey multiple comparisons of means
+    95% family-wise confidence level
+
+Fit: aov(formula = regressions)
+
+$EEDUC
+                               diff          lwr        upr     p adj
+some hs-less than hs    -0.00901491 -0.066000382 0.04797056 0.9992354
+HS diploma-less than hs  0.07039982  0.021670525 0.11912912 0.0004101
+some coll-less than hs   0.11805421  0.069887353 0.16622106 0.0000000
+assoc deg-less than hs   0.12898034  0.080194783 0.17776591 0.0000000
+bach deg-less than hs    0.20459069  0.156604192 0.25257719 0.0000000
+adv deg-less than hs     0.23777990  0.189729807 0.28582999 0.0000000
+HS diploma-some hs       0.07941473  0.046114946 0.11271451 0.0000000
+some coll-some hs        0.12706912  0.094597942 0.15954030 0.0000000
+assoc deg-some hs        0.13799526  0.104613187 0.17137732 0.0000000
+bach deg-some hs         0.21360560  0.181402565 0.24580864 0.0000000
+adv deg-some hs          0.24679481  0.214497088 0.27909253 0.0000000
+some coll-HS diploma     0.04765439  0.034179317 0.06112946 0.0000000
+assoc deg-HS diploma     0.05858052  0.043038236 0.07412281 0.0000000
+bach deg-HS diploma      0.13419087  0.121375417 0.14700633 0.0000000
+adv deg-HS diploma       0.16738008  0.154328523 0.18043164 0.0000000
+assoc deg-some coll      0.01092614 -0.002751012 0.02460329 0.2179168
+bach deg-some coll       0.08653648  0.076060914 0.09701205 0.0000000
+adv deg-some coll        0.11972569  0.108962569 0.13048882 0.0000000
+bach deg-assoc deg       0.07561035  0.062582579 0.08863812 0.0000000
+adv deg-assoc deg        0.10879956  0.095539465 0.12205965 0.0000000
+adv deg-bach deg         0.03318921  0.023264331 0.04311409 0.0000000
+
+$REGION
+                           diff          lwr         upr     p adj
+South-Northeast   -0.0444972618 -0.054409403 -0.03458512 0.0000000
+Midwest-Northeast -0.0438293882 -0.054728278 -0.03293050 0.0000000
+West-Northeast    -0.0268049582 -0.036743395 -0.01686652 0.0000000
+Midwest-South      0.0006678736 -0.008422233  0.00975798 0.9976166
+West-South         0.0176923036  0.009779229  0.02560538 0.0000001
+West-Midwest       0.0170244300  0.007905658  0.02614320 0.0000096
+
+$`EEDUC:REGION`
+                                                     diff           lwr           upr     p adj
+some hs:Northeast-less than hs:Northeast     0.1829452170 -0.0242064961  3.900969e-01 0.1844842
+HS diploma:Northeast-less than hs:Northeast  0.1661283432 -0.0141577994  3.464145e-01 0.1247669
+some coll:Northeast-less than hs:Northeast   0.2073122206  0.0280626004  3.865618e-01 0.0054312
+assoc deg:Northeast-less than hs:Northeast   0.2134264726  0.0325797584  3.942732e-01 0.0037311
+bach deg:Northeast-less than hs:Northeast    0.2768361194  0.0985221435  4.551501e-01 0.0000030
+adv deg:Northeast-less than hs:Northeast     0.3017891683  0.1234674059  4.801109e-01 0.0000001
+less than hs:South-less than hs:Northeast    0.0225447372 -0.1801114590  2.252009e-01 1.0000000
+some hs:South-less than hs:Northeast        -0.0063236941 -0.1957391293  1.830917e-01 1.0000000
+HS diploma:South-less than hs:Northeast      0.0904255319 -0.0880646458  2.689157e-01 0.9869164
+some coll:South-less than hs:Northeast       0.1482784977 -0.0295645670  3.261216e-01 0.2881755
+assoc deg:South-less than hs:Northeast       0.1606841526 -0.0180760762  3.394444e-01 0.1578414
+bach deg:South-less than hs:Northeast        0.2451054505  0.0674791221  4.227318e-01 0.0001066
+adv deg:South-less than hs:Northeast         0.2749642897  0.0972927959  4.526358e-01 0.0000033
+less than hs:Midwest-less than hs:Northeast -0.0288052373 -0.2611153409  2.035049e-01 1.0000000
+some hs:Midwest-less than hs:Northeast      -0.0081458967 -0.2074761544  1.911844e-01 1.0000000
+HS diploma:Midwest-less than hs:Northeast    0.1091211841 -0.0702501649  2.884925e-01 0.8922690
+some coll:Midwest-less than hs:Northeast     0.1489809316 -0.0294479332  3.274098e-01 0.2853007
+assoc deg:Midwest-less than hs:Northeast     0.1598194713 -0.0196599722  3.392989e-01 0.1717196
+bach deg:Midwest-less than hs:Northeast      0.2385783028  0.0605665835  4.165900e-01 0.0002273
+adv deg:Midwest-less than hs:Northeast       0.2771782066  0.0988977743  4.554586e-01 0.0000029
+less than hs:West-less than hs:Northeast     0.1174525589 -0.0856906055  3.205957e-01 0.9354250
+some hs:West-less than hs:Northeast          0.0478210303 -0.1420580345  2.377001e-01 1.0000000
+HS diploma:West-less than hs:Northeast       0.1265715105 -0.0523281038  3.054711e-01 0.6523406
+some coll:West-less than hs:Northeast        0.1718774587 -0.0059067142  3.496616e-01 0.0749366
+assoc deg:West-less than hs:Northeast        0.1820416935  0.0033926461  3.606907e-01 0.0392369
+bach deg:West-less than hs:Northeast         0.2509390536  0.0733317439  4.285464e-01 0.0000558
+adv deg:West-less than hs:Northeast          0.2871528046  0.1094216740  4.648839e-01 0.0000007
+HS diploma:Northeast-some hs:Northeast      -0.0168168738 -0.1298368506  9.620310e-02 1.0000000
+some coll:Northeast-some hs:Northeast        0.0243670036 -0.0869920925  1.357261e-01 1.0000000
+assoc deg:Northeast-some hs:Northeast        0.0304812557 -0.0834307981  1.443933e-01 0.9999999
+bach deg:Northeast-some hs:Northeast         0.0938909024 -0.0159557905  2.037376e-01 0.2403978
+adv deg:Northeast-some hs:Northeast          0.1188439513  0.0089846189  2.287033e-01 0.0166691
+less than hs:South-some hs:Northeast        -0.1604004797 -0.3064824972 -1.431846e-02 0.0131867
+some hs:South-some hs:Northeast             -0.1892689110 -0.3163461674 -6.219165e-02 0.0000117
+HS diploma:South-some hs:Northeast          -0.0925196850 -0.2026521758  1.761281e-02 0.2732306
+some coll:South-some hs:Northeast           -0.0346667193 -0.1437473208  7.441388e-02 0.9999963
+assoc deg:South-some hs:Northeast           -0.0222610643 -0.1328306867  8.830856e-02 1.0000000
+bach deg:South-some hs:Northeast             0.0621602336 -0.0465666469  1.708871e-01 0.9427858
+adv deg:South-some hs:Northeast              0.0920190727 -0.0167815783  2.008197e-01 0.2601973
+less than hs:Midwest-some hs:Northeast      -0.2117504543 -0.3967866836 -2.671422e-02 0.0065670
+some hs:Midwest-some hs:Northeast           -0.1910911136 -0.3325229828 -4.965924e-02 0.0001851
+HS diploma:Midwest-some hs:Northeast        -0.0738240329 -0.1853789647  3.773090e-02 0.7793314
+some coll:Midwest-some hs:Northeast         -0.0339642853 -0.1439973793  7.606881e-02 0.9999980
+assoc deg:Midwest-some hs:Northeast         -0.0231257456 -0.1348544019  8.860291e-02 1.0000000
+bach deg:Midwest-some hs:Northeast           0.0556330858 -0.0537222715  1.649884e-01 0.9861597
+adv deg:Midwest-some hs:Northeast            0.0942329896 -0.0155592437  2.040252e-01 0.2328753
+less than hs:West-some hs:Northeast         -0.0654926580 -0.2122494883  8.126417e-02 0.9979829
+some hs:West-some hs:Northeast              -0.1351241866 -0.2628914800 -7.356893e-03 0.0234103
+HS diploma:West-some hs:Northeast           -0.0563737064 -0.1671685347  5.442112e-02 0.9861323
+some coll:West-some hs:Northeast            -0.0110677582 -0.1200523173  9.791680e-02 1.0000000
+assoc deg:West-some hs:Northeast            -0.0009035234 -0.1112933061  1.094863e-01 1.0000000
+bach deg:West-some hs:Northeast              0.0679938367 -0.0407019702  1.766896e-01 0.8609326
+adv deg:West-some hs:Northeast               0.1042075877 -0.0046904231  2.131056e-01 0.0840711
+some coll:Northeast-HS diploma:Northeast     0.0411838774 -0.0034491738  8.581693e-02 0.1231059
+assoc deg:Northeast-HS diploma:Northeast     0.0472981295 -0.0033695820  9.796584e-02 0.1095088
+bach deg:Northeast-HS diploma:Northeast      0.1107077762  0.0699946711  1.514209e-01 0.0000000
+adv deg:Northeast-HS diploma:Northeast       0.1356608251  0.0949136303  1.764080e-01 0.0000000
+less than hs:South-HS diploma:Northeast     -0.1435836059 -0.2481360656 -3.903115e-02 0.0001211
+some hs:South-HS diploma:Northeast          -0.1724520373 -0.2482140993 -9.668998e-02 0.0000000
+HS diploma:South-HS diploma:Northeast       -0.0757028112 -0.1171808355 -3.422479e-02 0.0000000
+some coll:South-HS diploma:Northeast        -0.0178498455 -0.0564482729  2.074858e-02 0.9964819
+assoc deg:South-HS diploma:Northeast        -0.0054441906 -0.0480693281  3.718095e-02 1.0000000
+bach deg:South-HS diploma:Northeast          0.0789771074  0.0413899353  1.165643e-01 0.0000000
+adv deg:South-HS diploma:Northeast           0.1088359465  0.0710359117  1.466360e-01 0.0000000
+less than hs:Midwest-HS diploma:Northeast   -0.1949335805 -0.3493021885 -4.056497e-02 0.0009280
+some hs:Midwest-HS diploma:Northeast        -0.1742742398 -0.2722244036 -7.632408e-02 0.0000000
+HS diploma:Midwest-HS diploma:Northeast     -0.0570071591 -0.1021265983 -1.188772e-02 0.0009168
+some coll:Midwest-HS diploma:Northeast      -0.0171474115 -0.0583607921  2.406597e-02 0.9993678
+assoc deg:Midwest-HS diploma:Northeast      -0.0063088719 -0.0518561397  3.923840e-02 1.0000000
+bach deg:Midwest-HS diploma:Northeast        0.0724499596  0.0330817599  1.118182e-01 0.0000000
+adv deg:Midwest-HS diploma:Northeast         0.1110498634  0.0704839236  1.516158e-01 0.0000000
+less than hs:West-HS diploma:Northeast      -0.0486757842 -0.1541690456  5.681748e-02 0.9966009
+some hs:West-HS diploma:Northeast           -0.1183073129 -0.1952211752 -4.139345e-02 0.0000041
+HS diploma:West-HS diploma:Northeast        -0.0395568326 -0.0827627921  3.649127e-03 0.1328774
+some coll:West-HS diploma:Northeast          0.0057491156 -0.0325770517  4.407528e-02 1.0000000
+assoc deg:West-HS diploma:Northeast          0.0159133504 -0.0262430856  5.806979e-02 0.9998895
+bach deg:West-HS diploma:Northeast           0.0848107105  0.0473135185  1.223079e-01 0.0000000
+adv deg:West-HS diploma:Northeast            0.1210244615  0.0829451006  1.591038e-01 0.0000000
+assoc deg:Northeast-some coll:Northeast      0.0061142521 -0.0407317736  5.296028e-02 1.0000000
+bach deg:Northeast-some coll:Northeast       0.0695238988  0.0336785356  1.053693e-01 0.0000000
+adv deg:Northeast-some coll:Northeast        0.0944769477  0.0585928701  1.303610e-01 0.0000000
+less than hs:South-some coll:Northeast      -0.1847674834 -0.2875222883 -8.201268e-02 0.0000000
+some hs:South-some coll:Northeast           -0.2136359147 -0.2868972495 -1.403746e-01 0.0000000
+HS diploma:South-some coll:Northeast        -0.1168866887 -0.1535985346 -8.017484e-02 0.0000000
+some coll:South-some coll:Northeast         -0.0590337229 -0.0924578419 -2.560960e-02 0.0000000
+assoc deg:South-some coll:Northeast         -0.0466280680 -0.0846311663 -8.624970e-03 0.0017210
+bach deg:South-some coll:Northeast           0.0377932299  0.0055422045  7.004426e-02 0.0042632
+adv deg:South-some coll:Northeast            0.0676520691  0.0351532111  1.001509e-01 0.0000000
+less than hs:Midwest-some coll:Northeast    -0.2361174579 -0.3892742412 -8.296067e-02 0.0000038
+some hs:Midwest-some coll:Northeast         -0.2154581172 -0.3114871114 -1.194291e-01 0.0000000
+HS diploma:Midwest-some coll:Northeast      -0.0981910365 -0.1389721220 -5.740995e-02 0.0000000
+some coll:Midwest-some coll:Northeast       -0.0583312889 -0.0947438675 -2.191871e-02 0.0000010
+assoc deg:Midwest-some coll:Northeast       -0.0474927493 -0.0887466793 -6.238819e-03 0.0059033
+bach deg:Midwest-some coll:Northeast         0.0312660822 -0.0030440954  6.557626e-02 0.1389573
+adv deg:Midwest-some coll:Northeast          0.0698659860  0.0341878609  1.055441e-01 0.0000000
+less than hs:West-some coll:Northeast       -0.0898596616 -0.1935715768  1.385225e-02 0.2161531
+some hs:West-some coll:Northeast            -0.1594911903 -0.2339430227 -8.503936e-02 0.0000000
+HS diploma:West-some coll:Northeast         -0.0807407101 -0.1193941455 -4.208727e-02 0.0000000
+some coll:West-some coll:Northeast          -0.0354347618 -0.0685440994 -2.325424e-03 0.0196305
+assoc deg:West-some coll:Northeast          -0.0252705271 -0.0627471628  1.220611e-02 0.7467463
+bach deg:West-some coll:Northeast            0.0436268331  0.0114807207  7.577295e-02 0.0001651
+adv deg:West-some coll:Northeast             0.0798405841  0.0470172561  1.126639e-01 0.0000000
+bach deg:Northeast-assoc deg:Northeast       0.0634096467  0.0202819551  1.065373e-01 0.0000174
+adv deg:Northeast-assoc deg:Northeast        0.0883626956  0.0452028214  1.315226e-01 0.0000000
+less than hs:South-assoc deg:Northeast      -0.1908817354 -0.2963978843 -8.536559e-02 0.0000000
+some hs:South-assoc deg:Northeast           -0.2197501667 -0.2968366824 -1.426637e-01 0.0000000
+HS diploma:South-assoc deg:Northeast        -0.1230009407 -0.1668514521 -7.915043e-02 0.0000000
+some coll:South-assoc deg:Northeast         -0.0651479750 -0.1062852993 -2.401065e-02 0.0000015
+assoc deg:South-assoc deg:Northeast         -0.0527423200 -0.0976794228 -7.805217e-03 0.0041391
+bach deg:South-assoc deg:Northeast           0.0316789779 -0.0085110254  7.186898e-02 0.4088295
+adv deg:South-assoc deg:Northeast            0.0615378170  0.0211486664  1.019270e-01 0.0000056
+less than hs:Midwest-assoc deg:Northeast    -0.2422317100 -0.3972546373 -8.720878e-02 0.0000024
+some hs:Midwest-assoc deg:Northeast         -0.2215723693 -0.3205505257 -1.225942e-01 0.0000000
+HS diploma:Midwest-assoc deg:Northeast      -0.1043052886 -0.1516149562 -5.699562e-02 0.0000000
+some coll:Midwest-assoc deg:Northeast       -0.0644455410 -0.1080458116 -2.084527e-02 0.0000148
+assoc deg:Midwest-assoc deg:Northeast       -0.0536070013 -0.1013248644 -5.889138e-03 0.0090456
+bach deg:Midwest-assoc deg:Northeast         0.0251518301 -0.0167086047  6.701226e-02 0.9043973
+adv deg:Midwest-assoc deg:Northeast          0.0637517339  0.0207629409  1.067405e-01 0.0000133
+less than hs:West-assoc deg:Northeast       -0.0959739137 -0.2024223475  1.047452e-02 0.1535428
+some hs:West-assoc deg:Northeast            -0.1656054423 -0.2438242577 -8.738663e-02 0.0000000
+HS diploma:West-assoc deg:Northeast         -0.0868549621 -0.1323433759 -4.136655e-02 0.0000000
+some coll:West-assoc deg:Northeast          -0.0415490139 -0.0824309898 -6.670380e-04 0.0406189
+assoc deg:West-assoc deg:Northeast          -0.0313847791 -0.0758775420  1.310798e-02 0.6586067
+bach deg:West-assoc deg:Northeast            0.0375125810 -0.0025932822  7.761844e-02 0.1073079
+adv deg:West-assoc deg:Northeast             0.0737263320  0.0330756422  1.143770e-01 0.0000000
+adv deg:Northeast-bach deg:Northeast         0.0249530489 -0.0059195067  5.582560e-02 0.3531617
+less than hs:South-bach deg:Northeast       -0.2542913822 -0.3554051676 -1.531776e-01 0.0000000
+some hs:South-bach deg:Northeast            -0.2831598135 -0.3541011332 -2.122185e-01 0.0000000
+HS diploma:South-bach deg:Northeast         -0.1864105875 -0.2182415047 -1.545797e-01 0.0000000
+some coll:South-bach deg:Northeast          -0.1285576217 -0.1565329572 -1.005823e-01 0.0000000
+assoc deg:South-bach deg:Northeast          -0.1161519668 -0.1494638738 -8.284006e-02 0.0000000
+bach deg:South-bach deg:Northeast           -0.0317306689 -0.0582933552 -5.167983e-03 0.0029523
+adv deg:South-bach deg:Northeast            -0.0018718297 -0.0287348793  2.499122e-02 1.0000000
+less than hs:Midwest-bach deg:Northeast     -0.3056413567 -0.4577020286 -1.535807e-01 0.0000000
+some hs:Midwest-bach deg:Northeast          -0.2849820160 -0.3792529839 -1.907110e-01 0.0000000
+HS diploma:Midwest-bach deg:Northeast       -0.1677149353 -0.2041641410 -1.312657e-01 0.0000000
+some coll:Midwest-bach deg:Northeast        -0.1278551878 -0.1593404786 -9.636990e-02 0.0000000
+assoc deg:Midwest-bach deg:Northeast        -0.1170166481 -0.1539941332 -8.003916e-02 0.0000000
+bach deg:Midwest-bach deg:Northeast         -0.0382578166 -0.0672860089 -9.229624e-03 0.0003440
+adv deg:Midwest-bach deg:Northeast           0.0003420872 -0.0302908407  3.097502e-02 1.0000000
+less than hs:West-bach deg:Northeast        -0.1593835604 -0.2614698426 -5.729728e-02 0.0000025
+some hs:West-bach deg:Northeast             -0.2290150891 -0.3011851869 -1.568450e-01 0.0000000
+HS diploma:West-bach deg:Northeast          -0.1502646089 -0.1843165653 -1.162127e-01 0.0000000
+some coll:West-bach deg:Northeast           -0.1049586607 -0.1325571370 -7.736018e-02 0.0000000
+assoc deg:West-bach deg:Northeast           -0.0947944259 -0.1275044532 -6.208440e-02 0.0000000
+bach deg:West-bach deg:Northeast            -0.0258970657 -0.0523322735  5.381420e-04 0.0642601
+adv deg:West-bach deg:Northeast              0.0103166853 -0.0169380121  3.757138e-02 0.9998837
+less than hs:South-adv deg:Northeast        -0.2792444311 -0.3803719475 -1.781169e-01 0.0000000
+some hs:South-adv deg:Northeast             -0.3081128624 -0.3790737517 -2.371520e-01 0.0000000
+HS diploma:South-adv deg:Northeast          -0.2113636364 -0.2432381443 -1.794891e-01 0.0000000
+some coll:South-adv deg:Northeast           -0.1535106706 -0.1815355944 -1.254857e-01 0.0000000
+assoc deg:South-adv deg:Northeast           -0.1411050157 -0.1744585778 -1.077515e-01 0.0000000
+bach deg:South-adv deg:Northeast            -0.0566837178 -0.0832986246 -3.006881e-02 0.0000000
+adv deg:South-adv deg:Northeast             -0.0268248786 -0.0537395659  8.980871e-05 0.0521327
+less than hs:Midwest-adv deg:Northeast      -0.3305944056 -0.4826642084 -1.785246e-01 0.0000000
+some hs:Midwest-adv deg:Northeast           -0.3099350649 -0.4042207603 -2.156494e-01 0.0000000
+HS diploma:Midwest-adv deg:Northeast        -0.1926679842 -0.2291552636 -1.561807e-01 0.0000000
+some coll:Midwest-adv deg:Northeast         -0.1528082366 -0.1843375960 -1.212789e-01 0.0000000
+assoc deg:Midwest-adv deg:Northeast         -0.1419696970 -0.1789847124 -1.049547e-01 0.0000000
+bach deg:Midwest-adv deg:Northeast          -0.0632108655 -0.0922868506 -3.413488e-02 0.0000000
+adv deg:Midwest-adv deg:Northeast           -0.0246109617 -0.0552891825  6.067259e-03 0.3695357
+less than hs:West-adv deg:Northeast         -0.1843366093 -0.2864364916 -8.223673e-02 0.0000000
+some hs:West-adv deg:Northeast              -0.2539681380 -0.3261574722 -1.817788e-01 0.0000000
+HS diploma:West-adv deg:Northeast           -0.1752176577 -0.2093103651 -1.411250e-01 0.0000000
+some coll:West-adv deg:Northeast            -0.1299117095 -0.1575604502 -1.022630e-01 0.0000000
+assoc deg:West-adv deg:Northeast            -0.1197474747 -0.1524999228 -8.699503e-02 0.0000000
+bach deg:West-adv deg:Northeast             -0.0508501146 -0.0773377942 -2.436244e-02 0.0000000
+adv deg:West-adv deg:Northeast              -0.0146363636 -0.0419419581  1.266923e-02 0.9729095
+some hs:South-less than hs:South            -0.0288684313 -0.1484775059  9.074064e-02 1.0000000
+HS diploma:South-less than hs:South          0.0678807947 -0.0335433995  1.693050e-01 0.7600530
+some coll:South-less than hs:South           0.1257337604  0.0254527589  2.260148e-01 0.0010853
+assoc deg:South-less than hs:South           0.1381394154  0.0362407254  2.400381e-01 0.0001698
+bach deg:South-less than hs:South            0.2225607133  0.1226645863  3.224568e-01 0.0000000
+adv deg:South-less than hs:South             0.2524195524  0.1524431387  3.523960e-01 0.0000000
+less than hs:Midwest-less than hs:South     -0.0513499745 -0.2313391626  1.286392e-01 0.9999996
+some hs:Midwest-less than hs:South          -0.0306906339 -0.1654521835  1.040709e-01 1.0000000
+HS diploma:Midwest-less than hs:South        0.0865764469 -0.0163905599  1.895435e-01 0.2715083
+some coll:Midwest-less than hs:South         0.1264361944  0.0251199399  2.277524e-01 0.0012018
+assoc deg:Midwest-less than hs:South         0.1372747341  0.0341195389  2.404299e-01 0.0002713
+bach deg:Midwest-less than hs:South          0.2160335655  0.1154537672  3.166134e-01 0.0000000
+adv deg:Midwest-less than hs:South           0.2546334693  0.1535788497  3.556881e-01 0.0000000
+less than hs:West-less than hs:South         0.0949078217 -0.0454320118  2.352477e-01 0.7414455
+some hs:West-less than hs:South              0.0252762931 -0.0950656485  1.456182e-01 1.0000000
+HS diploma:West-less than hs:South           0.1040267733  0.0018837578  2.061698e-01 0.0395168
+some coll:West-less than hs:South            0.1493327215  0.0491561984  2.495092e-01 0.0000113
+assoc deg:West-less than hs:South            0.1594969563  0.0577934373  2.612005e-01 0.0000021
+bach deg:West-less than hs:South             0.2283943164  0.1285320108  3.282566e-01 0.0000000
+adv deg:West-less than hs:South              0.2646080674  0.1645257093  3.646904e-01 0.0000000
+HS diploma:South-some hs:South               0.0967492260  0.0253661719  1.681323e-01 0.0001708
+some coll:South-some hs:South                0.1546021918  0.0848529802  2.243514e-01 0.0000000
+assoc deg:South-some hs:South                0.1670078467  0.0949521997  2.390635e-01 0.0000000
+bach deg:South-some hs:South                 0.2514291446  0.1822344235  3.206239e-01 0.0000000
+adv deg:South-some hs:South                  0.2812879837  0.2119774034  3.505986e-01 0.0000000
+less than hs:Midwest-some hs:South          -0.0224815432 -0.1874202624  1.424572e-01 1.0000000
+some hs:Midwest-some hs:South               -0.0018222026 -0.1157052500  1.120608e-01 1.0000000
+HS diploma:Midwest-some hs:South             0.1154448782  0.0418862096  1.890035e-01 0.0000021
+some coll:Midwest-some hs:South              0.1553046257  0.0840750205  2.265342e-01 0.0000000
+assoc deg:Midwest-some hs:South              0.1661431654  0.0923213020  2.399650e-01 0.0000000
+bach deg:Midwest-some hs:South               0.2449019968  0.1747238730  3.150801e-01 0.0000000
+adv deg:Midwest-some hs:South                0.2835019006  0.2126449363  3.543589e-01 0.0000000
+less than hs:West-some hs:South              0.1237762530  0.0033439396  2.442086e-01 0.0349860
+some hs:West-some hs:South                   0.0541447244 -0.0422443628  1.505338e-01 0.9529298
+HS diploma:West-some hs:South                0.1328952046  0.0604944529  2.052960e-01 0.0000000
+some coll:West-some hs:South                 0.1782011528  0.1086022375  2.478001e-01 0.0000000
+assoc deg:West-some hs:South                 0.1883653876  0.1165860103  2.601448e-01 0.0000000
+bach deg:West-some hs:South                  0.2572627477  0.1881168634  3.264086e-01 0.0000000
+adv deg:West-some hs:South                   0.2934764987  0.2240131872  3.629398e-01 0.0000000
+some coll:South-HS diploma:South             0.0578529657  0.0287756729  8.693026e-02 0.0000000
+assoc deg:South-HS diploma:South             0.0702586207  0.0360160636  1.045012e-01 0.0000000
+bach deg:South-HS diploma:South              0.1546799186  0.1269590624  1.824008e-01 0.0000000
+adv deg:South-HS diploma:South               0.1845387577  0.1565299556  2.125476e-01 0.0000000
+less than hs:Midwest-HS diploma:South       -0.1192307692 -0.2714980261  3.303649e-02 0.4238186
+some hs:Midwest-HS diploma:South            -0.0985714286 -0.1931752601 -3.967597e-03 0.0289706
+HS diploma:Midwest-HS diploma:South          0.0186956522 -0.0186060122  5.599732e-02 0.9886943
+some coll:Midwest-HS diploma:South           0.0585553997  0.0260870597  9.102374e-02 0.0000000
+assoc deg:Midwest-HS diploma:South           0.0693939394  0.0315759018  1.072120e-01 0.0000000
+bach deg:Midwest-HS diploma:South            0.1481527708  0.1180611522  1.782444e-01 0.0000000
+adv deg:Midwest-HS diploma:South             0.1867526746  0.1551102058  2.183951e-01 0.0000000
+less than hs:West-HS diploma:South           0.0270270270 -0.0753667158  1.294208e-01 0.9999999
+some hs:West-HS diploma:South               -0.0426045016 -0.1152088581  2.999985e-02 0.9245951
+HS diploma:West-HS diploma:South             0.0361459786  0.0011830654  7.110889e-02 0.0322864
+some coll:West-HS diploma:South              0.0814519268  0.0527370272  1.101668e-01 0.0000000
+assoc deg:West-HS diploma:South              0.0916161616  0.0579588377  1.252735e-01 0.0000000
+bach deg:West-HS diploma:South               0.1605135217  0.1329147940  1.881122e-01 0.0000000
+adv deg:West-HS diploma:South                0.1967272727  0.1683426274  2.251119e-01 0.0000000
+assoc deg:South-some coll:South              0.0124056549 -0.0182857904  4.309710e-02 0.9996176
+bach deg:South-some coll:South               0.0968269529  0.0736351877  1.200187e-01 0.0000000
+adv deg:South-some coll:South                0.1266857920  0.1031506035  1.502210e-01 0.0000000
+less than hs:Midwest-some coll:South        -0.1770837350 -0.3285919183 -2.557555e-02 0.0044749
+some hs:Midwest-some coll:South             -0.1564243943 -0.2498015706 -6.304722e-02 0.0000002
+HS diploma:Midwest-some coll:South          -0.0391573136 -0.0732282141 -5.086413e-03 0.0060846
+some coll:Midwest-some coll:South            0.0007024340 -0.0279960888  2.940096e-02 1.0000000
+assoc deg:Midwest-some coll:South            0.0115409736 -0.0230945005  4.617645e-02 0.9999903
+bach deg:Midwest-some coll:South             0.0902998051  0.0643206285  1.162790e-01 0.0000000
+adv deg:Midwest-some coll:South              0.1288997089  0.1011389824  1.566604e-01 0.0000000
+less than hs:West-some coll:South           -0.0308259387 -0.1320874352  7.043556e-02 0.9999985
+some hs:West-some coll:South                -0.1004574674 -0.1714560919 -2.945884e-02 0.0000536
+HS diploma:West-some coll:South             -0.0217069871 -0.0532001198  9.786145e-03 0.7054485
+some coll:West-some coll:South               0.0235989611 -0.0007722836  4.797021e-02 0.0735893
+assoc deg:West-some coll:South               0.0337631959  0.0037260929  6.380030e-02 0.0089594
+bach deg:West-some coll:South                0.1026605560  0.0796149084  1.257062e-01 0.0000000
+adv deg:West-some coll:South                 0.1388743070  0.1148930603  1.628556e-01 0.0000000
+bach deg:South-assoc deg:South               0.0844212979  0.0550117463  1.138308e-01 0.0000000
+adv deg:South-assoc deg:South                0.1142801371  0.0845990176  1.439613e-01 0.0000000
+less than hs:Midwest-assoc deg:South        -0.1894893899 -0.3420731157 -3.690566e-02 0.0013342
+some hs:Midwest-assoc deg:South             -0.1688300493 -0.2639424081 -7.371769e-02 0.0000000
+HS diploma:Midwest-assoc deg:South          -0.0515629685 -0.0901361460 -1.298979e-02 0.0002426
+some coll:Midwest-assoc deg:South           -0.0117032210 -0.0456247328  2.221829e-02 0.9999805
+assoc deg:Midwest-assoc deg:South           -0.0008646813 -0.0399374317  3.820807e-02 1.0000000
+bach deg:Midwest-assoc deg:South             0.0778941502  0.0462400609  1.095482e-01 0.0000000
+ [ reached getOption("max.print") -- omitted 128 rows ]
+
+> regressions2<-lm(vaccinated~ EEDUC* GENID_DESCRIBE)
+> summary(regressions2)
+
+Call:
+lm(formula = vaccinated ~ EEDUC * GENID_DESCRIBE)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.95686  0.04841  0.08771  0.16711  0.63636 
+
+Coefficients:
+                                          Estimate Std. Error t value Pr(>|t|)    
+(Intercept)                                0.78571    0.08606   9.130  < 2e-16 ***
+EEDUCsome hs                              -0.26571    0.10749  -2.472 0.013437 *  
+EEDUCHS diploma                           -0.33117    0.08989  -3.684 0.000229 ***
+EEDUCsome coll                            -0.32195    0.08892  -3.621 0.000294 ***
+EEDUCassoc deg                            -0.40668    0.09079  -4.479 7.49e-06 ***
+EEDUCbach deg                             -0.34998    0.08793  -3.980 6.89e-05 ***
+EEDUCadv deg                              -0.33780    0.08813  -3.833 0.000127 ***
+GENID_DESCRIBEmale                        -0.02622    0.08979  -0.292 0.770274    
+GENID_DESCRIBEfemale                      -0.08964    0.08896  -1.008 0.313671    
+GENID_DESCRIBEtransgender                 -0.42208    0.12974  -3.253 0.001141 ** 
+GENID_DESCRIBEother                       -0.24405    0.10829  -2.254 0.024220 *  
+EEDUCsome hs:GENID_DESCRIBEmale            0.23181    0.11173   2.075 0.038011 *  
+EEDUCHS diploma:GENID_DESCRIBEmale         0.34523    0.09366   3.686 0.000228 ***
+EEDUCsome coll:GENID_DESCRIBEmale          0.40013    0.09264   4.319 1.57e-05 ***
+EEDUCassoc deg:GENID_DESCRIBEmale          0.50824    0.09456   5.375 7.68e-08 ***
+EEDUCbach deg:GENID_DESCRIBEmale           0.51791    0.09165   5.651 1.60e-08 ***
+EEDUCadv deg:GENID_DESCRIBEmale            0.53517    0.09185   5.826 5.69e-09 ***
+EEDUCsome hs:GENID_DESCRIBEfemale          0.25082    0.11076   2.265 0.023539 *  
+EEDUCHS diploma:GENID_DESCRIBEfemale       0.42343    0.09279   4.563 5.04e-06 ***
+EEDUCsome coll:GENID_DESCRIBEfemale        0.44822    0.09180   4.883 1.05e-06 ***
+EEDUCassoc deg:GENID_DESCRIBEfemale        0.54349    0.09366   5.803 6.55e-09 ***
+EEDUCbach deg:GENID_DESCRIBEfemale         0.56619    0.09082   6.234 4.57e-10 ***
+EEDUCadv deg:GENID_DESCRIBEfemale          0.59331    0.09102   6.518 7.16e-11 ***
+EEDUCsome hs:GENID_DESCRIBEtransgender     0.75922    0.18919   4.013 6.00e-05 ***
+EEDUCHS diploma:GENID_DESCRIBEtransgender  0.75325    0.14563   5.172 2.32e-07 ***
+EEDUCsome coll:GENID_DESCRIBEtransgender   0.86397    0.13889   6.221 4.98e-10 ***
+EEDUCassoc deg:GENID_DESCRIBEtransgender   0.84305    0.15678   5.377 7.59e-08 ***
+EEDUCbach deg:GENID_DESCRIBEtransgender    0.92112    0.13933   6.611 3.84e-11 ***
+EEDUCadv deg:GENID_DESCRIBEtransgender     0.73607    0.14022   5.249 1.53e-07 ***
+EEDUCsome hs:GENID_DESCRIBEother           0.42405    0.14512   2.922 0.003477 ** 
+EEDUCHS diploma:GENID_DESCRIBEother        0.54208    0.11606   4.671 3.00e-06 ***
+EEDUCsome coll:GENID_DESCRIBEother         0.62403    0.11347   5.499 3.82e-08 ***
+EEDUCassoc deg:GENID_DESCRIBEother         0.70410    0.11728   6.004 1.94e-09 ***
+EEDUCbach deg:GENID_DESCRIBEother          0.63361    0.11259   5.628 1.83e-08 ***
+EEDUCadv deg:GENID_DESCRIBEother           0.56399    0.11271   5.004 5.63e-07 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.322 on 69079 degrees of freedom
+Multiple R-squared:  0.06622,	Adjusted R-squared:  0.06576 
+F-statistic: 144.1 on 34 and 69079 DF,  p-value: < 2.2e-16
+
+> anova(regressions2)
+Analysis of Variance Table
+
+Response: vaccinated
+                        Df Sum Sq Mean Sq F value    Pr(>F)    
+EEDUC                    6  276.8  46.132 444.913 < 2.2e-16 ***
+GENID_DESCRIBE           4  211.3  52.826 509.474 < 2.2e-16 ***
+EEDUC:GENID_DESCRIBE    24   19.9   0.828   7.986 < 2.2e-16 ***
+Residuals            69079 7162.6   0.104                      
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+    95% family-wise confidence level
+
+Fit: aov(formula = regressions2)
+
+$EEDUC
+                               diff          lwr        upr     p adj
+some hs-less than hs    -0.00901491 -0.065192418 0.04716260 0.9991703
+HS diploma-less than hs  0.07039982  0.022361429 0.11843821 0.0003126
+some coll-less than hs   0.11805421  0.070570284 0.16553813 0.0000000
+assoc deg-less than hs   0.12898034  0.080886485 0.17707420 0.0000000
+bach deg-less than hs    0.20459069  0.157284565 0.25189682 0.0000000
+adv deg-less than hs     0.23777990  0.190411082 0.28514872 0.0000000
+HS diploma-some hs       0.07941473  0.046587085 0.11224238 0.0000000
+some coll-some hs        0.12706912  0.095058332 0.15907990 0.0000000
+assoc deg-some hs        0.13799526  0.105086492 0.17090402 0.0000000
+bach deg-some hs         0.21360560  0.181859153 0.24535205 0.0000000
+adv deg-some hs          0.24679481  0.214955019 0.27863460 0.0000000
+some coll-HS diploma     0.04765439  0.034370372 0.06093840 0.0000000
+assoc deg-HS diploma     0.05858052  0.043258602 0.07390245 0.0000000
+bach deg-HS diploma      0.13419087  0.121557120 0.14682462 0.0000000
+adv deg-HS diploma       0.16738008  0.154513573 0.18024659 0.0000000
+assoc deg-some coll      0.01092614 -0.002557091 0.02440936 0.2029911
+bach deg-some coll       0.08653648  0.076209441 0.09686353 0.0000000
+adv deg-some coll        0.11972569  0.109115173 0.13033621 0.0000000
+bach deg-assoc deg       0.07561035  0.062767293 0.08845340 0.0000000
+adv deg-assoc deg        0.10879956  0.095727472 0.12187164 0.0000000
+adv deg-bach deg         0.03318921  0.023405050 0.04297337 0.0000000
+
+$GENID_DESCRIBE
+                          diff         lwr          upr     p adj
+male-NA             0.43716831  0.41050481  0.463831808 0.0000000
+female-NA           0.42583674  0.39935444  0.452319037 0.0000000
+transgender-NA      0.39758563  0.33049229  0.464678967 0.0000000
+other-NA            0.35861539  0.31677371  0.400457070 0.0000000
+female-male        -0.01133157 -0.01825644 -0.004406694 0.0000789
+transgender-male   -0.03958268 -0.10161620  0.022450844 0.4089493
+other-male         -0.07855292 -0.11167947 -0.045426372 0.0000000
+transgender-female -0.02825111 -0.09020697  0.033704740 0.7255633
+other-female       -0.06722135 -0.10020222 -0.034240481 0.0000003
+other-transgender  -0.03897024 -0.10888406  0.030943579 0.5490554
+
+$`EEDUC:GENID_DESCRIBE`
+                                                         diff           lwr           upr     p adj
+some hs:NA-less than hs:NA                      -2.657143e-01 -0.6767150641  0.1452864927 0.8595871
+HS diploma:NA-less than hs:NA                   -3.311688e-01 -0.6748649482  0.0125272859 0.0796021
+some coll:NA-less than hs:NA                    -3.219462e-01 -0.6619558716  0.0180635321 0.0973674
+assoc deg:NA-less than hs:NA                    -4.066820e-01 -0.7538255341 -0.0595385212 0.0037354
+bach deg:NA-less than hs:NA                     -3.499776e-01 -0.6861848943 -0.0137703229 0.0285314
+adv deg:NA-less than hs:NA                      -3.377976e-01 -0.6747647753 -0.0008304628 0.0483948
+less than hs:male-less than hs:NA               -2.622061e-02 -0.3695539918  0.3171127622 1.0000000
+some hs:male-less than hs:NA                    -6.012062e-02 -0.3952071831  0.2749659468 1.0000000
+HS diploma:male-less than hs:NA                 -1.215592e-02 -0.3420288347  0.3177170002 1.0000000
+some coll:male-less than hs:NA                   5.195855e-02 -0.2775187933  0.3814358854 1.0000000
+assoc deg:male-less than hs:NA                   7.534007e-02 -0.2546639056  0.4053440387 1.0000000
+bach deg:male-less than hs:NA                    1.417080e-01 -0.1876386922  0.4710547726 0.9997211
+adv deg:male-less than hs:NA                     1.711490e-01 -0.1582322807  0.5005302804 0.9913743
+less than hs:female-less than hs:NA             -8.963585e-02 -0.4298038949  0.2505321862 1.0000000
+some hs:female-less than hs:NA                  -1.045262e-01 -0.4381202470  0.2290679132 0.9999998
+HS diploma:female-less than hs:NA                2.625385e-03 -0.3269248107  0.3321755802 1.0000000
+some coll:female-less than hs:NA                 3.663961e-02 -0.2926918832  0.3659711078 1.0000000
+assoc deg:female-less than hs:NA                 4.717093e-02 -0.2823691198  0.3767109724 1.0000000
+bach deg:female-less than hs:NA                  1.265741e-01 -0.2026918464  0.4558400665 0.9999756
+adv deg:female-less than hs:NA                   1.658744e-01 -0.1634204060  0.4951691424 0.9947851
+less than hs:transgender-less than hs:NA        -4.220779e-01 -0.9181605363  0.0740046922 0.2671588
+some hs:transgender-less than hs:NA              7.142857e-02 -0.4985269597  0.6413841025 1.0000000
+HS diploma:transgender-less than hs:NA           3.227418e-13 -0.4030194210  0.4030194210 1.0000000
+some coll:transgender-less than hs:NA            1.199461e-01 -0.2500352405  0.4899274238 0.9999996
+assoc deg:transgender-less than hs:NA            1.428571e-02 -0.4432591813  0.4718306099 1.0000000
+bach deg:transgender-less than hs:NA             1.490683e-01 -0.2267492249  0.5248858709 0.9999507
+adv deg:transgender-less than hs:NA             -2.380952e-02 -0.4037798779  0.3561608303 1.0000000
+less than hs:other-less than hs:NA              -2.440476e-01 -0.6581107128  0.1700154747 0.9491749
+some hs:other-less than hs:NA                   -8.571429e-02 -0.5147612228  0.3433326514 1.0000000
+HS diploma:other-less than hs:NA                -3.313697e-02 -0.3851477493  0.3188738171 1.0000000
+some coll:other-less than hs:NA                  5.803571e-02 -0.2851229574  0.4011943860 1.0000000
+assoc deg:other-less than hs:NA                  5.336617e-02 -0.3011870230  0.4079193711 1.0000000
+bach deg:other-less than hs:NA                   3.958692e-02 -0.3030724049  0.3822462431 1.0000000
+adv deg:other-less than hs:NA                   -1.785714e-02 -0.3603577915  0.3246435058 1.0000000
+HS diploma:NA-some hs:NA                        -6.545455e-02 -0.3309398667  0.2000307758 1.0000000
+some coll:NA-some hs:NA                         -5.623188e-02 -0.3169271703  0.2044634021 1.0000000
+assoc deg:NA-some hs:NA                         -1.409677e-01 -0.4109011577  0.1289656739 0.9906629
+bach deg:NA-some hs:NA                          -8.426332e-02 -0.3399795208  0.1714528750 0.9999994
+adv deg:NA-some hs:NA                           -7.208333e-02 -0.3287977648  0.1846310981 1.0000000
+less than hs:male-some hs:NA                     2.394937e-01 -0.0255218809  0.5045092226 0.1583983
+some hs:male-some hs:NA                          2.055937e-01 -0.0486472436  0.4598345787 0.3808962
+HS diploma:male-some hs:NA                       2.535584e-01  0.0062294851  0.5008872519 0.0355765
+some coll:male-some hs:NA                        3.176728e-01  0.0708717944  0.5644738691 0.0004679
+assoc deg:male-some hs:NA                        3.410544e-01  0.0935507027  0.5885580019 0.0000778
+bach deg:male-some hs:NA                         4.074223e-01  0.1607956747  0.6540489771 0.0000002
+adv deg:male-some hs:NA                          4.368633e-01  0.1901905005  0.6835360706 0.0000000
+less than hs:female-some hs:NA                   1.760784e-01 -0.0848233331  0.4369801958 0.7928031
+some hs:female-some hs:NA                        1.611881e-01 -0.0910824605  0.4134586981 0.8749174
+HS diploma:female-some hs:NA                     2.683397e-01  0.0214413792  0.5152379618 0.0145439
+some coll:female-some hs:NA                      3.023539e-01  0.0557475947  0.5489602013 0.0014452
+assoc deg:female-some hs:NA                      3.128852e-01  0.0660004679  0.5597699561 0.0006796
+bach deg:female-some hs:NA                       3.922884e-01  0.1457696237  0.6388071678 0.0000007
+adv deg:female-some hs:NA                        4.315887e-01  0.1850313924  0.6781459154 0.0000000
+less than hs:transgender-some hs:NA             -1.563636e-01 -0.6018447191  0.2891174464 0.9999972
+some hs:transgender-some hs:NA                   3.371429e-01 -0.1893595098  0.8636452240 0.8721675
+HS diploma:transgender-some hs:NA                2.657143e-01 -0.0730778167  0.6045063881 0.4552798
+some coll:transgender-some hs:NA                 3.856604e-01  0.0869270162  0.6843937385 0.0004351
+assoc deg:transgender-some hs:NA                 2.800000e-01 -0.1221228250  0.6821228250 0.7338262
+bach deg:transgender-some hs:NA                  4.147826e-01  0.1088508120  0.7207144054 0.0001221
+adv deg:transgender-some hs:NA                   2.419048e-01 -0.0691143772  0.5529239010 0.4759310
+less than hs:other-some hs:NA                    2.166667e-02 -0.3301908052  0.3735241385 1.0000000
+some hs:other-some hs:NA                         1.800000e-01 -0.1893734007  0.5493734007 0.9970354
+HS diploma:other-some hs:NA                      2.325773e-01 -0.0435875341  0.5087421733 0.2886656
+some coll:other-some hs:NA                       3.237500e-01  0.0589608219  0.5885391781 0.0015355
+assoc deg:other-some hs:NA                       3.190805e-01  0.0396821698  0.5984787498 0.0060954
+bach deg:other-some hs:NA                        3.053012e-01  0.0411594867  0.5694429229 0.0048574
+adv deg:other-some hs:NA                         2.478571e-01 -0.0160787002  0.5117929859 0.1067077
+some coll:NA-HS diploma:NA                       9.222661e-03 -0.1218018144  0.1402471372 1.0000000
+assoc deg:NA-HS diploma:NA                      -7.551320e-02 -0.2240710303  0.0730446373 0.9939446
+bach deg:NA-HS diploma:NA                       -1.880878e-02 -0.1396233249  0.1020057700 1.0000000
+adv deg:NA-HS diploma:NA                        -6.628788e-03 -0.1295420920  0.1162845163 1.0000000
+less than hs:male-HS diploma:NA                  3.049482e-01  0.1655257515  0.4443706811 0.0000000
+some hs:male-HS diploma:NA                       2.710482e-01  0.1533884411  0.3887079849 0.0000000
+HS diploma:male-HS diploma:NA                    3.190129e-01  0.2171455610  0.4208802669 0.0000000
+some coll:male-HS diploma:NA                     3.831274e-01  0.2825483880  0.4837063664 0.0000000
+assoc deg:male-HS diploma:NA                     4.065089e-01  0.3042179519  0.5087998435 0.0000000
+bach deg:male-HS diploma:NA                      4.728769e-01  0.3727265539  0.5730271888 0.0000000
+adv deg:male-HS diploma:NA                       5.023178e-01  0.4020539596  0.6025817024 0.0000000
+less than hs:female-HS diploma:NA                2.415330e-01  0.1100981576  0.3729677961 0.0000000
+some hs:female-HS diploma:NA                     2.266427e-01  0.1133032351  0.3399820934 0.0000000
+HS diploma:female-HS diploma:NA                  3.337942e-01  0.2329768203  0.4346116116 0.0000000
+some coll:female-HS diploma:NA                   3.678084e-01  0.2677082443  0.4679086426 0.0000000
+assoc deg:female-HS diploma:NA                   3.783398e-01  0.2775555429  0.4791239720 0.0000000
+bach deg:female-HS diploma:NA                    4.577429e-01  0.3578585781  0.5576273043 0.0000000
+adv deg:female-HS diploma:NA                     4.970432e-01  0.3970638804  0.5970225184 0.0000000
+less than hs:transgender-HS diploma:NA          -9.090909e-02 -0.4751730316  0.2933548498 1.0000000
+some hs:transgender-HS diploma:NA                4.025974e-01 -0.0732283253  0.8784231305 0.2787624
+HS diploma:transgender-HS diploma:NA             3.311688e-01  0.0782153381  0.5841223242 0.0003066
+some coll:transgender-HS diploma:NA              4.511149e-01  0.2550358518  0.6471939938 0.0000000
+assoc deg:transgender-HS diploma:NA              3.454545e-01  0.0124257969  0.6784832940 0.0300402
+bach deg:transgender-HS diploma:NA               4.802372e-01  0.2733564029  0.6871179054 0.0000000
+adv deg:transgender-HS diploma:NA                3.073593e-01  0.0930271215  0.5216914932 0.0000240
+less than hs:other-HS diploma:NA                 8.712121e-02 -0.1830806782  0.3573231024 0.9999997
+some hs:other-HS diploma:NA                      2.454545e-01 -0.0471921530  0.5381012440 0.2974630
+HS diploma:other-HS diploma:NA                   2.980319e-01  0.1384310899  0.4576326402 0.0000000
+some coll:other-HS diploma:NA                    3.892045e-01  0.2502128555  0.5281962354 0.0000000
+assoc deg:other-HS diploma:NA                    3.845350e-01  0.2194023753  0.5496676352 0.0000000
+bach deg:other-HS diploma:NA                     3.707558e-01  0.2330015189  0.5085099816 0.0000000
+adv deg:other-HS diploma:NA                      3.133117e-01  0.1759526323  0.4506707444 0.0000000
+assoc deg:NA-some coll:NA                       -8.473586e-02 -0.2245536194  0.0550819036 0.9291762
+bach deg:NA-some coll:NA                        -2.803144e-02 -0.1379210713  0.0818581937 1.0000000
+adv deg:NA-some coll:NA                         -1.585145e-02 -0.1280443937  0.0963414952 1.0000000
+less than hs:male-some coll:NA                   2.957256e-01  0.1656555733  0.4257955366 0.0000000
+some hs:male-some coll:NA                        2.618256e-01  0.1554140937  0.3682370095 0.0000000
+HS diploma:male-some coll:NA                     3.097903e-01  0.2211531608  0.3984273443 0.0000000
+some coll:male-some coll:NA                      3.739047e-01  0.2867513480  0.4610580836 0.0000000
+assoc deg:male-some coll:NA                      3.972862e-01  0.3081626478  0.4864098249 0.0000000
+bach deg:male-some coll:NA                       4.636542e-01  0.3769959009  0.5503125191 0.0000000
+adv deg:male-some coll:NA                        4.930952e-01  0.4063056521  0.5798846872 0.0000000
+less than hs:female-some coll:NA                 2.323103e-01  0.1108414381  0.3537791928 0.0000000
+some hs:female-some coll:NA                      2.174200e-01  0.1158060144  0.3190339913 0.0000000
+HS diploma:female-some coll:NA                   3.245716e-01  0.2371431626  0.4119999465 0.0000000
+some coll:female-some coll:NA                    3.585858e-01  0.2719853992  0.4451861649 0.0000000
+assoc deg:female-some coll:NA                    3.691171e-01  0.2817269688  0.4565072233 0.0000000
+bach deg:female-some coll:NA                     4.485203e-01  0.3621694695  0.5348710901 0.0000000
+adv deg:female-some coll:NA                      4.878205e-01  0.4013599072  0.5742811687 0.0000000
+less than hs:transgender-some coll:NA           -1.001318e-01 -0.4811020301  0.2808385255 1.0000000
+some hs:transgender-some coll:NA                 3.933747e-01 -0.0797951013  0.8665445837 0.3169183
+HS diploma:transgender-some coll:NA              3.219462e-01  0.0740247183  0.5698676212 0.0003763
+some coll:transgender-some coll:NA               4.418923e-01  0.2523491831  0.6314353397 0.0000000
+assoc deg:transgender-some coll:NA               3.362319e-01  0.0070089750  0.6654547931 0.0375373
+bach deg:transgender-some coll:NA                4.710145e-01  0.2703176525  0.6717113330 0.0000000
+adv deg:transgender-some coll:NA                 2.981366e-01  0.0897671128  0.5065061791 0.0000258
+less than hs:other-some coll:NA                  7.789855e-02 -0.1875984134  0.3433955149 1.0000000
+some hs:other-some coll:NA                       2.362319e-01 -0.0520763999  0.5245401680 0.3499635
+HS diploma:other-some coll:NA                    2.888092e-01  0.1373100820  0.4403083253 0.0000000
+some coll:other-some coll:NA                     3.799819e-01  0.2503737581  0.5095900100 0.0000000
+assoc deg:other-some coll:NA                     3.753123e-01  0.2179962229  0.5326284648 0.0000000
+bach deg:other-some coll:NA                      3.615331e-01  0.2332529084  0.4898132693 0.0000000
+adv deg:other-some coll:NA                       3.040890e-01  0.1762333007  0.4319447531 0.0000000
+bach deg:NA-assoc deg:NA                         5.670442e-02 -0.0735942688  0.1870031069 0.9996486
+adv deg:NA-assoc deg:NA                          6.888441e-02 -0.0633626084  0.2011314256 0.9910360
+less than hs:male-assoc deg:NA                   3.804614e-01  0.2327447352  0.5281780905 0.0000000
+some hs:male-assoc deg:NA                        3.465614e-01  0.2191823881  0.4739404309 0.0000000
+HS diploma:male-assoc deg:NA                     3.945261e-01  0.2815723555  0.5074798654 0.0000000
+some coll:male-assoc deg:NA                      4.586406e-01  0.3468473439  0.5704338035 0.0000000
+assoc deg:male-assoc deg:NA                      4.820221e-01  0.3686861743  0.5953580142 0.0000000
+bach deg:male-assoc deg:NA                       5.483901e-01  0.4369823516  0.6597977842 0.0000000
+adv deg:male-assoc deg:NA                        5.778310e-01  0.4663212204  0.6893408346 0.0000000
+less than hs:female-assoc deg:NA                 3.170462e-01  0.1768438022  0.4572485445 0.0000000
+some hs:female-assoc deg:NA                      3.021559e-01  0.1787564306  0.4255552909 0.0000000
+HS diploma:female-assoc deg:NA                   4.093074e-01  0.2972996429  0.5213151819 0.0000000
+some coll:female-assoc deg:NA                    4.433216e-01  0.3319589755  0.5546843043 0.0000000
+assoc deg:female-assoc deg:NA                    4.538530e-01  0.3418750496  0.5658308583 0.0000000
+bach deg:female-assoc deg:NA                     5.332561e-01  0.4220874409  0.6444248345 0.0000000
+adv deg:female-assoc deg:NA                      5.725564e-01  0.4613023739  0.6838104177 0.0000000
+less than hs:transgender-assoc deg:NA           -1.539589e-02 -0.4027463420  0.3719545532 1.0000000
+some hs:transgender-assoc deg:NA                 4.781106e-01 -0.0002111718  0.9564323700 0.0502923
+HS diploma:transgender-assoc deg:NA              4.066820e-01  0.1490639716  0.6643000837 0.0000009
+some coll:transgender-assoc deg:NA               5.266281e-01  0.3245672491  0.7286889894 0.0000000
+assoc deg:transgender-assoc deg:NA               4.209677e-01  0.0843823285  0.7575531554 0.0009244
+bach deg:transgender-assoc deg:NA                5.557504e-01  0.3431915625  0.7683091388 0.0000000
+adv deg:transgender-assoc deg:NA                 3.828725e-01  0.1630546723  0.6026903354 0.0000000
+less than hs:other-assoc deg:NA                  1.626344e-01 -0.1119391784  0.4372079956 0.9460068
+some hs:other-assoc deg:NA                       3.209677e-01  0.0242798869  0.6176555969 0.0156885
+HS diploma:other-assoc deg:NA                    3.735451e-01  0.2066498831  0.5404402400 0.0000000
+some coll:other-assoc deg:NA                     4.647177e-01  0.3174075826  0.6120279013 0.0000000
+assoc deg:other-assoc deg:NA                     4.600482e-01  0.2878553487  0.6322410547 0.0000000
+bach deg:other-assoc deg:NA                      4.462689e-01  0.3001257929  0.5924121006 0.0000000
+adv deg:other-assoc deg:NA                       3.888249e-01  0.2430541626  0.5345956070 0.0000000
+adv deg:NA-bach deg:NA                           1.217999e-02 -0.0878999705  0.1122599496 1.0000000
+less than hs:male-bach deg:NA                    3.237570e-01  0.2039782738  0.4435357137 0.0000000
+some hs:male-bach deg:NA                         2.898570e-01  0.1963041177  0.3834098632 0.0000000
+HS diploma:male-bach deg:NA                      3.378217e-01  0.2651217900  0.4105215927 0.0000000
+some coll:male-bach deg:NA                       4.019362e-01  0.3310527918  0.4728195175 0.0000000
+assoc deg:male-bach deg:NA                       4.253177e-01  0.3520254133  0.4986099370 0.0000000
+bach deg:male-bach deg:NA                        4.916856e-01  0.4214118688  0.5619594288 0.0000000
+adv deg:male-bach deg:NA                         5.211266e-01  0.4506910920  0.5915621249 0.0000000
+less than hs:female-bach deg:NA                  2.603418e-01  0.1499631794  0.3707203291 0.0000000
+some hs:female-bach deg:NA                       2.454514e-01  0.1573938227  0.3335090607 0.0000000
+HS diploma:female-bach deg:NA                    3.526030e-01  0.2813817512  0.4238242355 0.0000000
+some coll:female-bach deg:NA                     3.866172e-01  0.3164148852  0.4568195565 0.0000000
+assoc deg:female-bach deg:NA                     3.971485e-01  0.3259742701  0.4683227996 0.0000000
+bach deg:female-bach deg:NA                      4.765517e-01  0.4066574838  0.5464459534 0.0000000
+adv deg:female-bach deg:NA                       5.158520e-01  0.4458221097  0.5858818439 0.0000000
+less than hs:transgender-bach deg:NA            -7.210031e-02 -0.4496808932  0.3054802662 1.0000000
+some hs:transgender-bach deg:NA                  4.214062e-01 -0.0490387598  0.8918511199 0.1722341
+HS diploma:transgender-bach deg:NA               3.499776e-01  0.1072971856  0.5926580316 0.0000202
+some coll:transgender-bach deg:NA                4.699237e-01  0.2872893110  0.6525580895 0.0000000
+assoc deg:transgender-bach deg:NA                3.642633e-01  0.0389688940  0.6895577518 0.0087179
+bach deg:transgender-bach deg:NA                 4.990459e-01  0.3048605477  0.6932313155 0.0000000
+adv deg:transgender-bach deg:NA                  3.261681e-01  0.1240626569  0.5282735126 0.0000004
+less than hs:other-bach deg:NA                   1.059300e-01 -0.1546796411  0.3665396202 0.9999158
+some hs:other-bach deg:NA                        2.642633e-01 -0.0195507152  0.5480773610 0.1169856
+HS diploma:other-bach deg:NA                     3.168406e-01  0.1740795641  0.4596017208 0.0000000
+some coll:other-bach deg:NA                      4.080133e-01  0.2887363010  0.5272903447 0.0000000
+assoc deg:other-bach deg:NA                      4.033438e-01  0.2544239937  0.5522635716 0.0000000
+bach deg:other-bach deg:NA                       3.895645e-01  0.2717318229  0.5073972325 0.0000000
+adv deg:other-bach deg:NA                        3.321205e-01  0.2147499910  0.4494909405 0.0000000
+less than hs:male-adv deg:NA                     3.115770e-01  0.1896816917  0.4334723167 0.0000000
+some hs:male-adv deg:NA                          2.776770e-01  0.1814290635  0.3739249382 0.0000000
+HS diploma:male-adv deg:NA                       3.256417e-01  0.2495049754  0.4017784282 0.0000000
+some coll:male-adv deg:NA                        3.897562e-01  0.3153520215  0.4641603087 0.0000000
+assoc deg:male-adv deg:NA                        4.131377e-01  0.3364351361  0.4898402351 0.0000000
+bach deg:male-adv deg:NA                         4.795057e-01  0.4056820207  0.5533292978 0.0000000
+adv deg:male-adv deg:NA                          5.089466e-01  0.4349690045  0.5829242333 0.0000000
+less than hs:female-adv deg:NA                   2.481618e-01  0.1354898728  0.3608336566 0.0000000
+some hs:female-adv deg:NA                        2.332715e-01  0.1423557235  0.3241871808 0.0000000
+HS diploma:female-adv deg:NA                     3.404230e-01  0.2656968987  0.4151491089 0.0000000
+some coll:female-adv deg:NA                      3.744372e-01  0.3006815984  0.4481928642 0.0000000
+assoc deg:female-adv deg:NA                      3.849685e-01  0.3102872129  0.4596498778 0.0000000
+bach deg:female-adv deg:NA                       4.643717e-01  0.3909092930  0.5378341651 0.0000000
+adv deg:female-adv deg:NA                        5.036720e-01  0.4300804949  0.5772634796 0.0000000
+less than hs:transgender-adv deg:NA             -8.428030e-02 -0.4625376488  0.2939770427 1.0000000
+some hs:transgender-adv deg:NA                   4.092262e-01 -0.0617620969  0.8802144779 0.2256310
+HS diploma:transgender-adv deg:NA                3.377976e-01  0.0940655671  0.5815296710 0.0000661
+some coll:transgender-adv deg:NA                 4.577437e-01  0.2737142413  0.6417731801 0.0000000
+assoc deg:transgender-adv deg:NA                 3.520833e-01  0.0260036024  0.6781630642 0.0161901
+bach deg:transgender-adv deg:NA                  4.868659e-01  0.2913678889  0.6823639951 0.0000000
+adv deg:transgender-adv deg:NA                   3.139881e-01  0.1106211131  0.5173550774 0.0000021
+less than hs:other-adv deg:NA                    9.375000e-02 -0.1678391914  0.3553391914 0.9999953
+some hs:other-adv deg:NA                         2.520833e-01 -0.0326304416  0.5367971083 0.1916193
+HS diploma:other-adv deg:NA                      3.046607e-01  0.1601191331  0.4492021727 0.0000000
+some coll:other-adv deg:NA                       3.958333e-01  0.2744309718  0.5172356949 0.0000000
+assoc deg:other-adv deg:NA                       3.911638e-01  0.2405363421  0.5417912441 0.0000000
+bach deg:other-adv deg:NA                        3.773845e-01  0.2574009069  0.4973681694 0.0000000
+adv deg:other-adv deg:NA                         3.199405e-01  0.2004107569  0.4394701955 0.0000000
+some hs:male-less than hs:male                  -3.390000e-02 -0.1504959244  0.0826959177 1.0000000
+HS diploma:male-less than hs:male                1.406470e-02 -0.0865719978  0.1147013930 1.0000000
+some coll:male-less than hs:male                 7.817916e-02 -0.0211532102  0.1775115319 0.4466547
+assoc deg:male-less than hs:male                 1.015607e-01  0.0004952349  0.2026261278 0.0468523
+bach deg:male-less than hs:male                  1.679287e-01  0.0690303590  0.2668269511 0.0000000
+adv deg:male-less than hs:male                   1.973696e-01  0.0983563288  0.2963829006 0.0000000
+less than hs:female-less than hs:male           -6.341524e-02 -0.1938985664  0.0670680874 0.9971717
+some hs:female-less than hs:male                -7.830555e-02 -0.1905401861  0.0339290820 0.7297833
+HS diploma:female-less than hs:male              2.884600e-02 -0.0707277628  0.1284197619 1.0000000
+some coll:female-less than hs:male               6.286023e-02 -0.0359873158  0.1617077700 0.8807410
+assoc deg:female-less than hs:male               7.339154e-02 -0.0261486255  0.1729317077 0.6069509
+bach deg:female-less than hs:male                1.527947e-01  0.0541657592  0.2514236905 0.0000018
+adv deg:female-less than hs:male                 1.920950e-01  0.0933698540  0.2908201120 0.0000000
+less than hs:transgender-less than hs:male      -3.958573e-01 -0.7797968376 -0.0119177769 0.0328005
+some hs:transgender-less than hs:male            9.764919e-02 -0.3779145952  0.5732129677 1.0000000
+HS diploma:transgender-less than hs:male         2.622061e-02 -0.2262397910  0.2786810207 1.0000000
+some coll:transgender-less than hs:male          1.461667e-01 -0.0492758400  0.3416092529 0.5726792
+assoc deg:transgender-less than hs:male          4.050633e-02 -0.2921480475  0.3731607057 1.0000000
+bach deg:transgender-less than hs:male           1.752889e-01 -0.0309886231  0.3815664987 0.2697134
+adv deg:transgender-less than hs:male            2.411091e-03 -0.2113389330  0.2161611151 1.0000000
+less than hs:other-less than hs:male            -2.178270e-01 -0.4875673394  0.0519133309 0.3841805
+some hs:other-less than hs:male                 -5.949367e-02 -0.3517142674  0.2327269256 1.0000000
+HS diploma:other-less than hs:male              -6.916351e-03 -0.1657344683  0.1519017657 1.0000000
+some coll:other-less than hs:male                8.425633e-02 -0.0538359471  0.2223486053 0.9235083
+assoc deg:other-less than hs:male                7.958679e-02 -0.0847895243  0.2439631021 0.9973531
+bach deg:other-less than hs:male                 6.580753e-02 -0.0710391508  0.2026542187 0.9976543
+adv deg:other-less than hs:male                  8.363472e-03 -0.1280854091  0.1448123531 1.0000000
+HS diploma:male-some hs:male                     4.796470e-02 -0.0193624311  0.1152918330 0.6856618
+some coll:male-some hs:male                      1.120792e-01  0.0467177216  0.1774406068 0.0000000
+assoc deg:male-some hs:male                      1.354607e-01  0.0674943497  0.2034270198 0.0000000
+bach deg:male-some hs:male                       2.018287e-01  0.1371288036  0.2665285131 0.0000000
+adv deg:male-some hs:male                        2.312696e-01  0.1663941294  0.2961451066 0.0000000
+less than hs:female-some hs:male                -2.951524e-02 -0.1364315438  0.0774010714 1.0000000
+ [ reached getOption("max.print") -- omitted 345 rows ]
+
+> #Created subgroup of Hispanics.
+> summary(RHISPANIC)
+Not Hispanic     Hispanic 
+       62660         6454 
+> # the Hispanic people were not the majority of the sample.
+> hispanic <- Household_Pulse_data$RHISPANIC == "Hispanic"
+> summary(hispanic)
+   Mode   FALSE    TRUE 
+logical   62660    6454 
+> subgrouphispanic <- subset(Household_Pulse_data, hispanic)
+> summary(subgrouphispanic)
+        RHISPANIC      RRACE               EEDUC              MS       EGENID_BIRTH      GENID_DESCRIBE      SEXUAL_ORIENTATION
+ Not Hispanic:   0   White:5247   less than hs: 183   NA       :  94   male  :2564   NA         : 129   NA            : 200    
+ Hispanic    :6454   Black: 309   some hs     : 259   married  :3428   female:3890   male       :2456   gay or lesbian: 262    
+                     Asian: 207   HS diploma  :1064   widowed  : 259                 female     :3711   straight      :5411    
+                     Other: 691   some coll   :1603   divorced : 894                 transgender:  45   bisexual      : 286    
+                                  assoc deg   : 719   separated: 216                 other      : 113   something else: 155    
+                                  bach deg    :1459   never    :1563                                    dont know     : 140    
+                                  adv deg     :1167                                                                            
+                      KIDS_LT5Y                        KIDS_5_11Y                       KIDS_12_17Y  
+ NA                        :5554   NA                       :5112   NA                        :4990  
+ Yes children under 5 in HH: 900   Yes children 5 - 11 in HH:1342   Yes children 12 - 17 in HH:1464  
+                                                                                                     
+                                                                                                     
+                                                                                                     
+                                                                                                     
+                                                                                                     
+                              ENROLLNONE                 RECVDVACC                         DOSESRV    
+ NA                                :5880   NA                 : 105   NA                       :1038  
+ children not in any type of school: 574   yes got vaxx       :5449   yes got all doses        :5084  
+                                           no did not get vaxx: 900   yes plan to get all doses: 292  
+                                                                      no will not get all doses:  40  
+                                                                                                      
+                                                                                                      
+                                                                                                      
+                     GETVACRV                                  KIDDOSES                       KIDGETVAC   
+ NA                      :5549   NA                                :5051   NA                      :5977  
+ definitely will get vaxx: 121   Yes kids got or will get all doses: 938   definitely will get vaxx: 103  
+ probably will get vaxx  : 114   no kids did not or will not       : 465   probably will get vaxx  :  64  
+ unsure about vaxx       : 190                                             unsure about vaxx       :  82  
+ probably not            : 125                                             probably not            :  57  
+ definitely not          : 355                                             definitely not          : 109  
+                                                                           dont know yet           :  62  
+                      HADCOVID                     WRKLOSSRV                             ANYWORK                    KINDWORK   
+ NA                       : 202   NA                    : 284   NA                           : 317   NA                 :2876  
+ yes doctor told had covid:1173   yes recent HH job loss:1262   yes employment in last 7 days:3676   work for govt      : 633  
+ no did not               :5001   no recent HH job loss :4908   no employment in last 7 days :2461   work for private co:2021  
+ not sure                 :  78                                                                      work for nonprofit : 389  
+                                                                                                     self employed      : 430  
+                                                                                                     work in family biz : 105  
+                                                                                                                               
+            RSNNOWRKRV                                        CHLDCARE                             CURFOODSUF  
+ NA              :4228   NA                                       :5193   NA                            : 961  
+ retired         : 708   yes impacts to childcare because pandemic: 348   had enough food               :3693  
+ other           : 536   no                                       : 913   had enough but not what wanted:1287  
+ caring for kids : 175                                                    sometimes not enough food     : 405  
+ laid off        : 168                                                    often not enough food         : 108  
+ sick or disabled: 141                                                                                         
+ (Other)         : 498                                                                                         
+                                               CHILDFOOD                                               ANXIOUS    
+ NA                                                 :5612   NA                                             :1099  
+ often kids not eating enough because couldnt afford:  71   no anxiety over past 2 wks                     :2026  
+ sometimes kids not eating enough                   : 251   several days anxiety over past 2 wks           :1830  
+ kids got enough food                               : 520   more than half the days anxiety over past 2 wks: 588  
+                                                            nearly every day anxiety                       : 911  
+                                                                                                                  
+                                                                                                                  
+                                             WORRY                                TENURE    
+ NA                                             :1105   NA                           :1481  
+ no worry over past 2 wks                       :2356   housing owned free and clear :1021  
+ several days worried over past 2 wks           :1779   housing owned with mortgage  :2268  
+ more than half the days worried over past 2 wks: 496   housing rented               :1596  
+ nearly every day worry                         : 718   housing occupied without rent:  88  
+                                                                                            
+                                                                                            
+                                LIVQTRRV               RENTCUR                    MORTCUR    
+ live in detached 1 family          :3143   NA             :4860   NA                 :4196  
+ NA                                 :1520   current on rent:1353   current on mortgage:2042  
+ live in bldg w 5+ apts             : 782   behind on rent : 241   behind on mortgage : 216  
+ live in 1 family attached to others: 426                                                    
+ live in building with 3-4 apts     : 205                                                    
+ live in mobile home                : 195                                                    
+ (Other)                            : 183                                                    
+                                        EVICT                                               FORCLOSE           EST_ST    
+ NA                                        :6227   NA                                           :6241   California:1074  
+ very likely evicted in next 2 months      :  32   very likely forclosed in next 2 months       :   5   Texas     : 759  
+ somewhat likely evicted in next 2 months  :  64   somewhat likely forclosed in next 2 months   :  22   Florida   : 614  
+ not very likely evicted in next 2 months  :  61   not very likely forclosed in next 2 months   :  74   New Mexico: 414  
+ not at all likely evicted in next 2 months:  70   not at all forclosed evicted in next 2 months: 112   Arizona   : 266  
+                                                                                                        Colorado  : 187  
+                                                                                                        (Other)   :3140  
+                   PRIVHLTH                     PUBHLTH           REGION                          INCOME     Num_kids_Pub_School
+ has private health ins:3816   has public health ins:1645   Northeast: 794   NA                      :2598   Min.   :0.000      
+ no private health ins :1258   no public health ins :3282   South    :2209   HH income $35k - 49.9   : 803   1st Qu.:1.000      
+ NA                    :1380   NA                   :1527   Midwest  : 617   HH income $75 - 99.9    : 676   Median :2.000      
+                                                            West     :2834   HH income $25k - $34.9k : 614   Mean   :1.707      
+                                                                             HH income $50k - 74.9   : 571   3rd Qu.:2.000      
+                                                                             HH income less than $25k: 551   Max.   :4.000      
+                                                                             (Other)                 : 641   NA's   :4719       
+ Num_kids_Priv_School Num_kids_homeschool        Works_onsite           works_remote           Shop_in_store 
+ Min.   :0.000        Min.   :0.000       NA           : 857   NA             :1034   NA              : 973  
+ 1st Qu.:0.000        1st Qu.:0.000       worked onsite:3347   worked remotely:1900   shopped in store:4359  
+ Median :1.000        Median :1.000       no           :2250   no             :3520   no              :1122  
+ Mean   :1.034        Mean   :0.908                                                                          
+ 3rd Qu.:2.000        3rd Qu.:2.000                                                                          
+ Max.   :2.000        Max.   :2.000                                                                          
+ NA's   :6157         NA's   :6258                                                                           
+                 eat_in_restaurant
+ NA                       : 994   
+ eat at restaurant indoors:2691   
+ no                       :2769   
+                                  
+                                  
+                                  
+                                  
+> non_hispanic <- subset(Household_Pulse_data, !hispanic)
+> summary(non_hispanic)
+        RHISPANIC       RRACE                EEDUC               MS        EGENID_BIRTH       GENID_DESCRIBE 
+ Not Hispanic:62660   White:51691   less than hs:  228   NA       :  787   male  :25028   NA         : 1002  
+ Hispanic    :    0   Black: 5103   some hs     :  677   married  :36608   female:37632   male       :24340  
+                      Asian: 3354   HS diploma  : 6793   widowed  : 3613                  female     :36552  
+                      Other: 2512   some coll   :12993   divorced : 9416                  transgender:  157  
+                                    assoc deg   : 6789   separated:  998                  other      :  609  
+                                    bach deg    :18616   never    :11238                                     
+                                    adv deg     :16564                                                       
+      SEXUAL_ORIENTATION                      KIDS_LT5Y                         KIDS_5_11Y                        KIDS_12_17Y   
+ NA            : 1306    NA                        :56788   NA                       :53355   NA                        :53056  
+ gay or lesbian: 2081    Yes children under 5 in HH: 5872   Yes children 5 - 11 in HH: 9305   Yes children 12 - 17 in HH: 9604  
+ straight      :55827                                                                                                           
+ bisexual      : 2002                                                                                                           
+ something else:  716                                                                                                           
+ dont know     :  728                                                                                                           
+                                                                                                                                
+                              ENROLLNONE                  RECVDVACC                          DOSESRV     
+ NA                                :58405   NA                 :  746   NA                       : 8067  
+ children not in any type of school: 4255   yes got vaxx       :54877   yes got all doses        :52678  
+                                            no did not get vaxx: 7037   yes plan to get all doses: 1701  
+                                                                        no will not get all doses:  214  
+                                                                                                         
+                                                                                                         
+                                                                                                         
+                     GETVACRV                                   KIDDOSES                        KIDGETVAC    
+ NA                      :55610   NA                                :53267   NA                      :59407  
+ definitely will get vaxx:  488   Yes kids got or will get all doses: 6197   definitely will get vaxx:  384  
+ probably will get vaxx  :  617   no kids did not or will not       : 3196   probably will get vaxx  :  375  
+ unsure about vaxx       : 1394                                              unsure about vaxx       :  654  
+ probably not            : 1474                                              probably not            :  536  
+ definitely not          : 3077                                              definitely not          :  927  
+                                                                             dont know yet           :  377  
+                      HADCOVID                      WRKLOSSRV                              ANYWORK                     KINDWORK    
+ NA                       : 1161   NA                    : 1677   NA                           : 1818   NA                 :27664  
+ yes doctor told had covid: 7949   yes recent HH job loss: 6796   yes employment in last 7 days:35561   work for govt      : 5745  
+ no did not               :53220   no recent HH job loss :54187   no employment in last 7 days :25281   work for private co:19349  
+ not sure                 :  330                                                                        work for nonprofit : 4666  
+                                                                                                        self employed      : 4536  
+                                                                                                        work in family biz :  700  
+                                                                                                                                   
+            RSNNOWRKRV                                         CHLDCARE                              CURFOODSUF   
+ NA              :38431   NA                                       :53226   NA                            : 5809  
+ retired         :14316   yes impacts to childcare because pandemic: 2218   had enough food               :45541  
+ other           : 3491   no                                       : 7216   had enough but not what wanted: 8660  
+ sick or disabled: 1310                                                     sometimes not enough food     : 2081  
+ caring for kids : 1154                                                     often not enough food         :  569  
+ laid off        :  996                                                                                           
+ (Other)         : 2962                                                                                           
+                                               CHILDFOOD                                                ANXIOUS     
+ NA                                                 :58646   NA                                             : 6847  
+ often kids not eating enough because couldnt afford:  200   no anxiety over past 2 wks                     :24585  
+ sometimes kids not eating enough                   :  940   several days anxiety over past 2 wks           :17964  
+ kids got enough food                               : 2874   more than half the days anxiety over past 2 wks: 5552  
+                                                             nearly every day anxiety                       : 7712  
+                                                                                                                    
+                                                                                                                    
+                                             WORRY                                 TENURE     
+ NA                                             : 6911   NA                           : 9622  
+ no worry over past 2 wks                       :29520   housing owned free and clear :15717  
+ several days worried over past 2 wks           :16157   housing owned with mortgage  :25748  
+ more than half the days worried over past 2 wks: 4483   housing rented               :10983  
+ nearly every day worry                         : 5589   housing occupied without rent:  590  
+                                                                                              
+                                                                                              
+                                LIVQTRRV                RENTCUR                     MORTCUR     
+ live in detached 1 family          :38205   NA             :51712   NA                 :37004  
+ NA                                 : 9816   current on rent: 9886   current on mortgage:24420  
+ live in bldg w 5+ apts             : 5949   behind on rent : 1062   behind on mortgage : 1236  
+ live in 1 family attached to others: 4202                                                      
+ live in mobile home                : 1586                                                      
+ live in building with 3-4 apts     : 1532                                                      
+ (Other)                            : 1370                                                      
+                                        EVICT                                                FORCLOSE               EST_ST     
+ NA                                        :61632   NA                                           :61454   California   : 4285  
+ very likely evicted in next 2 months      :  175   very likely forclosed in next 2 months       :   60   Texas        : 3007  
+ somewhat likely evicted in next 2 months  :  313   somewhat likely forclosed in next 2 months   :  196   Washington   : 2468  
+ not very likely evicted in next 2 months  :  284   not very likely forclosed in next 2 months   :  400   Florida      : 2114  
+ not at all likely evicted in next 2 months:  256   not at all forclosed evicted in next 2 months:  550   Massachusetts: 1823  
+                                                                                                          Oregon       : 1795  
+                                                                                                          (Other)      :47168  
+                   PRIVHLTH                      PUBHLTH            REGION                          INCOME      Num_kids_Pub_School
+ has private health ins:43053   has public health ins:21701   Northeast: 9684   NA                     :17737   Min.   :0.00       
+ no private health ins :10017   no public health ins :30099   South    :20471   HH income $75 - 99.9   : 9441   1st Qu.:1.00       
+ NA                    : 9590   NA                   :10860   Midwest  :13034   HH income $35k - 49.9  : 8527   Median :2.00       
+                                                              West     :19471   HH income $50k - 74.9  : 7259   Mean   :1.71       
+                                                                                HH income $150 - 199   : 5769   3rd Qu.:2.00       
+                                                                                HH income $25k - $34.9k: 5191   Max.   :4.00       
+                                                                                (Other)                : 8736   NA's   :50389      
+ Num_kids_Priv_School Num_kids_homeschool        Works_onsite            works_remote            Shop_in_store  
+ Min.   :0.00         Min.   :0.00        NA           : 5493   NA             : 6988   NA              : 5900  
+ 1st Qu.:0.00         1st Qu.:0.00        worked onsite:31571   worked remotely:20963   shopped in store:49217  
+ Median :1.00         Median :1.00        no           :25596   no             :34709   no              : 7543  
+ Mean   :1.03         Mean   :0.86                                                                              
+ 3rd Qu.:2.00         3rd Qu.:2.00                                                                              
+ Max.   :2.00         Max.   :2.00                                                                              
+ NA's   :60273        NA's   :61163                                                                             
+                 eat_in_restaurant
+ NA                       : 6223  
+ eat at restaurant indoors:29714  
+ no                       :26723  
+                                  
+                                  
+                                  
+                                  
+> hispanic_income <- subgrouphispanic$INCOME
+> summary(as.numeric(subgrouphispanic$INCOME))
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   1.000   3.000   3.176   5.000   8.000 
+> non_hispanic_income <- non_hispanic$INCOME
+> summary(as.numeric(non_hispanic$INCOME))
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   1.000   4.000   3.949   6.000   8.000 
+> # Exploring where the subgroup differs from sample.
+> hispanic_income <- Household_Pulse_data$RHISPANIC == "Hispanic" & Household_Pulse_data$INCOME == "HH income less than $25k"
+> non_hispanic_income <- Household_Pulse_data$RHISPANIC == "Not Hispanic" & Household_Pulse_data$INCOME == "HH income less than $25k"
+> summary(hispanic_income)
+   Mode   FALSE    TRUE 
+logical   68563     551 
+> summary(non_hispanic_income)
+   Mode   FALSE    TRUE 
+logical   65065    4049 
+> regression12 <-  lm(non_hispanic_income ~ hispanic_income)
+> summary(regression12)
+
+Call:
+lm(formula = non_hispanic_income ~ hispanic_income)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.05906 -0.05906 -0.05906 -0.05906  0.94094 
+
+Coefficients:
+                      Estimate Std. Error t value Pr(>|t|)    
+(Intercept)          0.0590552  0.0008967  65.860  < 2e-16 ***
+hispanic_incomeTRUE -0.0590552  0.0100425  -5.881 4.11e-09 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.2348 on 69112 degrees of freedom
+Multiple R-squared:  0.0005001,	Adjusted R-squared:  0.0004856 
+F-statistic: 34.58 on 1 and 69112 DF,  p-value: 4.108e-09
+
+> confint(regression12)
+                          2.5 %      97.5 %
+(Intercept)          0.05729770  0.06081265
+hispanic_incomeTRUE -0.07873845 -0.03937191
+> anova(regression12)
+Analysis of Variance Table
+
+Response: non_hispanic_income
+                   Df Sum Sq Mean Sq F value    Pr(>F)    
+hispanic_income     1    1.9 1.90630  34.581 4.108e-09 ***
+Residuals       69112 3809.9 0.05513                      
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> summary(INCOME)
+                      NA HH income less than $25k  HH income $25k - $34.9k    HH income $35k - 49.9    HH income $50k - 74.9 
+                   20335                     4600                     5805                     9330                     7830 
+    HH income $75 - 99.9    HH income $100k - 149     HH income $150 - 199        HH income $200k + 
+                   10117                     4980                     6117                        0 
+> # The second way I interpreted to run the regression was using a direct subset of Hispanics.
+> # Additionally, in the regression we divided the different income levels, with people making less than $25,000 the
+> # lowest and people that make at most $199,999 the highest. In order to test whether there is a relationship
+> # between Hispanic public health insurance and their income level, where the dependent variable is public health 
+> # insurance, while the independents are the different income levels.
+> hispanic_subgroup <- subset(Household_Pulse_data, Household_Pulse_data$RHISPANIC == "Hispanic") 
+> summary(hispanic_subgroup)
+        RHISPANIC      RRACE               EEDUC              MS       EGENID_BIRTH      GENID_DESCRIBE      SEXUAL_ORIENTATION
+ Not Hispanic:   0   White:5247   less than hs: 183   NA       :  94   male  :2564   NA         : 129   NA            : 200    
+ Hispanic    :6454   Black: 309   some hs     : 259   married  :3428   female:3890   male       :2456   gay or lesbian: 262    
+                     Asian: 207   HS diploma  :1064   widowed  : 259                 female     :3711   straight      :5411    
+                     Other: 691   some coll   :1603   divorced : 894                 transgender:  45   bisexual      : 286    
+                                  assoc deg   : 719   separated: 216                 other      : 113   something else: 155    
+                                  bach deg    :1459   never    :1563                                    dont know     : 140    
+                                  adv deg     :1167                                                                            
+                      KIDS_LT5Y                        KIDS_5_11Y                       KIDS_12_17Y  
+ NA                        :5554   NA                       :5112   NA                        :4990  
+ Yes children under 5 in HH: 900   Yes children 5 - 11 in HH:1342   Yes children 12 - 17 in HH:1464  
+                                                                                                     
+                                                                                                     
+                                                                                                     
+                                                                                                     
+                                                                                                     
+                              ENROLLNONE                 RECVDVACC                         DOSESRV    
+ NA                                :5880   NA                 : 105   NA                       :1038  
+ children not in any type of school: 574   yes got vaxx       :5449   yes got all doses        :5084  
+                                           no did not get vaxx: 900   yes plan to get all doses: 292  
+                                                                      no will not get all doses:  40  
+                                                                                                      
+                                                                                                      
+                                                                                                      
+                     GETVACRV                                  KIDDOSES                       KIDGETVAC   
+ NA                      :5549   NA                                :5051   NA                      :5977  
+ definitely will get vaxx: 121   Yes kids got or will get all doses: 938   definitely will get vaxx: 103  
+ probably will get vaxx  : 114   no kids did not or will not       : 465   probably will get vaxx  :  64  
+ unsure about vaxx       : 190                                             unsure about vaxx       :  82  
+ probably not            : 125                                             probably not            :  57  
+ definitely not          : 355                                             definitely not          : 109  
+                                                                           dont know yet           :  62  
+                      HADCOVID                     WRKLOSSRV                             ANYWORK                    KINDWORK   
+ NA                       : 202   NA                    : 284   NA                           : 317   NA                 :2876  
+ yes doctor told had covid:1173   yes recent HH job loss:1262   yes employment in last 7 days:3676   work for govt      : 633  
+ no did not               :5001   no recent HH job loss :4908   no employment in last 7 days :2461   work for private co:2021  
+ not sure                 :  78                                                                      work for nonprofit : 389  
+                                                                                                     self employed      : 430  
+                                                                                                     work in family biz : 105  
+                                                                                                                               
+            RSNNOWRKRV                                        CHLDCARE                             CURFOODSUF  
+ NA              :4228   NA                                       :5193   NA                            : 961  
+ retired         : 708   yes impacts to childcare because pandemic: 348   had enough food               :3693  
+ other           : 536   no                                       : 913   had enough but not what wanted:1287  
+ caring for kids : 175                                                    sometimes not enough food     : 405  
+ laid off        : 168                                                    often not enough food         : 108  
+ sick or disabled: 141                                                                                         
+ (Other)         : 498                                                                                         
+                                               CHILDFOOD                                               ANXIOUS    
+ NA                                                 :5612   NA                                             :1099  
+ often kids not eating enough because couldnt afford:  71   no anxiety over past 2 wks                     :2026  
+ sometimes kids not eating enough                   : 251   several days anxiety over past 2 wks           :1830  
+ kids got enough food                               : 520   more than half the days anxiety over past 2 wks: 588  
+                                                            nearly every day anxiety                       : 911  
+                                                                                                                  
+                                                                                                                  
+                                             WORRY                                TENURE    
+ NA                                             :1105   NA                           :1481  
+ no worry over past 2 wks                       :2356   housing owned free and clear :1021  
+ several days worried over past 2 wks           :1779   housing owned with mortgage  :2268  
+ more than half the days worried over past 2 wks: 496   housing rented               :1596  
+ nearly every day worry                         : 718   housing occupied without rent:  88  
+                                                                                            
+                                                                                            
+                                LIVQTRRV               RENTCUR                    MORTCUR    
+ live in detached 1 family          :3143   NA             :4860   NA                 :4196  
+ NA                                 :1520   current on rent:1353   current on mortgage:2042  
+ live in bldg w 5+ apts             : 782   behind on rent : 241   behind on mortgage : 216  
+ live in 1 family attached to others: 426                                                    
+ live in building with 3-4 apts     : 205                                                    
+ live in mobile home                : 195                                                    
+ (Other)                            : 183                                                    
+                                        EVICT                                               FORCLOSE           EST_ST    
+ NA                                        :6227   NA                                           :6241   California:1074  
+ very likely evicted in next 2 months      :  32   very likely forclosed in next 2 months       :   5   Texas     : 759  
+ somewhat likely evicted in next 2 months  :  64   somewhat likely forclosed in next 2 months   :  22   Florida   : 614  
+ not very likely evicted in next 2 months  :  61   not very likely forclosed in next 2 months   :  74   New Mexico: 414  
+ not at all likely evicted in next 2 months:  70   not at all forclosed evicted in next 2 months: 112   Arizona   : 266  
+                                                                                                        Colorado  : 187  
+                                                                                                        (Other)   :3140  
+                   PRIVHLTH                     PUBHLTH           REGION                          INCOME     Num_kids_Pub_School
+ has private health ins:3816   has public health ins:1645   Northeast: 794   NA                      :2598   Min.   :0.000      
+ no private health ins :1258   no public health ins :3282   South    :2209   HH income $35k - 49.9   : 803   1st Qu.:1.000      
+ NA                    :1380   NA                   :1527   Midwest  : 617   HH income $75 - 99.9    : 676   Median :2.000      
+                                                            West     :2834   HH income $25k - $34.9k : 614   Mean   :1.707      
+                                                                             HH income $50k - 74.9   : 571   3rd Qu.:2.000      
+                                                                             HH income less than $25k: 551   Max.   :4.000      
+                                                                             (Other)                 : 641   NA's   :4719       
+ Num_kids_Priv_School Num_kids_homeschool        Works_onsite           works_remote           Shop_in_store 
+ Min.   :0.000        Min.   :0.000       NA           : 857   NA             :1034   NA              : 973  
+ 1st Qu.:0.000        1st Qu.:0.000       worked onsite:3347   worked remotely:1900   shopped in store:4359  
+ Median :1.000        Median :1.000       no           :2250   no             :3520   no              :1122  
+ Mean   :1.034        Mean   :0.908                                                                          
+ 3rd Qu.:2.000        3rd Qu.:2.000                                                                          
+ Max.   :2.000        Max.   :2.000                                                                          
+ NA's   :6157         NA's   :6258                                                                           
+                 eat_in_restaurant
+ NA                       : 994   
+ eat at restaurant indoors:2691   
+ no                       :2769   
+                                  
+                                  
+                                  
+                                  
+> summary(Household_Pulse_data$PUBHLTH)
+has public health ins  no public health ins                    NA 
+                23346                 33381                 12387 
+> public_health_insurance <- hispanic_subgroup$PUBHLTH == "has public health ins"
+> summary(public_health_insurance)
+   Mode   FALSE    TRUE 
+logical    4809    1645 
+> incomeless25 <-  hispanic_subgroup$INCOME == "HH income less than $25k"
+> income25_35 <- hispanic_subgroup$INCOME == "HH income $25k - $34.9k"
+> income35_45 <- hispanic_subgroup$INCOME == "HH income $35k - 49.9"
+> income50_75 <- hispanic_subgroup$INCOME == "HH income $50k - 74.9"
+> income75_99 <- hispanic_subgroup$INCOME == "HH income $75 - 99.9"
+> income100_149 <- hispanic_subgroup$INCOME == "HH income $100k - 149"
+> income150_199 <- hispanic_subgroup$INCOME == "HH income $150 - 199"
+> regression <- lm(public_health_insurance ~ incomeless25 + income25_35 + income35_45 + income50_75 + income75_99 + income100_149 +income150_199 )
+> summary(regression)
+
+Call:
+lm(formula = public_health_insurance ~ incomeless25 + income25_35 + 
+    income35_45 + income50_75 + income75_99 + income100_149 + 
+    income150_199)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-0.4465 -0.2452 -0.2452  0.5535  0.8621 
+
+Coefficients:
+                   Estimate Std. Error t value Pr(>|t|)    
+(Intercept)        0.245189   0.008414  29.140  < 2e-16 ***
+incomeless25TRUE   0.201272   0.020115  10.006  < 2e-16 ***
+income25_35TRUE    0.106603   0.019245   5.539 3.16e-08 ***
+income35_45TRUE    0.023803   0.017316   1.375 0.169312    
+income50_75TRUE   -0.031528   0.019822  -1.591 0.111762    
+income75_99TRUE   -0.072112   0.018517  -3.894 9.95e-05 ***
+income100_149TRUE -0.098431   0.026430  -3.724 0.000198 ***
+income150_199TRUE -0.107258   0.024482  -4.381 1.20e-05 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.4289 on 6446 degrees of freedom
+Multiple R-squared:  0.03269,	Adjusted R-squared:  0.03164 
+F-statistic: 31.12 on 7 and 6446 DF,  p-value: < 2.2e-16
+
+> confint(regression)
+                        2.5 %       97.5 %
+(Intercept)        0.22869396  0.261683249
+incomeless25TRUE   0.16183995  0.240704794
+income25_35TRUE    0.06887643  0.144329422
+income35_45TRUE   -0.01014331  0.057748664
+income50_75TRUE   -0.07038686  0.007330133
+income75_99TRUE   -0.10841187 -0.035811494
+income100_149TRUE -0.15024326 -0.046618595
+income150_199TRUE -0.15524966 -0.059265483
+> anova(regression)
+Analysis of Variance Table
+
+Response: public_health_insurance
+                Df  Sum Sq Mean Sq  F value    Pr(>F)    
+incomeless25     1   22.11 22.1111 120.2109 < 2.2e-16 ***
+income25_35      1    9.03  9.0303  49.0948 2.687e-12 ***
+income35_45      1    1.94  1.9445  10.5715  0.001154 ** 
+income50_75      1    0.00  0.0024   0.0128  0.909816    
+income75_99      1    1.49  1.4939   8.1221  0.004387 ** 
+income100_149    1    1.96  1.9601  10.6562  0.001103 ** 
+income150_199    1    3.53  3.5305  19.1945 1.199e-05 ***
+Residuals     6446 1185.65  0.1839                       
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+> # For the KNN, we are using a factor for education, from less than high school to some college.
+> # by creating different variables for the educational levels of our subgroup of Hispanics.
+> # Then, use the norm variables of enrollnone, private health insurance, and whether they did/did not
+> # work from home to predict the educational levels. 
+> less_highschool <- hispanic_subgroup$EEDUC == "less than hs"  
+> some_highschool <- hispanic_subgroup$EEDUC == "some hs"
+> highschool <- hispanic_subgroup$EEDUC == "HS diploma"
+> some_college <- hispanic_subgroup$EEDUC == "some coll"
+> educ_indx <- factor((less_highschool + 2*some_highschool + 3*highschool + 4*some_college), levels=c(1,2,3,4),labels = c("Less HS","Some HS","HS","Some College"))
+> norm_varb <- function(X_in) { (X_in - min(X_in, na.rm = TRUE))/( max(X_in, na.rm = TRUE) - min(X_in, na.rm = TRUE) )
++ }
+> norm_enroll <- norm_varb (hispanic_subgroup$ENROLLNONE == "children not in any type of school")
+> norm_private_insurance <- norm_varb(hispanic_subgroup$PRIVHLTH == "has private health ins")
+> norm_remote <- norm_varb (hispanic_subgroup$works_remote == "worked remotely")
+> norm_remote2 <- norm_varb (hispanic_subgroup$works_remote == "no")
+> data_use_prelim <- data.frame(norm_enroll, norm_private_insurance, norm_remote, norm_remote2)
+> good_obs_data_use <- complete.cases(data_use_prelim,educ_indx)
+> dat_use <- subset(data_use_prelim,good_obs_data_use)
+> y_use <- subset(educ_indx,good_obs_data_use)
+> set.seed(1)
+> NN_obs <- sum(good_obs_data_use == 1)
+> select1 <- (runif(NN_obs) < 0.9)
+> train_data <- subset(dat_use,select1)
+> test_data <- subset(dat_use,(!select1))
+> cl_data <- y_use[select1]
+> true_data <- y_use[!select1]
+> summary(cl_data)
+     Less HS      Some HS           HS Some College 
+         163          232          961         1430 
+> prop.table(summary(cl_data))
+     Less HS      Some HS           HS Some College 
+  0.05850682   0.08327351   0.34493898   0.51328069 
+> summary(train_data)
+  norm_enroll      norm_private_insurance  norm_remote      norm_remote2   
+ Min.   :0.00000   Min.   :0.0000         Min.   :0.0000   Min.   :0.0000  
+ 1st Qu.:0.00000   1st Qu.:0.0000         1st Qu.:0.0000   1st Qu.:0.0000  
+ Median :0.00000   Median :0.0000         Median :0.0000   Median :1.0000  
+ Mean   :0.09261   Mean   :0.4939         Mean   :0.1798   Mean   :0.6278  
+ 3rd Qu.:0.00000   3rd Qu.:1.0000         3rd Qu.:0.0000   3rd Qu.:1.0000  
+ Max.   :1.00000   Max.   :1.0000         Max.   :1.0000   Max.   :1.0000  
+> require(class)
+Loading required package: class
+> for (indx in seq(1, 9, by= 2)) {
++   pred_borough <- knn(train_data, test_data, cl_data, k = indx, l = 0, prob = FALSE, use.all = TRUE)
++   num_correct_labels <- sum(pred_borough == true_data)
++   correct_rate <- num_correct_labels/length(true_data)
++   print(c(indx,correct_rate))
++ }
+[1] 1.0000000 0.5479876
+[1] 3.0000000 0.5479876
+[1] 5.0000000 0.5479876
+[1] 7.0000000 0.5479876
+[1] 9.0000000 0.5479876
+> cl_data_n <- as.numeric(cl_data)
+> model_ols1 <- lm(cl_data_n ~ train_data$norm_enroll + train_data$norm_private_insurance +
++                    train_data$norm_remote + train_data$norm_remote2)         
+> y_hat <- fitted.values(model_ols1)
+> cl_data_n1 <- as.numeric(cl_data_n == 1)
+> model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_enroll + train_data$norm_private_insurance +
++                      train_data$norm_remote + train_data$norm_remote2)
+> y_hat_v1 <- fitted.values(model_ols_v1)
+> mean(y_hat_v1[cl_data_n1 == 1])
+[1] 0.07048838
+> cl_data_n1 <- as.numeric(cl_data_n == 2)
+> model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_enroll + train_data$norm_private_insurance +
++                      train_data$norm_remote + train_data$norm_remote2)
+> y_hat_v1 <- fitted.values(model_ols_v1)
+> mean(y_hat_v1[cl_data_n1 == 1])
+[1] 0.09351857
+> cl_data_n1 <- as.numeric(cl_data_n == 3)
+> model_ols_v1 <- lm( cl_data_n1 ~ train_data$norm_enroll + train_data$norm_private_insurance +
++                       train_data$norm_remote + train_data$norm_remote2)
+> y_hat_v1 <- fitted.values(model_ols_v1)
+> mean(y_hat_v1[cl_data_n1 == 1])
+[1] 0.3492482
+> cl_data_n1 <- as.numeric(cl_data_n == 4)
+> model_ols_v1 <- lm(cl_data_n1 ~ train_data$norm_enroll + train_data$norm_private_insurance +
++                      train_data$norm_remote + train_data$norm_remote2)
+> y_hat_v1 <- fitted.values(model_ols_v1)
+> mean(y_hat_v1[cl_data_n1 == 1])
+[1] 0.5284674
+> #Now we, will test the levels of anxiety of wealthy Hispanics.
+> # For the dependent variable, we set it to Hispanics that make a $150,000-$199,999 income
+> # and the independent variables are the levels of anxiety.
+> summary(ANXIOUS)
+                                             NA                      no anxiety over past 2 wks 
+                                           7946                                           26611 
+           several days anxiety over past 2 wks more than half the days anxiety over past 2 wks 
+                                          19794                                            6140 
+                       nearly every day anxiety 
+                                           8623 
+> no_anxious <- hispanic_subgroup$ANXIOUS == "no anxiety over past 2 wks"
+> some_anxious <- hispanic_subgroup$ANXIOUS == "several days anxiety over past 2 wks"
+> very_anxious <- hispanic_subgroup$ANXIOUS == "more than half the days anxiety over past 2 wks"
+> extremely_anxious <- hispanic_subgroup$ANXIOUS == "nearly every day anxiety"
+> very_evict <- hispanic_subgroup$EVICT == "very likely evicted in next 2 months"
+> regression1 <- lm(very_evict ~ no_anxious + some_anxious + very_anxious + extremely_anxious )
+> summary(regression1)
+
+Call:
+lm(formula = very_evict ~ no_anxious + some_anxious + very_anxious + 
+    extremely_anxious)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-0.01976 -0.00437 -0.00437 -0.00099  0.99901 
+
+Coefficients:
+                        Estimate Std. Error t value Pr(>|t|)    
+(Intercept)           -2.647e-16  2.111e-03   0.000   1.0000    
+no_anxiousTRUE         9.872e-04  2.622e-03   0.377   0.7065    
+some_anxiousTRUE       4.372e-03  2.671e-03   1.637   0.1017    
+very_anxiousTRUE       6.803e-03  3.575e-03   1.903   0.0571 .  
+extremely_anxiousTRUE  1.976e-02  3.135e-03   6.302 3.14e-10 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.06998 on 6449 degrees of freedom
+Multiple R-squared:  0.008202,	Adjusted R-squared:  0.007586 
+F-statistic: 13.33 on 4 and 6449 DF,  p-value: 8.049e-11
+
+> xtabs(~ INCOME + EVICT + REGION) 
+, , REGION = Northeast
+
+                          EVICT
+INCOME                       NA very likely evicted in next 2 months somewhat likely evicted in next 2 months
+  NA                       2968                                   12                                       21
+  HH income less than $25k  570                                    2                                       12
+  HH income $25k - $34.9k   739                                    3                                        3
+  HH income $35k - 49.9    1303                                    1                                        9
+  HH income $50k - 74.9    1094                                    1                                        1
+  HH income $75 - 99.9     1582                                    0                                        1
+  HH income $100k - 149     878                                    0                                        0
+  HH income $150 - 199     1148                                    0                                        0
+  HH income $200k +           0                                    0                                        0
+                          EVICT
+INCOME                     not very likely evicted in next 2 months not at all likely evicted in next 2 months
+  NA                                                             27                                         20
+  HH income less than $25k                                       14                                         10
+  HH income $25k - $34.9k                                         9                                         14
+  HH income $35k - 49.9                                           5                                         13
+  HH income $50k - 74.9                                           4                                          6
+  HH income $75 - 99.9                                            2                                          4
+  HH income $100k - 149                                           0                                          1
+  HH income $150 - 199                                            0                                          1
+  HH income $200k +                                               0                                          0
+
+, , REGION = South
+
+                          EVICT
+INCOME                       NA very likely evicted in next 2 months somewhat likely evicted in next 2 months
+  NA                       6833                                   63                                       75
+  HH income less than $25k 1535                                   16                                       34
+  HH income $25k - $34.9k  1862                                    7                                       21
+  HH income $35k - 49.9    2967                                    9                                       11
+  HH income $50k - 74.9    2385                                    2                                        4
+  HH income $75 - 99.9     3107                                    1                                        0
+  HH income $100k - 149    1537                                    0                                        1
+  HH income $150 - 199     1969                                    1                                        0
+  HH income $200k +           0                                    0                                        0
+                          EVICT
+INCOME                     not very likely evicted in next 2 months not at all likely evicted in next 2 months
+  NA                                                             55                                         43
+  HH income less than $25k                                       25                                         17
+  HH income $25k - $34.9k                                        23                                         14
+  HH income $35k - 49.9                                          14                                         17
+  HH income $50k - 74.9                                           3                                          8
+  HH income $75 - 99.9                                            6                                         10
+  HH income $100k - 149                                           1                                          2
+  HH income $150 - 199                                            1                                          1
+  HH income $200k +                                               0                                          0
+
+, , REGION = Midwest
+
+                          EVICT
+INCOME                       NA very likely evicted in next 2 months somewhat likely evicted in next 2 months
+  NA                       3951                                   20                                       39
+  HH income less than $25k  891                                    7                                        9
+  HH income $25k - $34.9k  1251                                    4                                        8
+  HH income $35k - 49.9    1908                                    0                                        1
+  HH income $50k - 74.9    1671                                    0                                        2
+  HH income $75 - 99.9     2015                                    1                                        1
+  HH income $100k - 149     856                                    0                                        0
+  HH income $150 - 199      904                                    0                                        0
+  HH income $200k +           0                                    0                                        0
+                          EVICT
+INCOME                     not very likely evicted in next 2 months not at all likely evicted in next 2 months
+  NA                                                             25                                         15
+  HH income less than $25k                                       13                                         14
+  HH income $25k - $34.9k                                        11                                          6
+  HH income $35k - 49.9                                           9                                          4
+  HH income $50k - 74.9                                           2                                          8
+  HH income $75 - 99.9                                            1                                          2
+  HH income $100k - 149                                           0                                          1
+  HH income $150 - 199                                            0                                          1
+  HH income $200k +                                               0                                          0
+
+, , REGION = West
+
+                          EVICT
+INCOME                       NA very likely evicted in next 2 months somewhat likely evicted in next 2 months
+  NA                       5992                                   34                                       66
+  HH income less than $25k 1364                                    5                                       24
+  HH income $25k - $34.9k  1772                                    8                                       16
+  HH income $35k - 49.9    3022                                    7                                        9
+  HH income $50k - 74.9    2625                                    3                                        4
+  HH income $75 - 99.9     3374                                    0                                        2
+  HH income $100k - 149    1699                                    0                                        3
+  HH income $150 - 199     2087                                    0                                        0
+  HH income $200k +           0                                    0                                        0
+                          EVICT
+INCOME                     not very likely evicted in next 2 months not at all likely evicted in next 2 months
+  NA                                                             39                                         37
+  HH income less than $25k                                       19                                         19
+  HH income $25k - $34.9k                                        15                                         19
+  HH income $35k - 49.9                                          14                                          7
+  HH income $50k - 74.9                                           4                                          3
+  HH income $75 - 99.9                                            4                                          4
+  HH income $100k - 149                                           0                                          1
+  HH income $150 - 199                                            0                                          4
+  HH income $200k +                                               0                                          0
+
+> educationsample <- Household_Pulse_data$EEDUC
+> summary(educationsample)
+less than hs      some hs   HS diploma    some coll    assoc deg     bach deg      adv deg 
+         411          936         7857        14596         7508        20075        17731 
+> table(educationsample)
+educationsample
+less than hs      some hs   HS diploma    some coll    assoc deg     bach deg      adv deg 
+         411          936         7857        14596         7508        20075        17731 
+> educationsubgroup <- hispanic_subgroup$EEDUC
+> summary(educationsubgroup)
+less than hs      some hs   HS diploma    some coll    assoc deg     bach deg      adv deg 
+         183          259         1064         1603          719         1459         1167 
+> table(educationsubgroup)
+educationsubgroup
+less than hs      some hs   HS diploma    some coll    assoc deg     bach deg      adv deg 
+         183          259         1064         1603          719         1459         1167 
+
+
+# All of the work on this exam is my own, answered honestly as rules state.
+# Name: Nicholas Alonso
+#  Date: 10/22/2021
