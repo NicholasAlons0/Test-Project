@@ -1,19 +1,299 @@
 
 attach(acs2017_ny)
-use_varb <- (AGE >= 25) & (AGE <= 55) & (LABFORCE == 2) & (WKSWORK2 > 4) & (UHRSWORK >= 35) & (Hispanic == 1) & (female == 0)
+use_varb <- (AGE >= 25) & (AGE <= 55) & (LABFORCE == 2) & (WKSWORK2 > 4) &
+  (UHRSWORK >= 35) & (Hispanic == 1) & (female == 1) & ((educ_college == 1) | (educ_advdeg == 1))
 dat_use <- subset(acs2017_ny,use_varb) 
 detach()
 attach(dat_use)
+summary(dat_use)
+model_temp <- lm(INCWAGE ~ educ_hs )
+summary(model_temp)
+summary(dat_use)
+# We cannot use educ_hs because we are using a subset of educ_college, thus excluding those that have just
+# a high school education because they do not have a bachelors. We can see this reviewing the summary of the
+# subset, in the educ-hs, there are only values
+# of 0. In other words, the subset excludes those that do not have a bachelors. Logically, people that
+#  so they will come up as NA in the
+# regression because the subset has already excluded them.
 
-model_temp1 <- lm(INCWAGE ~ AGE + I(AGE^2))
+model_temp6 <- lm(INCWAGE ~ educ_college + educ_advdeg + has_PvtHealthIns)
+summary(model_temp6)
+# When we run a regression that has both a bachelors and an advanced degree, it causes one of them to
+# be canceled out, in this case it was educ_advance that showed up as NA.  The interpretation of educ_college 
+# in the subset is that it is only including two education levels, it is only adding people that
+# have a bacholer's given that they have a masters.
+# Coefficients: (1 not defined because of singularities)
+# The other dummy variable, has private health insurance, seems to be working sensibly, the coefficient 
+# is positive 29123.1, indicating that someone with private health insurance is likely to be making 
+# a wage of that much higher.
+
+detach()
+
+#The following regressions, we will be using a subset of Dominicans.
+attach(acs2017_ny)
+use_varb <-  (in_NYC == 1) & (AGE >= 20) & (AGE <= 70) & (LABFORCE == 2) & (WKSWORK2 > 4)  & (UHRSWORK >= 35) & (Hisp_DomR == 1) 
+dat_use <- subset(acs2017_ny,use_varb) 
+detach()  
+attach(dat_use)
+model_temp1 <- lm(INCWAGE ~ AGE + I(AGE^2) + educ_hs + educ_somecoll + educ_college + educ_advdeg)
 summary(model_temp1)
 suppressMessages(require(AER))
 NNobs <- length(INCWAGE)
-set.seed(12345) # just so you can replicate and get same "random" choices
-graph_obs <- (runif(NNobs) < 0.1) # runif picks data randomly, so 1/10 as random observations from the data
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.5) 
 dat_graph <-subset(dat_use,graph_obs)  
 plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = dat_graph)
-# Add variables from regression to predicted2
-to_be_predicted2 <- data.frame(AGE = 25:55)
+to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 1, educ_somecoll = 1, educ_college = 1, educ_advdeg = 1)
 to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
 lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
+summary(to_be_predicted2$yhat)
+detach()
+detach()
+detach()
+# We can see in this graph that unlike the previous regressions, it does not go in a straight line diagonally 
+# upward. We can note there is a curve in the graph, increase from the 20s-30s range, peaking at the 40s-50s
+# and decreasing around the 60s-70s range. There is not a big increase or dip in the graph because maybe
+# you are educated,  your income will maintain high.
+# The variables in the non-linear regression are AGE, AGE^2 and all the educational variables except educ_nohs.
+# Unlike previous regressions, we see the graph is curved, which is due to the AGE^2. We can find the peak
+# of predicted wages using the summary of to_be_predicted2$yhat, where the maximum is the highest peak along 
+# the curve and in this case is 139364. 
+
+# Next we will try two more regressions with same subset, one with AGE^3 and another with AGE^3 and AGE^4.
+model_temp2 <- lm(INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + educ_hs + educ_somecoll + educ_college + educ_advdeg)
+summary(model_temp2)
+suppressMessages(require(AER))
+NNobs <- length(INCWAGE)
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.5) 
+dat_graph <-subset(dat_use,graph_obs)  
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 1, educ_somecoll = 1, educ_college = 1, educ_advdeg = 1)
+to_be_predicted2$yhat <- predict(model_temp2, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
+detach()
+detach()
+detach()
+
+# When adding a higher order polynomial on age, the line change its dimensions slightly. In the regression 
+# with just AGE^2, we see that around the ages after 50, the wages decrease,
+# as we can note in the graphs. However, in the regression including AGE^3, after the 50s
+# the graph does decrease, flattening out and almost inclining in the 70s range.
+# Additionally, at a 90% confidence, all of the variables in the regression demonstrate significance except
+# for age^3, which has a p-value above 0.1
+
+model_temp3 <- lm((INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + I(AGE^4) + educ_hs + educ_somecoll + educ_college + educ_advdeg ) )
+summary(model_temp3)
+suppressMessages(require(AER))
+NNobs <- length(INCWAGE)
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.5) 
+dat_graph <-subset(dat_use,graph_obs)  
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 1, educ_somecoll = 1, educ_college = 1, educ_advdeg = 1)
+to_be_predicted2$yhat <- predict(model_temp3, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
+detach()
+detach()
+detach()
+
+# Indeed, even when adding the age^3 and age^4, the higher order polynomials did change the slope of
+# the predicted line. One interesting point to note is when looking at the summaries of the regressions, 
+# the age, age^2, age^3 and age^4 are not jointly significant, due to p-values that are
+# greater than the level of significance of 0.1, thus we fail to reject the null hypothesis the polynomials
+# of AGE shows no relationship between INCWAGE. The lack of significance is likely due to high polynomials becuase
+#  in the first regression and second regressions when using just AGE and AGE^2, 
+# and AGE, AGE^2 and AGE^3, the results were significance and did show a relationship.
+# Therefore, we would use just age^2 more frequently, possibly age^3, but not age^4 because the variables are
+# less likely to be significant.
+# The patterns of the graphs were similar from the range of the 20s to mid 40s, the wages would increase.
+# However, depending on the polynomial added to the regression, the end of the line would either 
+# decrease, flattened or increase.
+
+model_temp4 <- lm(INCWAGE ~ I(log(AGE)) + I(log(AGE^2)) + I(log(AGE^3)) )
+summary(model_temp4)
+# When using polynomials in log(AGE), the summary of the regression tells us I(log(AGE^2)) + I(log(AGE^3))
+# appear as NA, therefore deeming them useless. It is better to use I(^2), than to apply a log function.
+# to AGE. Funny enough, the adjusted r squared is negative, something I have never seen before,
+# so we definitely do not want to use log AGE.
+
+model_temp7 <- lm(INCWAGE ~ AGE + educ_hs+ I(educ_hs^2) + educ_somecoll + educ_college + educ_advdeg)
+summary(model_temp7)
+# We do not use polynomial terms on a dummy variable, such as educ_hs because the they will appear as NA
+# in the summary. In this case, we use the polynomial for the educ_hs^2, however in the summary it is
+# the coefficient, std.error, t-stat and p-value are all NAs.
+
+regression <- lm(INCWAGE ~ AGE + I(AGE^2) + educ_hs + educ_somecoll + educ_college + educ_advdeg)
+summary(regression)
+suppressMessages(require(AER))
+NNobs <- length(INCWAGE)
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.5) 
+dat_graph <-subset(dat_use,graph_obs)  
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 1, educ_somecoll = 1, educ_college = 1, educ_advdeg = 1)
+to_be_predicted2$yhat <- predict(regression, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
+summary(to_be_predicted2$yhat)
+# The predicted wages for this model are:
+#  Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 125509  131378  135640  134571  138424  139364 
+# In this case, the predicated wage seems reasonable because, although the subset is made of a minority group,
+# we are including people that are college educated with a bachelors or a masters, thus the
+# income wages is much higher.
+to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 0, educ_somecoll = 0, educ_college = 0, educ_advdeg = 0)
+to_be_predicted2$yhat <- predict(regression, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "purple")
+summary(to_be_predicted2$yhat)
+exp(to_be_predicted2)
+# The predicted wages for this model are:
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# 14208   20077   24339   23270   27124   28063 
+# In this case, the predicated wage seems reasonable because we are only counting Dominicans with
+# no high school education, thus the wages will be much lower compared to Dominicans that are educated.
+# We note the difference in theese two different interactions and conclude that education has a positive
+# impact on income wages.
+
+regression2 <- lm(log1p(INCWAGE) ~ AGE + I(AGE^2) + educ_hs + educ_somecoll + educ_college + educ_advdeg)
+summary(regression2)
+suppressMessages(require(AER))
+NNobs <- length(log1p(INCWAGE))
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.5) 
+dat_graph <-subset(dat_use,graph_obs)  
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,30), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 1, educ_somecoll = 1, educ_college = 1, educ_advdeg = 1)
+to_be_predicted2$yhat <- predict(regression2, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
+summary(to_be_predicted2$yhat)
+exp(to_be_predicted2)
+
+# When using log as the on the dependent variable income wage, the predicted values become much lower, as well as the 
+# line plotted on the graph. In other words, the Log expression expresses the same values within a smaller range 
+# compared to the original values. when looking at the summary of the predicted values, we only see a range from 
+# about 11-13. However, when using the function exp, it computes the exponential function, so 
+# we see the real values of yhat, which are extremely similar, if not
+# the exact same as the previous regression. They are listed from values 1 to 51, but the actually represent people
+# ages 20- 70. While the column on the right side represents the wages in dollar terms. Nonetheless, the log function 
+# maintains the logic that log operates using the same values on a smaller scale, while exp can make the log easier 
+# to interpret.
+
+regression4 <-  lm(INCWAGE ~ AGE + I(AGE^2) + female + I(female*AGE) + I(female*(AGE^2)) + has_PvtHealthIns )
+summary(regression4)
+suppressMessages(require(AER))
+NNobs <- length(INCWAGE)
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.5) 
+dat_graph <-subset(dat_use,graph_obs)  
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,40000), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 20:70, female = 0, has_PvtHealthIns = 0)
+to_be_predicted2$yhat <- predict(regression4, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
+summary(to_be_predicted2$yhat)
+to_be_predicted2 <- data.frame(AGE = 20:70, female = 1, has_PvtHealthIns = 0)
+to_be_predicted2$yhat <- predict(regression4, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "purple")
+summary(to_be_predicted2$yhat)
+# Male No Private Health Insurance
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+#17108   24649   29244   28077   32267   33283 
+# Female
+# Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+# -790.6 18708.8 24956.4 22200.3 29019.5 30393.9
+# So, to see the different interactions, we run two different predicted lines. Male with no private health insurance
+# and female with no private health insurance. As we can see on the graph for females is lower than brown line for males, 
+# where we take a look at the predicted wages, where the peaks of the parabolas are 30393.9 and 33283
+# for female no insurance and male no insurance respectively.
+# do predicted lines twice!!!!
+# Different interactions...... is changing the predicted lines
+# The curve is more obvious, we can see that the second polynomial is also negative. 
+
+regression <- lm(INCWAGE ~ AGE + I(AGE^2) + educ_hs + educ_somecoll + educ_college + educ_advdeg)
+summary(regression)
+stargazer(regression, type = "text")
+suppressMessages(require(AER))
+NNobs <- length(INCWAGE)
+set.seed(12345) 
+graph_obs <- (runif(NNobs) < 0.5) 
+dat_graph <-subset(dat_use,graph_obs)  
+plot(INCWAGE ~ jitter(AGE, factor = 2), pch = 16, col = rgb(0.5, 0.5, 0.5, alpha = 0.2), ylim = c(0,300000), data = dat_graph)
+to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 1, educ_somecoll = 1, educ_college = 1, educ_advdeg = 1)
+to_be_predicted2$yhat <- predict(regression, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
+summary(to_be_predicted2$yhat)
+print(to_be_predicted2)
+to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 1, educ_somecoll = 1, educ_college = 0, educ_advdeg = 0)
+to_be_predicted2$yhat <- predict(regression, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "purple")
+summary(to_be_predicted2$yhat)
+print(to_be_predicted2)
+# The other variables that we have been using are either the educational dummies or private health insurance
+# With the print function, it is similar to exp, except we it works without the log function, where it
+# prints the values as age goes up until you reach the middle then it goes down, which makes sense because 
+# when you getting into retirement territory your wages decrease.
+# the education variables do have expected patterns, there are relationships between the educational dummies and
+# income wage are all statistically significant at a level of significance of 0.001, demonstrating there is a
+# relationship between income wage and educational variables.
+# There is a casual link from the x variables to the y variable for the cases of education with respect to
+# income wages. For example, if you have a masters and compared yourself to someone that has not even a high 
+# school education, chances are you will be making a lot more money than them. However, the casual link is not
+# from income wage to education because you can still go to high school for free, you can
+# take out loans or you may have savings if you want to pursue higher education. So, you do need an education
+# to a higher wage, but you do not necessarily need a wage to have a higher education.
+
+
+
+#last thing is Explain your results, giving details about the estimation, some predicted values, 
+# and providing any relevant graphics. Impress.
+
+
+
+summary(residuals(regression3))
+#The residuals shows the unexplained variance across the range of the model,
+#each plot gave us the information about the model fit or 
+#(the red line representing the mean of the residuals that should be horizontal and centered on zero,
+#as indicated below), this indicates that there is not a lot of outliers causing bias in the model.
+
+
+
+
+
+
+
+
+#This particular bit of code was something we found from the rstudio community to graph the peak predicted wages.
+Poly_Model <- lm(INCWAGE ~ poly(AGE,3, raw=TRUE))
+summary(Poly_Model)
+plot(AGE, INCWAGE, col="green", ylim=c(0, 200000))
+# Add model
+AGE <- seq(min(AGE), max(AGE), length=1000)
+pred <- data.frame(AGE, INCWAGE = predict(Poly_Model, newdata = data.frame(AGE)))
+with(pred, lines(AGE, INCWAGE))
+# Vector of model coefficients
+cf <- coef(Poly_Model)
+# First derivative of my poly_model
+# This is the "raw" equation but we'll find its roots to get the locations of local maxima and minima.
+D1 <- cf[2] + 2*cf[3]*pred$AGE + 3*cf[4]*pred$AGE^2
+# Roots of first derivative (these are locations where first derivative (d WAGE/ d AGE) = 0).
+# Use quadratic formula to find roots (I honestly copied and pasted this formula, but I understand what it's doing)
+D1roots <- (-2*cf[3] + c(-1,1)*sqrt((2*cf[3])^2 - 4*3*cf[4]*cf[2]))/(2*3*cf[4])
+# Second derivative at the two roots. 
+D2atD1roots <-  2*cf[3] + 6*cf[4]*D1roots
+# Local maxima are where the second derivative is negative
+max_x <- D1roots[which(D2atD1roots < 0)]
+max_y <- cf %*% max_x^(0:3)
+# Plot local maxima
+points(max_x, max_y, pch=16, col="red")
+# Add values of Yield at local maxima
+text(max_x, max_y, label = round(max_y,2), adj=c(0.5,-1))
+
+# In this case, using poly is the same as using I(^3), however by using this we can code to find the
+# peak of the parabola and draw it on our graph. The peak of the parabola was found using 
+# the derivatives and the quadratic formula. In the case of our subgroup of Dominicans, the peak of
+# the wage line is 47179.26
+# The reason there are so many data points compared to our original model temp is because originally, we use
+# only 50% of the subset in previous regressions. In the case, by using the derivatives we can find the
+# peak of the parabola. Unfortunately, we have tried to replicate these commands using a different polynomial,
+# but were not able to code it properly, nonetheless it was an interesting way to graph it.
+
+
