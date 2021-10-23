@@ -1,4 +1,3 @@
-
 attach(acs2017_ny)
 use_varb <- (AGE >= 25) & (AGE <= 55) & (LABFORCE == 2) & (WKSWORK2 > 4) &
   (UHRSWORK >= 35) & (Hispanic == 1) & (female == 1) & ((educ_college == 1) | (educ_advdeg == 1))
@@ -8,14 +7,11 @@ attach(dat_use)
 summary(dat_use)
 model_temp <- lm(INCWAGE ~ educ_hs )
 summary(model_temp)
-summary(dat_use)
 # We cannot use educ_hs because we are using a subset of educ_college, thus excluding those that have just
 # a high school education because they do not have a bachelors. We can see this reviewing the summary of the
 # subset, in the educ-hs, there are only values
 # of 0. In other words, the subset excludes those that do not have a bachelors. Logically, people that
-#  so they will come up as NA in the
-# regression because the subset has already excluded them.
-
+#  so they will come up as NA in the regression because the subset has already excluded them.
 model_temp6 <- lm(INCWAGE ~ educ_college + educ_advdeg + has_PvtHealthIns)
 summary(model_temp6)
 # When we run a regression that has both a bachelors and an advanced degree, it causes one of them to
@@ -47,6 +43,10 @@ to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 1, educ_somecoll = 1, educ
 to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
 lines(yhat ~ AGE, data = to_be_predicted2, col = "brown")
 summary(to_be_predicted2$yhat)
+to_be_predicted2 <- data.frame(AGE = 20:70, educ_hs = 1, educ_somecoll = 1, educ_college = 0, educ_advdeg = 0)
+to_be_predicted2$yhat <- predict(model_temp1, newdata = to_be_predicted2)
+lines(yhat ~ AGE, data = to_be_predicted2, col = "purple")
+summary(to_be_predicted2$yhat)
 detach()
 detach()
 detach()
@@ -57,7 +57,9 @@ detach()
 # The variables in the non-linear regression are AGE, AGE^2 and all the educational variables except educ_nohs.
 # Unlike previous regressions, we see the graph is curved, which is due to the AGE^2. We can find the peak
 # of predicted wages using the summary of to_be_predicted2$yhat, where the maximum is the highest peak along 
-# the curve and in this case is 139364. 
+# the curve of the brown line in this case is 139364. While we see the different interactions between
+# people that have a masters, bacholers, some college and high school education (the brown line) and
+# people with a some college and a bacholers.
 
 # Next we will try two more regressions with same subset, one with AGE^3 and another with AGE^3 and AGE^4.
 model_temp2 <- lm(INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + educ_hs + educ_somecoll + educ_college + educ_advdeg)
@@ -77,10 +79,10 @@ detach()
 
 # When adding a higher order polynomial on age, the line change its dimensions slightly. In the regression 
 # with just AGE^2, we see that around the ages after 50, the wages decrease,
-# as we can note in the graphs. However, in the regression including AGE^3, after the 50s
-# the graph does decrease, flattening out and almost inclining in the 70s range.
-# Additionally, at a 90% confidence, all of the variables in the regression demonstrate significance except
-# for age^3, which has a p-value above 0.1
+# as we can note in the graphs. However, in the regression including AGE^3, after the 50s year old range
+# the graph does decrease, flattening out and almost inclining in the 70s range. 
+# Additionally, at a 90% confidence, all of the variables in the regression demonstrate significance
+# at a level of significance of 0.1 except for age^3, which has a p-value above 0.1. 
 
 model_temp3 <- lm((INCWAGE ~ AGE + I(AGE^2) + I(AGE^3) + I(AGE^4) + educ_hs + educ_somecoll + educ_college + educ_advdeg ) )
 summary(model_temp3)
@@ -101,14 +103,16 @@ detach()
 # the predicted line. One interesting point to note is when looking at the summaries of the regressions, 
 # the age, age^2, age^3 and age^4 are not jointly significant, due to p-values that are
 # greater than the level of significance of 0.1, thus we fail to reject the null hypothesis the polynomials
-# of AGE shows no relationship between INCWAGE. The lack of significance is likely due to high polynomials becuase
-#  in the first regression and second regressions when using just AGE and AGE^2, 
+# of AGE shows no relationship between INCWAGE. The lack of significance is likely due to high polynomials 
+# because in the first regression and second regressions when using just AGE and AGE^2, 
 # and AGE, AGE^2 and AGE^3, the results were significance and did show a relationship.
 # Therefore, we would use just age^2 more frequently, possibly age^3, but not age^4 because the variables are
-# less likely to be significant.
-# The patterns of the graphs were similar from the range of the 20s to mid 40s, the wages would increase.
-# However, depending on the polynomial added to the regression, the end of the line would either 
-# decrease, flattened or increase.
+# less likely to be significant. The patterns of the graphs were similar from the range of the 20s
+# to mid 40s, the wages would increase. However, depending on the polynomial added to the regression, 
+# the end of the line would either decrease, flattened or increase. The reason for the interaction
+# different increases and decreases of the plotted lines in because the coefficients of the polynomials
+# are positive, negative, positive, negative for the first four coefficients of the regression, thus 
+# shifting the dimensions of the graph.
 
 model_temp4 <- lm(INCWAGE ~ I(log(AGE)) + I(log(AGE^2)) + I(log(AGE^3)) )
 summary(model_temp4)
@@ -151,7 +155,7 @@ exp(to_be_predicted2)
 # 14208   20077   24339   23270   27124   28063 
 # In this case, the predicated wage seems reasonable because we are only counting Dominicans with
 # no high school education, thus the wages will be much lower compared to Dominicans that are educated.
-# We note the difference in theese two different interactions and conclude that education has a positive
+# We note the difference in these two different interactions and conclude that education has a positive
 # impact on income wages.
 
 regression2 <- lm(log1p(INCWAGE) ~ AGE + I(AGE^2) + educ_hs + educ_somecoll + educ_college + educ_advdeg)
@@ -210,7 +214,6 @@ summary(to_be_predicted2$yhat)
 
 regression <- lm(INCWAGE ~ AGE + I(AGE^2) + educ_hs + educ_somecoll + educ_college + educ_advdeg)
 summary(regression)
-stargazer(regression, type = "text")
 suppressMessages(require(AER))
 NNobs <- length(INCWAGE)
 set.seed(12345) 
@@ -240,26 +243,6 @@ print(to_be_predicted2)
 # from income wage to education because you can still go to high school for free, you can
 # take out loans or you may have savings if you want to pursue higher education. So, you do need an education
 # to a higher wage, but you do not necessarily need a wage to have a higher education.
-
-
-
-#last thing is Explain your results, giving details about the estimation, some predicted values, 
-# and providing any relevant graphics. Impress.
-
-
-
-summary(residuals(regression3))
-#The residuals shows the unexplained variance across the range of the model,
-#each plot gave us the information about the model fit or 
-#(the red line representing the mean of the residuals that should be horizontal and centered on zero,
-#as indicated below), this indicates that there is not a lot of outliers causing bias in the model.
-
-
-
-
-
-
-
 
 #This particular bit of code was something we found from the rstudio community to graph the peak predicted wages.
 Poly_Model <- lm(INCWAGE ~ poly(AGE,3, raw=TRUE))
