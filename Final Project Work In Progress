@@ -1,0 +1,95 @@
+# drinking occurs more in poor communities, so we we be able to predict where
+# someone lives based if they are a heavy drinker drink or not.
+
+# test if there is a correlation between health and race
+#people's income with their condition of health????
+# we need the table the figure out the variables after 100.
+library(readr)
+BRFSS_2015 <- read_csv("Downloads/Final Project/BRFSS_2015.csv")
+View(BRFSS_2015)
+attach(BRFSS_2015)
+
+#subset people from 20 to 65
+
+#V1 is states
+BRFSS_2015$V1 <- as.numeric(BRFSS_2015$V1)
+BRFSS_2015$V1 <- as.factor(BRFSS_2015$V1)
+summary(BRFSS_2015$V1)
+
+#Income
+BRFSS_2015$V63 <- as.factor(BRFSS_2015$V63)
+summary(BRFSS_2015$V63)
+less_than_10k <- BRFSS_2015$V63 == "1.0"
+summary(less_than_10k)
+
+#General Health
+BRFSS_2015$V27 <- as.factor(BRFSS_2015$V27)
+summary(BRFSS_2015$V27)
+excellent_health <- BRFSS_2015$V27 == "1.0"
+summary(excellent_health)
+
+
+
+regression <- lm(excellent_health ~ less_than_10k )
+summary(regression)
+#Race
+
+
+#Education
+
+
+# Income Second
+BRFSS_2015$V268 <- as.numeric(BRFSS_2015$V268)
+summary(BRFSS_2015$V268)
+
+
+as.numeric(BRFSS_2015$V1)
+#this works
+alabama <- BRFSS_2015$V1 ==  2
+summary(as.numeric(alabama))
+
+summary(BRFSS_2015)
+
+
+
+summary(V1)
+list(V1)
+head(BRFSS_2015)
+
+
+regression <- lm()
+
+unique(train_data['Stay'])
+# this list the number of people that will stay for each category.
+less_than_10days <- train_data$Stay == "0-10"
+days11to20_stay <- train_data$Stay == "11-20"
+summary(less_than_10days)
+summary(days11to20_stay)
+
+#We can code the numer of days
+
+summary(train_data$Stay)
+barplot(train_data$Stay)
+
+
+
+ggplot(train_data$Stay)
+
+# admission deposit?
+# only people that put an admissions deposit is a large amount of money,
+# those that are sick do not show up to the hospital because they cannot 
+# afford it.
+
+#we gonna focus on healthcare...
+#try to predict bed grade using admission deposit
+# correlation betwenn income leve and having health insurance.
+
+
+#maybe health insurances charge more to people with inelastic health
+
+
+
+#Tensions exist between Dominicans and Haitians because both groups have had their 
+#security threatened by the other in the past. The tension created between Dominicans 
+#and Haitians was difficult to resolve due to the fearful memories that both groups'
+#security was threatened.
