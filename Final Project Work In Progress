@@ -25,14 +25,48 @@ summary(less_than_10k)
 #General Health
 BRFSS_2015$V27 <- as.factor(BRFSS_2015$V27)
 summary(BRFSS_2015$V27)
-excellent_health <- BRFSS_2015$V27 == "1.0"
-summary(excellent_health)
+good_health <- BRFSS_2015$V27 == "1.0" & BRFSS_2015$V27 == "2.0" & BRFSS_2015$V27 == "3.0"
+summary(good_health)
 
-
+#run the sam exact regression as the paper and duplicate with updated varions of data set
+# and compare to are the finding s still relevant, how have they changed
+summary(BRFSS_2015)
 
 regression <- lm(excellent_health ~ less_than_10k )
 summary(regression)
+
+
 #Race
+White <- BRFSS_2015$V252 == "1.0"
+summary(White)
+
+
+#
+Black <- BRFSS_2015$V252 == "2.0"
+summary(Black)
+
+American_Indian <- BRFSS_2015$V252 == "3.0"
+summary(American_Indian)
+
+Asian <- BRFSS_2015$V252 == "4.0"
+summary(Asian)
+
+Native_Hawaiian <- BRFSS_2015$V252 == "5.0"
+summary(Native_Hawaiian)
+
+Other_Races <- BRFSS_2015$V252 == "6.0"
+summary(Other_Races)
+
+Multi_racial <- BRFSS_2015$V252 == "7.0"
+summary(Multi_racial)
+
+Hispanic <- BRFSS_2015$V252 == "8.0"
+summary(Hispanic)
+
+
+# separate peoples health into two categories, good health and bad health, 
+# use regression on both
+# run the test using the whole group, then a subgroup.
 
 
 #Education
@@ -48,7 +82,7 @@ as.numeric(BRFSS_2015$V1)
 alabama <- BRFSS_2015$V1 ==  2
 summary(as.numeric(alabama))
 
-summary(BRFSS_2015)
+
 
 
 
@@ -57,7 +91,7 @@ list(V1)
 head(BRFSS_2015)
 
 
-regression <- lm()
+
 
 unique(train_data['Stay'])
 # this list the number of people that will stay for each category.
@@ -80,16 +114,13 @@ ggplot(train_data$Stay)
 # those that are sick do not show up to the hospital because they cannot 
 # afford it.
 
-#we gonna focus on healthcare...
+#we gonna focus on health between single and multiracial groups
 #try to predict bed grade using admission deposit
-# correlation betwenn income leve and having health insurance.
-
-
-#maybe health insurances charge more to people with inelastic health
+# correlation between income level and having health insurance.
 
 
 
-#Tensions exist between Dominicans and Haitians because both groups have had their 
-#security threatened by the other in the past. The tension created between Dominicans 
-#and Haitians was difficult to resolve due to the fearful memories that both groups'
-#security was threatened.
+#Cannot find specific multiracial
+WhiteMR <- BRFSS_2015$V252 == "10.0"
+summary(WhiteMR)
+list(BRFSS_2015$V252)
