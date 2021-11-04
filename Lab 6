@@ -1,0 +1,889 @@
+# Study Group: Nicholas Alonso, Herve Allah, Nicholas Espinosa, S Kara Cisse, Joel Andrade
+# We must always be aware of the levels or numbers of our dependent variable.
+summary(Household_Pulse_data$RECVDVACC)
+model_logit1 <- glm(RECVDVACC ~ EEDUC, family = binomial, data = Household_Pulse_data)
+summary(model_logit1)
+summary(as.numeric(Household_Pulse_data$RECVDVACC))
+# We should NOT use this! Since the variable RECVDVACC has three levels it is not a binomial and
+# defeats the purpose of a binary logit regression. We can check this via the global environment
+# and see RECVDVACC is a factor with 3 levels, or use summary as numeric to see the min of 1
+# and the max of 3, indicating there are three numbers. Thus, no point to using logistic regression
+# because even though the models runs, it would not be as meaningful.
+
+# We will start with a regression that This is a variation where we remove the NA's.
+Household_Pulse_data$vaxx <- (Household_Pulse_data$RECVDVACC == "yes got vaxx")
+summary(Household_Pulse_data$vaxx)
+use_varb <- (Household_Pulse_data$REGION == "South")
+dat_use <- subset(Household_Pulse_data,use_varb) 
+model_logit2 <- glm(vaxx ~  EEDUC + MS + RRACE  + GENID_DESCRIBE,
+                    family = binomial, data = dat_use)
+summary(model_logit2)
+to_be_predicted <- data.frame(EEDUC = "some coll", MS = "married", RRACE = "Black", GENID_DESCRIBE = "female", data = dat_use)
+to_be_predicted$yhat <- predict(model_logit2, to_be_predicted, type = "response")
+summary(to_be_predicted$yhat)
+# While the predicted probability for married black woman with some college education to be
+# vaccinated is is 0.8174. Additionally, we see from the summary statistics the majority of 
+# the variables are statistically significant. However, we will notice in the regressions below 
+# that incorporating NA's into the depedent variable does change the significance of the independent 
+# variables, even if the regression states it removes the NA's due to missigness.
+
+#Created table, plot, another table, bar graph.
+table1 <- table(Household_Pulse_data$EEDUC,Household_Pulse_data$vaxx)
+table1
+plot(table1, main="Vacvination Status By Education",
+     xlab="Education Levels",
+     ylab="Vaccination", 
+     col = c("grey", "blue"))
+# Proportions of people that are vaccinated from table.
+x=c(table1[1,2]/(table1[1,1]+table1[1,2]),
+    table1[2,2]/(table1[2,1]+table1[2,2]),
+    table1[3,2]/(table1[3,1]+table1[3,2]),
+    table1[4,2]/(table1[4,1]+table1[4,2]),
+    table1[5,2]/(table1[5,1]+table1[5,2]),
+    table1[6,2]/(table1[6,1]+table1[6,2]),
+    table1[7,2]/(table1[7,1]+table1[7,2]))
+x
+vaxx_prop_table<-data.frame(row.names=row.names(table1), Prop_Vaccination=x)
+vaxx_prop_table
+require(ggplot2)
+ggplot(data=vaxx_prop_table, aes(y=row.names(vaxx_prop_table), x=Prop_Vaccination, fill=row.names(vaxx_prop_table))) + 
+  geom_bar(stat="identity") + scale_fill_brewer(palette = "Dark2") +ggtitle("Proportion Of Vaccinated by Education") + theme(legend.position = "none") + labs( x="Vaccinated Proportion", y="Education Level")
+# We created tables and bar graphs demonstrating the proportion of vaccinated people
+# by educational level. We note the higher the educational level, the more larger the 
+# proportion of those vaccinated. 
+
+# In this following regression, we determine that the NA's are meaningful when creating the
+# dependent variable. While we could change the variable to a factor, for simplicity
+# we will leave it as a logical since vaxx would still be true or false and works 
+# properly in a logit model.
+Household_Pulse_data$vaxx <- (Household_Pulse_data$RECVDVACC == "yes got vaxx")
+is.na(Household_Pulse_data$vaxx) <- which(Household_Pulse_data$RECVDVACC == "NA") 
+summary(Household_Pulse_data$vaxx)
+use_varb10 <- (Household_Pulse_data$REGION == "South")
+dat_use10 <- subset(Household_Pulse_data,use_varb10) 
+model_logit10 <- glm(vaxx ~ EEDUC + MS + RRACE  + GENID_DESCRIBE + Works_onsite*INCOME, family = binomial, data = dat_use10)
+summary(model_logit10)
+to_be_predicted2<- data.frame(EEDUC = "some coll", MS = "separated", RRACE = "Asian", GENID_DESCRIBE = "female",
+    Works_onsite = "worked onsite", INCOME= "HH income $50k - 74.9",    data = dat_use10)
+to_be_predicted2$yhat<-predict(model_logit10, to_be_predicted2, type="response")
+summary(to_be_predicted2$yhat)
+#Use summary of the predicted values or summing the coefficients by using  1/(1+(exp()) 
+# produces that same probabilities, but using summary of the predicted values is easier.
+
+to_be_predicted<- data.frame( EEDUC = "some coll", MS = "separated", RRACE = "Asian", 
+GENID_DESCRIBE = "male", Works_onsite = "worked onsite", INCOME= "HH income $50k - 74.9",data = dat_use10)
+to_be_predicted$yhat<-predict(model_logit10, to_be_predicted, type="response")
+summary(to_be_predicted$yhat)
+
+# Coefficient value of predicted value with respect binary vaccination level.
+to_be_predicted2$yhat <- predict(model_logit10, to_be_predicted2)
+summary(to_be_predicted2$yhat)
+to_be_predicted$yhat <- predict(model_logit10, to_be_predicted)
+summary(to_be_predicted$yhat)
+
+# When the NA is an actually part of the string, the logit model will delete the observations. Even
+# when the NA's are deleleted, they stil impact the regression to some degree. But, 
+# when the NA is a factor the logit regression, the NA will still be incorporated. When not
+# adding NA's vs. adding  NA's we cause two different outcomes in the logit regressions. When 
+# looking at the summary, coefficients matter, the bigger the coefficients compared to other 
+# coefficients, the larger the effect. We can see that people with advance education has a large
+# positive coefficient of 1.69006 compared to the other variables. Demonstrating that people with advance 
+# education are much more likely to be vaccinated. In addition, the the significance determines 
+# whether or not there is a meaningful relationship, where we observe that advance degree is 
+# very significant. On the other hand, people that will describe themselves as other gender 
+# are very significant, but have a negative coefficient of -1.10822, demonstrating people from other 
+# gender are much more likely to NOT be vaccinated. Using the predicted values (type = "response") 
+# we can show a separated black woman with some college education that works on site and has an 
+# income of income $50k - 74.9 has a predicted probability of 0.8781 to be vaccinated. When comparing
+# separated black man with some college education that works on site and has an income of income 
+# $50k - 74.9 has a predicted value of 0.8931, indicating a higher likelihood that those men are vaccinated. As well as the 
+# Predicted coefficients (which are the predicted values without type="response") based on 
+# the binary vaccination variable, for men in this category are higher as well. Both 
+# indicating that married black men with some college education have a higher vaccination 
+# rate than women.
+
+#Probit regression
+model_probit1 <- glm(vaxx ~ EEDUC + MS + RRACE  + GENID_DESCRIBE + Works_onsite*INCOME,
+                     family = binomial (link = 'probit'), data = dat_use10)
+summary(model_probit1)
+to_be_predicted3<- data.frame(EEDUC = "some coll", MS = "separated", RRACE = "Asian", GENID_DESCRIBE = "female",
+                       Works_onsite = "worked onsite", INCOME= "HH income $50k - 74.9",  data = dat_use10)
+to_be_predicted3$yhat<-predict(model_probit1, to_be_predicted3, type="response")
+summary(to_be_predicted3$yhat)
+require(stargazer)
+stargazer(model_logit10,model_probit1, type = "text")
+stargazer(to_be_predicted2,to_be_predicted3, type = "text")
+# The probit model is similar to the logit, where most of the levels of significance remain 
+# similar, although the coefficients seem to vary. For example, the coefficients in probit 
+# are closer to 0 than logit coefficients. Additionally, we observe the predicted values for 
+# separated black woman with some college education that works on site and has an 
+# income of income $50k - 74.9 in yhat of the stargazer summary, where they vary by only 
+# 1 percentage point from 0.869 to 0.878. Ultimately, logit and probit give very similar
+# results.
+
+# Now we will split the train and test data to predict the accuracy.
+set.seed(1)
+index<-sample(x=2,size=nrow(dat_use10),replace=TRUE,prob=c(0.7,0.3))
+train<-dat_use10[index==1,]
+test<-dat_use10[index==2,]
+dim(dat_use10)
+dim(train)
+dim(test)
+trainmodel<-glm(vaxx ~ EEDUC + MS + RRACE  + GENID_DESCRIBE + Works_onsite*INCOME,
+                family = binomial, data = dat_use10)
+prob<-predict(object=trainmodel,newdata=test,type="response")
+pred<-cbind(test,prob)
+pred<-transform(pred,predict=ifelse(prob<=0.5,0,1))
+ta<-table(pred$vaxx,pred$predict)
+ta
+sum_diag<-sum(diag(ta))
+sum<-sum(ta)
+sum_diag/sum
+# An 87.5% accuracy of predicting correctly.
+
+# Initially thought this was a logit graph but actually predicts accuracy and confidence.
+# We cannot use with dependent variables that are factors and cannot have NA's.
+Household_Pulse_data$vaxx <- (Household_Pulse_data$RECVDVACC == "yes got vaxx")
+use_varb0 <- (Household_Pulse_data$REGION == "South")
+dat_use0 <- subset(Household_Pulse_data,use_varb0) 
+model_logit0 <- glm(vaxx ~  EEDUC + MS + RRACE+ GENID_DESCRIBE, family = binomial, data = dat_use0)
+summary(model_logit0)
+summary(model_logit0$fitted)
+summary(dat_use0$vaxx)
+pred_model_logit0 <- (model_logit0$fitted > 0.5)
+table(pred_model_logit0, dat_use0$vaxx)
+frac_correct_l1a <- mean(as.numeric(as.numeric(pred_model_logit0) == dat_use0$vaxx))
+pred_model_logit1b <- (model_logit0$fitted > mean(dat_use0$vaxx))
+table(pred_model_logit1b, dat_use0$vaxx)
+frac_correct_l1b <- mean(as.numeric(as.numeric(pred_model_logit1b) == dat_use0$vaxx))
+# examine how different cut-off values change predictive accuracy
+frac_correct_try <- rep(0,140)
+for (indx in 1:140) {
+  pred_model_indx <- (model_logit0$fitted > (indx/200) )
+  frac_correct_try[indx] <- mean(as.numeric(as.numeric(pred_model_indx) == dat_use0$vaxx))
+}
+plot((seq(140)/200),frac_correct_try)
+
+#This is predicting the accuracy, version of r squared, x axis is confidence, y axis is accuracy.
+# The best accuracy 0.864 with a confidence of 0.45. 
+
+require(pROC)
+roc_curve<-roc(test$vaxx,prob)
+x<-1-roc_curve$specificities
+y<-roc_curve$sensitivities
+plot(x=x,y=y,xlim=c(0,1),ylim=c(0,1),xlab="1-specificity",
+     ylab="sensitivity",main="ROC Curve",type="l",lwd=2)
+abline(a=0,b=1,col="grey")
+auc<-roc_curve$auc
+text(0.5,0.4,paste("AUC",round(auc,digits=2)),col="blue")
+# the accuracy of the model is 0.75.
+
+# We can create a plot and values of those vaccinated based on the year they were born.
+Household_Pulse_data$vaxx <- (Household_Pulse_data$RECVDVACC == "yes got vaxx")
+summary(Household_Pulse_data$vaxx)
+is.na(Household_Pulse_data$vaxx) <- which(Household_Pulse_data$RECVDVACC == "NA")
+summary(Household_Pulse_data$vaxx)
+Household_Pulse_data$vaxx <- as.factor(Household_Pulse_data$vaxx)
+summary(Household_Pulse_data$vaxx)
+levels(Household_Pulse_data$vaxx)
+levels(Household_Pulse_data$vaxx) <- c("No","Yes")
+summary(Household_Pulse_data$vaxx)
+use_varb3 <- (Household_Pulse_data$REGION == "South")
+dat_use3 <- subset(Household_Pulse_data,use_varb3) 
+NNobs <- length(dat_use3$vaxx)
+set.seed(1) 
+graph_obs <- (runif(NNobs) < 0.9) 
+dat_graph <-subset(dat_use3,graph_obs)  
+plot(vaxx ~ TBIRTH_YEAR, pch = 16, ylim = c(0,1), data = dat_graph, main = "Vaccination By Birth Year", xlab = "Birth Year", ylab = "Vaccination", col = c("blue","grey"))
+# We see the older a person is, the more likely they are to be vaccinated.
+
+
+#Console Output
+
+> load("~/Downloads/Household_Pulse_data.RData")
+> # Study Group: Nicholas Alonso, Herve Allah, Nicholas Espinosa, S Kara Cisse, Joel Andrade
+> # We must always be aware of the levels or numbers of our dependent variable.
+> summary(Household_Pulse_data$RECVDVACC)
+                 NA        yes got vaxx no did not get vaxx 
+                851               60326                7937 
+> model_logit1 <- glm(RECVDVACC ~ EEDUC, family = binomial, data = Household_Pulse_data)
+> summary(model_logit1)
+
+Call:
+glm(formula = RECVDVACC ~ EEDUC, family = binomial, data = Household_Pulse_data)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-3.0103   0.1472   0.1544   0.1567   0.1797  
+
+Coefficients:
+                 Estimate Std. Error z value Pr(>|z|)    
+(Intercept)      4.212128   0.411261  10.242   <2e-16 ***
+EEDUCsome hs    -0.094718   0.486712  -0.195    0.846    
+EEDUCHS diploma  0.015158   0.422036   0.036    0.971    
+EEDUCsome coll   0.182322   0.418118   0.436    0.663    
+EEDUCassoc deg  -0.003643   0.422329  -0.009    0.993    
+EEDUCbach deg    0.210906   0.416399   0.506    0.613    
+EEDUCadv deg     0.307838   0.417646   0.737    0.461    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 9175.3  on 69113  degrees of freedom
+Residual deviance: 9164.4  on 69107  degrees of freedom
+AIC: 9178.4
+
+Number of Fisher Scoring iterations: 7
+
+> summary(as.numeric(Household_Pulse_data$RECVDVACC))
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   2.000   2.000   2.103   2.000   3.000 
+> # We should NOT use this! Since the variable RECVDVACC has three levels it is not a binomial and
+> # defeats the purpose of a binary logit regression. We can check this via the global environment
+> # and see RECVDVACC is a factor with 3 levels, or use summary as numeric to see the min of 1
+> # and the max of 3, indicating there are three numbers. Thus, no point to using logistic regression
+> # because even though the models runs, it would not be as meaningful.
+> 
+> # We will start with a regression that This is a variation where we remove the NA's.
+> Household_Pulse_data$vaxx <- (Household_Pulse_data$RECVDVACC == "yes got vaxx")
+> summary(Household_Pulse_data$vaxx)
+   Mode   FALSE    TRUE 
+logical    8788   60326 
+> use_varb <- (Household_Pulse_data$REGION == "South")
+> dat_use <- subset(Household_Pulse_data,use_varb) 
+> model_logit2 <- glm(vaxx ~  EEDUC + MS + RRACE  + GENID_DESCRIBE,
++                     family = binomial, data = dat_use)
+> summary(model_logit2)
+
+Call:
+glm(formula = vaxx ~ EEDUC + MS + RRACE + GENID_DESCRIBE, family = binomial, 
+    data = dat_use)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.6836   0.3204   0.4299   0.6082   2.1655  
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               -2.18364    0.23278  -9.381  < 2e-16 ***
+EEDUCsome hs              -0.06023    0.21652  -0.278 0.780901    
+EEDUCHS diploma            0.35458    0.18578   1.909 0.056318 .  
+EEDUCsome coll             0.69632    0.18413   3.782 0.000156 ***
+EEDUCassoc deg             0.75957    0.18856   4.028 5.62e-05 ***
+EEDUCbach deg              1.50054    0.18558   8.086 6.18e-16 ***
+EEDUCadv deg               1.90845    0.18818  10.141  < 2e-16 ***
+MSmarried                  1.75667    0.15996  10.982  < 2e-16 ***
+MSwidowed                  2.36571    0.18531  12.766  < 2e-16 ***
+MSdivorced                 1.71998    0.16602  10.360  < 2e-16 ***
+MSseparated                1.19155    0.19195   6.208 5.38e-10 ***
+MSnever                    1.33909    0.16415   8.158 3.41e-16 ***
+RRACEBlack                -0.03170    0.05514  -0.575 0.565320    
+RRACEAsian                 0.83061    0.15005   5.535 3.11e-08 ***
+RRACEOther                -0.51993    0.08709  -5.970 2.37e-09 ***
+GENID_DESCRIBEmale         1.46269    0.14364  10.183  < 2e-16 ***
+GENID_DESCRIBEfemale       1.26117    0.14174   8.898  < 2e-16 ***
+GENID_DESCRIBEtransgender  1.31313    0.37576   3.495 0.000475 ***
+GENID_DESCRIBEother        0.72829    0.21429   3.399 0.000677 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 18390  on 22679  degrees of freedom
+Residual deviance: 16779  on 22661  degrees of freedom
+AIC: 16817
+
+Number of Fisher Scoring iterations: 5
+
+> to_be_predicted <- data.frame(EEDUC = "some coll", MS = "married", RRACE = "Black", GENID_DESCRIBE = "female", data = dat_use)
+> to_be_predicted$yhat <- predict(model_logit2, to_be_predicted, type = "response")
+> summary(to_be_predicted$yhat)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.8174  0.8174  0.8174  0.8174  0.8174  0.8174 
+> # While the predicted probability for married black woman with some college education to be
+> # vaccinated is is 0.8174. Additionally, we see from the summary statistics the majority of 
+> # the variables are statistically significant. However, we will notice in the regressions below 
+> # that incorporating NA's into the depedent variable does change the significance of the independent 
+> # variables, even if the regression states it removes the NA's due to missigness.
+> 
+> #Created table, plot, another table, bar graph.
+> table1 <- table(Household_Pulse_data$EEDUC,Household_Pulse_data$vaxx)
+> table1
+              
+               FALSE  TRUE
+  less than hs   121   290
+  some hs        284   652
+  HS diploma    1760  6097
+  some coll     2574 12022
+  assoc deg     1242  6266
+  bach deg      1803 18272
+  adv deg       1004 16727
+> plot(table1, main="Vacvination Status By Education",
++      xlab="Education Levels",
++      ylab="Vaccination", 
++      col = c("grey", "blue"))
+> # Proportions of people that are vaccinated from table.
+> x=c(table1[1,2]/(table1[1,1]+table1[1,2]),
++     table1[2,2]/(table1[2,1]+table1[2,2]),
++     table1[3,2]/(table1[3,1]+table1[3,2]),
++     table1[4,2]/(table1[4,1]+table1[4,2]),
++     table1[5,2]/(table1[5,1]+table1[5,2]),
++     table1[6,2]/(table1[6,1]+table1[6,2]),
++     table1[7,2]/(table1[7,1]+table1[7,2]))
+> x
+[1] 0.7055961 0.6965812 0.7759959 0.8236503 0.8345765 0.9101868 0.9433760
+> vaxx_prop_table<-data.frame(row.names=row.names(table1), Prop_Vaccination=x)
+> vaxx_prop_table
+             Prop_Vaccination
+less than hs        0.7055961
+some hs             0.6965812
+HS diploma          0.7759959
+some coll           0.8236503
+assoc deg           0.8345765
+bach deg            0.9101868
+adv deg             0.9433760
+> require(ggplot2)
+> ggplot(data=vaxx_prop_table, aes(y=row.names(vaxx_prop_table), x=Prop_Vaccination, fill=row.names(vaxx_prop_table))) + 
++   geom_bar(stat="identity") + scale_fill_brewer(palette = "Dark2") +ggtitle("Proportion Of Vaccinated by Education") + theme(legend.position = "none") + labs( x="Vaccinated Proportion", y="Education Level")
+> # We created tables and bar graphs demonstrating the proportion of vaccinated people
+> # by educational level. We note the higher the educational level, the more larger the 
+> # proportion of those vaccinated. 
+> 
+> # In this following regression, we determine that the NA's are meaningful when creating the
+> # dependent variable. While we could change the variable to a factor, for simplicity
+> # we will leave it as a logical since vaxx would still be true or false and works 
+> # properly in a logit model.
+> Household_Pulse_data$vaxx <- (Household_Pulse_data$RECVDVACC == "yes got vaxx")
+> is.na(Household_Pulse_data$vaxx) <- which(Household_Pulse_data$RECVDVACC == "NA") 
+> summary(Household_Pulse_data$vaxx)
+   Mode   FALSE    TRUE    NA's 
+logical    7937   60326     851 
+> use_varb10 <- (Household_Pulse_data$REGION == "South")
+> dat_use10 <- subset(Household_Pulse_data,use_varb10) 
+> model_logit10 <- glm(vaxx ~ EEDUC + MS + RRACE  + GENID_DESCRIBE + Works_onsite*INCOME, family = binomial, data = dat_use10)
+> summary(model_logit10)
+
+Call:
+glm(formula = vaxx ~ EEDUC + MS + RRACE + GENID_DESCRIBE + Works_onsite * 
+    INCOME, family = binomial, data = dat_use10)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.9924   0.2796   0.4105   0.5878   1.4564  
+
+Coefficients:
+                                                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                                                1.04197    0.41930   2.485 0.012955 *  
+EEDUCsome hs                                              -0.05904    0.21783  -0.271 0.786356    
+EEDUCHS diploma                                            0.30645    0.18646   1.644 0.100278    
+EEDUCsome coll                                             0.60880    0.18529   3.286 0.001017 ** 
+EEDUCassoc deg                                             0.67836    0.19011   3.568 0.000359 ***
+EEDUCbach deg                                              1.29996    0.18773   6.925 4.37e-12 ***
+EEDUCadv deg                                               1.69006    0.19202   8.802  < 2e-16 ***
+MSmarried                                                 -0.14090    0.30040  -0.469 0.639032    
+MSwidowed                                                  0.51409    0.31568   1.629 0.103415    
+MSdivorced                                                -0.07293    0.30341  -0.240 0.810053    
+MSseparated                                               -0.56551    0.31806  -1.778 0.075404 .  
+MSnever                                                   -0.43908    0.30205  -1.454 0.146035    
+RRACEBlack                                                 0.01570    0.05689   0.276 0.782526    
+RRACEAsian                                                 0.95906    0.16077   5.965 2.44e-09 ***
+RRACEOther                                                -0.45036    0.09002  -5.003 5.65e-07 ***
+GENID_DESCRIBEmale                                        -0.58112    0.28267  -2.056 0.039801 *  
+GENID_DESCRIBEfemale                                      -0.72890    0.28165  -2.588 0.009655 ** 
+GENID_DESCRIBEtransgender                                 -0.65667    0.45044  -1.458 0.144885    
+GENID_DESCRIBEother                                       -1.10822    0.32776  -3.381 0.000722 ***
+Works_onsiteworked onsite                                  0.58229    0.08989   6.478 9.30e-11 ***
+Works_onsiteno                                             0.73954    0.09587   7.714 1.22e-14 ***
+INCOMEHH income less than $25k                             0.75959    0.49808   1.525 0.127248    
+INCOMEHH income $25k - $34.9k                              1.87264    0.72946   2.567 0.010254 *  
+INCOMEHH income $35k - 49.9                                2.23352    1.01890   2.192 0.028372 *  
+INCOMEHH income $50k - 74.9                                1.32012    0.53063   2.488 0.012851 *  
+INCOMEHH income $75 - 99.9                                 1.51764    0.73712   2.059 0.039505 *  
+INCOMEHH income $100k - 149                                1.86225    0.72897   2.555 0.010630 *  
+INCOMEHH income $150 - 199                                12.02148  112.43523   0.107 0.914853    
+INCOMEHH income $200k +                                    1.37608    1.03590   1.328 0.184048    
+Works_onsiteworked onsite:INCOMEHH income less than $25k  -0.81922    0.51197  -1.600 0.109567    
+Works_onsiteno:INCOMEHH income less than $25k             -1.02171    0.50825  -2.010 0.044406 *  
+Works_onsiteworked onsite:INCOMEHH income $25k - $34.9k   -1.89289    0.73892  -2.562 0.010416 *  
+Works_onsiteno:INCOMEHH income $25k - $34.9k              -1.76615    0.74053  -2.385 0.017080 *  
+Works_onsiteworked onsite:INCOMEHH income $35k - 49.9     -2.17201    1.02482  -2.119 0.034055 *  
+Works_onsiteno:INCOMEHH income $35k - 49.9                -2.00026    1.02743  -1.947 0.051551 .  
+Works_onsiteworked onsite:INCOMEHH income $50k - 74.9     -1.24304    0.53970  -2.303 0.021267 *  
+Works_onsiteno:INCOMEHH income $50k - 74.9                -0.71300    0.54715  -1.303 0.192536    
+Works_onsiteworked onsite:INCOMEHH income $75 - 99.9      -1.45607    0.74444  -1.956 0.050474 .  
+Works_onsiteno:INCOMEHH income $75 - 99.9                 -0.86285    0.75307  -1.146 0.251891    
+Works_onsiteworked onsite:INCOMEHH income $100k - 149     -1.49708    0.73647  -2.033 0.042074 *  
+Works_onsiteno:INCOMEHH income $100k - 149                -1.00836    0.74525  -1.353 0.176036    
+Works_onsiteworked onsite:INCOMEHH income $150 - 199     -11.65360  112.43531  -0.104 0.917449    
+Works_onsiteno:INCOMEHH income $150 - 199                -11.11640  112.43545  -0.099 0.921242    
+Works_onsiteworked onsite:INCOMEHH income $200k +         -0.79230    1.04541  -0.758 0.448520    
+Works_onsiteno:INCOMEHH income $200k +                     0.10013    1.06883   0.094 0.925363    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 17317  on 22411  degrees of freedom
+Residual deviance: 15663  on 22367  degrees of freedom
+  (268 observations deleted due to missingness)
+AIC: 15753
+
+Number of Fisher Scoring iterations: 12
+
+> to_be_predicted2<- data.frame(EEDUC = "some coll", MS = "separated", RRACE = "Asian", GENID_DESCRIBE = "female",
++     Works_onsite = "worked onsite", INCOME= "HH income $50k - 74.9",    data = dat_use10)
+> to_be_predicted2$yhat<-predict(model_logit10, to_be_predicted2, type="response")
+> summary(to_be_predicted2$yhat)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.8781  0.8781  0.8781  0.8781  0.8781  0.8781 
+> #Use summary of the predicted values or summing the coefficients by using  1/(1+(exp()) 
+> # produces that same probabilities, but using summary of the predicted values is easier.
+> 
+> to_be_predicted<- data.frame( EEDUC = "some coll", MS = "separated", RRACE = "Asian", 
++ GENID_DESCRIBE = "male", Works_onsite = "worked onsite", INCOME= "HH income $50k - 74.9",data = dat_use10)
+> to_be_predicted$yhat<-predict(model_logit10, to_be_predicted, type="response")
+> summary(to_be_predicted$yhat)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.8931  0.8931  0.8931  0.8931  0.8931  0.8931 
+> 
+> # Coefficient value of predicted value with respect binary vaccination level.
+> to_be_predicted2$yhat <- predict(model_logit10, to_be_predicted2)
+> summary(to_be_predicted2$yhat)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.975   1.975   1.975   1.975   1.975   1.975 
+> to_be_predicted$yhat <- predict(model_logit10, to_be_predicted)
+> summary(to_be_predicted$yhat)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  2.123   2.123   2.123   2.123   2.123   2.123 
+> 
+> # When the NA is an actually part of the string, the logit model will delete the observations. Even
+> # when the NA's are deleleted, they stil impact the regression to some degree. But, 
+> # when the NA is a factor the logit regression, the NA will still be incorporated. When not
+> # adding NA's vs. adding  NA's we cause two different outcomes in the logit regressions. When 
+> # looking at the summary, coefficients matter, the bigger the coefficients compared to other 
+> # coefficients, the larger the effect. We can see that people with advance education has a large
+> # positive coefficient of 1.69006 compared to the other variables. Demonstrating that people with advance 
+> # education are much more likely to be vaccinated. In addition, the the significance determines 
+> # whether or not there is a meaningful relationship, where we observe that advance degree is 
+> # very significant. On the other hand, people that will describe themselves as other gender 
+> # are very significant, but have a negative coefficient of -1.10822, demonstrating people from other 
+> # gender are much more likely to NOT be vaccinated. Using the predicted values (type = "response") 
+> # we can show a separated black woman with some college education that works on site and has an 
+> # income of income $50k - 74.9 has a predicted probability of 0.8781 to be vaccinated. When comparing
+> # separated black man with some college education that works on site and has an income of income 
+> # $50k - 74.9 has a predicted value of 0.8931, indicating a higher likelihood that those men are vaccinated. As well as the 
+> # Predicted coefficients (which are the predicted values without type="response") based on 
+> # the binary vaccination variable, for men in this category are higher as well. Both 
+> # indicating that married black men with some college education have a higher vaccination 
+> # rate than women.
+> 
+> #Probit regression
+> model_probit1 <- glm(vaxx ~ EEDUC + MS + RRACE  + GENID_DESCRIBE + Works_onsite*INCOME,
++                      family = binomial (link = 'probit'), data = dat_use10)
+> summary(model_probit1)
+
+Call:
+glm(formula = vaxx ~ EEDUC + MS + RRACE + GENID_DESCRIBE + Works_onsite * 
+    INCOME, family = binomial(link = "probit"), data = dat_use10)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-3.1027   0.2711   0.4114   0.5920   1.4005  
+
+Coefficients:
+                                                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)                                               0.587178   0.224299   2.618 0.008849 ** 
+EEDUCsome hs                                             -0.046332   0.131274  -0.353 0.724133    
+EEDUCHS diploma                                           0.176458   0.111998   1.576 0.115131    
+EEDUCsome coll                                            0.348203   0.111149   3.133 0.001732 ** 
+EEDUCassoc deg                                            0.389844   0.113612   3.431 0.000601 ***
+EEDUCbach deg                                             0.719939   0.111885   6.435 1.24e-10 ***
+EEDUCadv deg                                              0.912772   0.113307   8.056 7.90e-16 ***
+MSmarried                                                -0.083523   0.160721  -0.520 0.603288    
+MSwidowed                                                 0.256835   0.168053   1.528 0.126439    
+MSdivorced                                               -0.048901   0.162415  -0.301 0.763351    
+MSseparated                                              -0.326724   0.172130  -1.898 0.057680 .  
+MSnever                                                  -0.242636   0.161803  -1.500 0.133723    
+RRACEBlack                                                0.007367   0.031332   0.235 0.814116    
+RRACEAsian                                                0.491297   0.077701   6.323 2.57e-10 ***
+RRACEOther                                               -0.258392   0.051283  -5.039 4.69e-07 ***
+GENID_DESCRIBEmale                                       -0.278766   0.142569  -1.955 0.050547 .  
+GENID_DESCRIBEfemale                                     -0.358274   0.142017  -2.523 0.011644 *  
+GENID_DESCRIBEtransgender                                -0.339275   0.243014  -1.396 0.162681    
+GENID_DESCRIBEother                                      -0.595332   0.171779  -3.466 0.000529 ***
+Works_onsiteworked onsite                                 0.339249   0.051177   6.629 3.38e-11 ***
+Works_onsiteno                                            0.425769   0.053847   7.907 2.64e-15 ***
+INCOMEHH income less than $25k                            0.433751   0.269859   1.607 0.107983    
+INCOMEHH income $25k - $34.9k                             0.982758   0.334597   2.937 0.003313 ** 
+INCOMEHH income $35k - 49.9                               1.162328   0.447042   2.600 0.009321 ** 
+INCOMEHH income $50k - 74.9                               0.718031   0.264648   2.713 0.006665 ** 
+INCOMEHH income $75 - 99.9                                0.843815   0.360347   2.342 0.019197 *  
+INCOMEHH income $100k - 149                               0.947558   0.326576   2.901 0.003714 ** 
+INCOMEHH income $150 - 199                                4.004751  30.712247   0.130 0.896253    
+INCOMEHH income $200k +                                   0.694430   0.469685   1.479 0.139273    
+Works_onsiteworked onsite:INCOMEHH income less than $25k -0.475588   0.278133  -1.710 0.087279 .  
+Works_onsiteno:INCOMEHH income less than $25k            -0.582521   0.275768  -2.112 0.034655 *  
+Works_onsiteworked onsite:INCOMEHH income $25k - $34.9k  -1.001764   0.341116  -2.937 0.003317 ** 
+Works_onsiteno:INCOMEHH income $25k - $34.9k             -0.923749   0.341729  -2.703 0.006868 ** 
+Works_onsiteworked onsite:INCOMEHH income $35k - 49.9    -1.134063   0.451224  -2.513 0.011961 *  
+Works_onsiteno:INCOMEHH income $35k - 49.9               -1.034642   0.452606  -2.286 0.022256 *  
+Works_onsiteworked onsite:INCOMEHH income $50k - 74.9    -0.678847   0.270168  -2.513 0.011982 *  
+Works_onsiteno:INCOMEHH income $50k - 74.9               -0.403801   0.273348  -1.477 0.139610    
+Works_onsiteworked onsite:INCOMEHH income $75 - 99.9     -0.813819   0.364839  -2.231 0.025706 *  
+Works_onsiteno:INCOMEHH income $75 - 99.9                -0.507095   0.368559  -1.376 0.168857    
+Works_onsiteworked onsite:INCOMEHH income $100k - 149    -0.757497   0.331294  -2.286 0.022226 *  
+Works_onsiteno:INCOMEHH income $100k - 149               -0.526707   0.335176  -1.571 0.116083    
+Works_onsiteworked onsite:INCOMEHH income $150 - 199     -3.810533  30.712331  -0.124 0.901258    
+Works_onsiteno:INCOMEHH income $150 - 199                -3.576562  30.712428  -0.116 0.907293    
+Works_onsiteworked onsite:INCOMEHH income $200k +        -0.393424   0.474867  -0.828 0.407391    
+Works_onsiteno:INCOMEHH income $200k +                   -0.024977   0.482832  -0.052 0.958743    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 17317  on 22411  degrees of freedom
+Residual deviance: 15661  on 22367  degrees of freedom
+  (268 observations deleted due to missingness)
+AIC: 15751
+
+Number of Fisher Scoring iterations: 12
+
+> to_be_predicted3<- data.frame(EEDUC = "some coll", MS = "separated", RRACE = "Asian", GENID_DESCRIBE = "female",
++                        Works_onsite = "worked onsite", INCOME= "HH income $50k - 74.9",  data = dat_use10)
+> to_be_predicted3$yhat<-predict(model_probit1, to_be_predicted3, type="response")
+> summary(to_be_predicted3$yhat)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.8687  0.8687  0.8687  0.8687  0.8687  0.8687 
+> require(stargazer)
+> stargazer(model_logit10,model_probit1, type = "text")
+
+======================================================
+                              Dependent variable:     
+                          ----------------------------
+                                      vaxx            
+                             logistic       probit    
+                               (1)            (2)     
+------------------------------------------------------
+EEDUCsome hs                  -0.059        -0.046    
+                             (0.218)        (0.131)   
+                                                      
+EEDUCHS diploma               0.306          0.176    
+                             (0.186)        (0.112)   
+                                                      
+EEDUCsome coll               0.609***      0.348***   
+                             (0.185)        (0.111)   
+                                                      
+EEDUCassoc deg               0.678***      0.390***   
+                             (0.190)        (0.114)   
+                                                      
+EEDUCbach deg                1.300***      0.720***   
+                             (0.188)        (0.112)   
+                                                      
+EEDUCadv deg                 1.690***      0.913***   
+                             (0.192)        (0.113)   
+                                                      
+MSmarried                     -0.141        -0.084    
+                             (0.300)        (0.161)   
+                                                      
+MSwidowed                     0.514          0.257    
+                             (0.316)        (0.168)   
+                                                      
+MSdivorced                    -0.073        -0.049    
+                             (0.303)        (0.162)   
+                                                      
+MSseparated                  -0.566*        -0.327*   
+                             (0.318)        (0.172)   
+                                                      
+MSnever                       -0.439        -0.243    
+                             (0.302)        (0.162)   
+                                                      
+RRACEBlack                    0.016          0.007    
+                             (0.057)        (0.031)   
+                                                      
+RRACEAsian                   0.959***      0.491***   
+                             (0.161)        (0.078)   
+                                                      
+RRACEOther                  -0.450***      -0.258***  
+                             (0.090)        (0.051)   
+                                                      
+GENID_DESCRIBEmale           -0.581**       -0.279*   
+                             (0.283)        (0.143)   
+                                                      
+GENID_DESCRIBEfemale        -0.729***      -0.358**   
+                             (0.282)        (0.142)   
+                                                      
+GENID_DESCRIBEtransgender     -0.657        -0.339    
+                             (0.450)        (0.243)   
+                                                      
+GENID_DESCRIBEother         -1.108***      -0.595***  
+                             (0.328)        (0.172)   
+                                                      
+Works_onsiteworked onsite    0.582***      0.339***   
+                             (0.090)        (0.051)   
+                                                      
+Works_onsiteno               0.740***      0.426***   
+                             (0.096)        (0.054)   
+                                                      
+25k                           0.760          0.434    
+                             (0.498)        (0.270)   
+                                                      
+34.9k                        1.873**       0.983***   
+                             (0.729)        (0.335)   
+                                                      
+35k - 49.9                   2.234**       1.162***   
+                             (1.019)        (0.447)   
+                                                      
+50k - 74.9                   1.320**       0.718***   
+                             (0.531)        (0.265)   
+                                                      
+75 - 99.9                    1.518**        0.844**   
+                             (0.737)        (0.360)   
+                                                      
+100k - 149                   1.862**       0.948***   
+                             (0.729)        (0.327)   
+                                                      
+150 - 199                     12.021         4.005    
+                            (112.435)      (30.712)   
+                                                      
+200k +                        1.376          0.694    
+                             (1.036)        (0.470)   
+                                                      
+25k                           -0.819        -0.476*   
+                             (0.512)        (0.278)   
+                                                      
+25k                          -1.022**      -0.583**   
+                             (0.508)        (0.276)   
+                                                      
+34.9k                        -1.893**      -1.002***  
+                             (0.739)        (0.341)   
+                                                      
+34.9k                        -1.766**      -0.924***  
+                             (0.741)        (0.342)   
+                                                      
+35k - 49.9                   -2.172**      -1.134**   
+                             (1.025)        (0.451)   
+                                                      
+35k - 49.9                   -2.000*       -1.035**   
+                             (1.027)        (0.453)   
+                                                      
+50k - 74.9                   -1.243**      -0.679**   
+                             (0.540)        (0.270)   
+                                                      
+50k - 74.9                    -0.713        -0.404    
+                             (0.547)        (0.273)   
+                                                      
+75 - 99.9                    -1.456*       -0.814**   
+                             (0.744)        (0.365)   
+                                                      
+75 - 99.9                     -0.863        -0.507    
+                             (0.753)        (0.369)   
+                                                      
+100k - 149                   -1.497**      -0.757**   
+                             (0.736)        (0.331)   
+                                                      
+100k - 149                    -1.008        -0.527    
+                             (0.745)        (0.335)   
+                                                      
+150 - 199                    -11.654        -3.811    
+                            (112.435)      (30.712)   
+                                                      
+150 - 199                    -11.116        -3.577    
+                            (112.435)      (30.712)   
+                                                      
+200k +                        -0.792        -0.393    
+                             (1.045)        (0.475)   
+                                                      
+200k +                        0.100         -0.025    
+                             (1.069)        (0.483)   
+                                                      
+Constant                     1.042**       0.587***   
+                             (0.419)        (0.224)   
+                                                      
+------------------------------------------------------
+Observations                  22,412        22,412    
+Log Likelihood              -7,831.345    -7,830.342  
+Akaike Inf. Crit.           15,752.690    15,750.680  
+======================================================
+Note:                      *p<0.1; **p<0.05; ***p<0.01
+> stargazer(to_be_predicted2,to_be_predicted3, type = "text")
+
+=================================================================================
+Statistic                   N      Mean    St. Dev.  Min  Pctl(25) Pctl(75)  Max 
+---------------------------------------------------------------------------------
+data.TBIRTH_YEAR          22,680 1,967.523  15.804  1,933  1,955    1,980   2,003
+data.Num_kids_Pub_School  4,587    1.683    0.866   0.000  1.000    2.000   4.000
+data.Num_kids_Priv_School  960     1.075    0.745   0.000  1.000    2.000   2.000
+data.Num_kids_homeschool   591     0.870    0.795   0.000  0.000    2.000   2.000
+data.vaxx                 22,412   0.870    0.336   0.000  1.000    1.000   1.000
+yhat                      22,680   1.975    0.000   1.975  1.975    1.975   1.975
+---------------------------------------------------------------------------------
+
+=================================================================================
+Statistic                   N      Mean    St. Dev.  Min  Pctl(25) Pctl(75)  Max 
+---------------------------------------------------------------------------------
+data.TBIRTH_YEAR          22,680 1,967.523  15.804  1,933  1,955    1,980   2,003
+data.Num_kids_Pub_School  4,587    1.683    0.866   0.000  1.000    2.000   4.000
+data.Num_kids_Priv_School  960     1.075    0.745   0.000  1.000    2.000   2.000
+data.Num_kids_homeschool   591     0.870    0.795   0.000  0.000    2.000   2.000
+data.vaxx                 22,412   0.870    0.336   0.000  1.000    1.000   1.000
+yhat                      22,680   0.869    0.000   0.869  0.869    0.869   0.869
+---------------------------------------------------------------------------------
+> # The probit model is similar to the logit, where most of the levels of significance remain 
+> # similar, although the coefficients seem to vary. For example, the coefficients in probit 
+> # are closer to 0 than logit coefficients. Additionally, we observe the predicted values for 
+> # separated black woman with some college education that works on site and has an 
+> # income of income $50k - 74.9 in yhat of the stargazer summary, where they vary by only 
+> # 1 percentage point from 0.869 to 0.878. Ultimately, logit and probit give very similar
+> # results.
+> 
+> # Now we will split the train and test data to predict the accuracy.
+> set.seed(1)
+> index<-sample(x=2,size=nrow(dat_use10),replace=TRUE,prob=c(0.7,0.3))
+> train<-dat_use10[index==1,]
+> test<-dat_use10[index==2,]
+> dim(dat_use10)
+[1] 22680    46
+> dim(train)
+[1] 15858    46
+> dim(test)
+[1] 6822   46
+> trainmodel<-glm(vaxx ~ EEDUC + MS + RRACE  + GENID_DESCRIBE + Works_onsite*INCOME,
++                 family = binomial, data = dat_use10)
+> prob<-predict(object=trainmodel,newdata=test,type="response")
+> pred<-cbind(test,prob)
+> pred<-transform(pred,predict=ifelse(prob<=0.5,0,1))
+> ta<-table(pred$vaxx,pred$predict)
+> ta
+       
+           0    1
+  FALSE    8  831
+  TRUE     6 5908
+> sum_diag<-sum(diag(ta))
+> sum<-sum(ta)
+> sum_diag/sum
+[1] 0.8760551
+> # An 87.5% accuracy of predicting correctly.
+> 
+> # Initially thought this was a logit graph but actually predicts accuracy and confidence.
+> # We cannot use with dependent variables that are factors and cannot have NA's.
+> Household_Pulse_data$vaxx <- (Household_Pulse_data$RECVDVACC == "yes got vaxx")
+> use_varb0 <- (Household_Pulse_data$REGION == "South")
+> dat_use0 <- subset(Household_Pulse_data,use_varb0) 
+> model_logit0 <- glm(vaxx ~  EEDUC + MS + RRACE+ GENID_DESCRIBE, family = binomial, data = dat_use0)
+> summary(model_logit0)
+
+Call:
+glm(formula = vaxx ~ EEDUC + MS + RRACE + GENID_DESCRIBE, family = binomial, 
+    data = dat_use0)
+
+Deviance Residuals: 
+    Min       1Q   Median       3Q      Max  
+-2.6836   0.3204   0.4299   0.6082   2.1655  
+
+Coefficients:
+                          Estimate Std. Error z value Pr(>|z|)    
+(Intercept)               -2.18364    0.23278  -9.381  < 2e-16 ***
+EEDUCsome hs              -0.06023    0.21652  -0.278 0.780901    
+EEDUCHS diploma            0.35458    0.18578   1.909 0.056318 .  
+EEDUCsome coll             0.69632    0.18413   3.782 0.000156 ***
+EEDUCassoc deg             0.75957    0.18856   4.028 5.62e-05 ***
+EEDUCbach deg              1.50054    0.18558   8.086 6.18e-16 ***
+EEDUCadv deg               1.90845    0.18818  10.141  < 2e-16 ***
+MSmarried                  1.75667    0.15996  10.982  < 2e-16 ***
+MSwidowed                  2.36571    0.18531  12.766  < 2e-16 ***
+MSdivorced                 1.71998    0.16602  10.360  < 2e-16 ***
+MSseparated                1.19155    0.19195   6.208 5.38e-10 ***
+MSnever                    1.33909    0.16415   8.158 3.41e-16 ***
+RRACEBlack                -0.03170    0.05514  -0.575 0.565320    
+RRACEAsian                 0.83061    0.15005   5.535 3.11e-08 ***
+RRACEOther                -0.51993    0.08709  -5.970 2.37e-09 ***
+GENID_DESCRIBEmale         1.46269    0.14364  10.183  < 2e-16 ***
+GENID_DESCRIBEfemale       1.26117    0.14174   8.898  < 2e-16 ***
+GENID_DESCRIBEtransgender  1.31313    0.37576   3.495 0.000475 ***
+GENID_DESCRIBEother        0.72829    0.21429   3.399 0.000677 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 18390  on 22679  degrees of freedom
+Residual deviance: 16779  on 22661  degrees of freedom
+AIC: 16817
+
+Number of Fisher Scoring iterations: 5
+
+> summary(model_logit0$fitted)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+0.08715 0.81740 0.89270 0.85974 0.92664 0.98768 
+> summary(dat_use0$vaxx)
+   Mode   FALSE    TRUE 
+logical    3181   19499 
+> pred_model_logit0 <- (model_logit0$fitted > 0.5)
+> table(pred_model_logit0, dat_use0$vaxx)
+                 
+pred_model_logit0 FALSE  TRUE
+            FALSE   170    98
+            TRUE   3011 19401
+> frac_correct_l1a <- mean(as.numeric(as.numeric(pred_model_logit0) == dat_use0$vaxx))
+> pred_model_logit1b <- (model_logit0$fitted > mean(dat_use0$vaxx))
+> table(pred_model_logit1b, dat_use0$vaxx)
+                  
+pred_model_logit1b FALSE  TRUE
+             FALSE  2259  7815
+             TRUE    922 11684
+> frac_correct_l1b <- mean(as.numeric(as.numeric(pred_model_logit1b) == dat_use0$vaxx))
+> # examine how different cut-off values change predictive accuracy
+> frac_correct_try <- rep(0,140)
+> for (indx in 1:140) {
++   pred_model_indx <- (model_logit0$fitted > (indx/200) )
++   frac_correct_try[indx] <- mean(as.numeric(as.numeric(pred_model_indx) == dat_use0$vaxx))
++ }
+> plot((seq(140)/200),frac_correct_try)
+> 
+> #This is predicting the accuracy, version of r squared, x axis is confidence, y axis is accuracy.
+> # The best accuracy 0.864 with a confidence of 0.45. 
+> 
+> require(pROC)
+> roc_curve<-roc(test$vaxx,prob)
+Setting levels: control = FALSE, case = TRUE
+Setting direction: controls < cases
+> x<-1-roc_curve$specificities
+> y<-roc_curve$sensitivities
+> plot(x=x,y=y,xlim=c(0,1),ylim=c(0,1),xlab="1-specificity",
++      ylab="sensitivity",main="ROC Curve",type="l",lwd=2)
+> abline(a=0,b=1,col="grey")
+> auc<-roc_curve$auc
+> text(0.5,0.4,paste("AUC",round(auc,digits=2)),col="blue")
+> # the accuracy of the model is 0.75.
+> 
+> # We can create a plot and values of those vaccinated based on the year they were born.
+> Household_Pulse_data$vaxx <- (Household_Pulse_data$RECVDVACC == "yes got vaxx")
+> summary(Household_Pulse_data$vaxx)
+   Mode   FALSE    TRUE 
+logical    8788   60326 
+> is.na(Household_Pulse_data$vaxx) <- which(Household_Pulse_data$RECVDVACC == "NA")
+> summary(Household_Pulse_data$vaxx)
+   Mode   FALSE    TRUE    NA's 
+logical    7937   60326     851 
+> Household_Pulse_data$vaxx <- as.factor(Household_Pulse_data$vaxx)
+> summary(Household_Pulse_data$vaxx)
+FALSE  TRUE  NA's 
+ 7937 60326   851 
+> levels(Household_Pulse_data$vaxx)
+[1] "FALSE" "TRUE" 
+> levels(Household_Pulse_data$vaxx) <- c("No","Yes")
+> summary(Household_Pulse_data$vaxx)
+   No   Yes  NA's 
+ 7937 60326   851 
+> use_varb3 <- (Household_Pulse_data$REGION == "South")
+> dat_use3 <- subset(Household_Pulse_data,use_varb3) 
+> NNobs <- length(dat_use3$vaxx)
+> set.seed(1) 
+> graph_obs <- (runif(NNobs) < 0.9) 
+> dat_graph <-subset(dat_use3,graph_obs)  
+> plot(vaxx ~ TBIRTH_YEAR, pch = 16, ylim = c(0,1), data = dat_graph, main = "Vaccination By Birth Year", xlab = "Birth Year", ylab = "Vaccination", col = c("blue","grey"))
+> # We see the older a person is, the more likely they are to be vaccinated.
+
+
